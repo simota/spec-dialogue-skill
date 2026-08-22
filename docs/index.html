@@ -1,0 +1,714 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Spec Dialogue · Skill Reference</title>
+<meta name="description" content="Six phases, seven gate dimensions and two locked documents: how the Spec Dialogue Agent Skill turns a rough feature idea into a specification and the acceptance tests that decide it.">
+<meta name="color-scheme" content="light dark">
+<meta property="og:title" content="Spec Dialogue · Skill Reference">
+<meta property="og:description" content="The dialogue is the work. The document is its crystallized output.">
+<meta property="og:type" content="website">
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Ctext y='.9em' font-size='90'%3E%F0%9F%97%A3%EF%B8%8F%3C/text%3E%3C/svg%3E">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Archivo:wght@500;600;700;800&family=JetBrains+Mono:wght@400;600&family=Zen+Kaku+Gothic+New:wght@400;500;700&display=swap">
+
+<style>
+:root{
+  --ground:#E7E9E4;
+  --surface:#F3F4F0;
+  --surface-2:#DDE0DA;
+  --ink:#141C22;
+  --muted:#5C6A70;
+  --faint:#8A959A;
+  --line:rgba(20,28,34,.16);
+  --line-soft:rgba(20,28,34,.08);
+  --gate:#9E3B26;
+  --gate-bg:rgba(158,59,38,.10);
+  --doc:#14615C;
+  --doc-bg:rgba(20,97,92,.10);
+  --warn:#8C6714;
+  --warn-bg:rgba(140,103,20,.12);
+  --shadow:0 1px 0 rgba(20,28,34,.06);
+
+  --f-display:"Archivo",-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;
+  --f-body:"Zen Kaku Gothic New","Archivo",-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;
+  --f-mono:"JetBrains Mono",ui-monospace,SFMono-Regular,Menlo,Consolas,monospace;
+}
+@media (prefers-color-scheme: dark){
+  :root:not([data-theme="light"]){
+    --ground:#101519; --surface:#171E23; --surface-2:#1F272D;
+    --ink:#DBE2E2; --muted:#8D9B9D; --faint:#6C787B;
+    --line:rgba(219,226,226,.17); --line-soft:rgba(219,226,226,.08);
+    --gate:#E07B5F; --gate-bg:rgba(224,123,95,.13);
+    --doc:#4FAEA5; --doc-bg:rgba(79,174,165,.13);
+    --warn:#D2A63F; --warn-bg:rgba(210,166,63,.14);
+    --shadow:0 1px 0 rgba(0,0,0,.35);
+  }
+}
+:root[data-theme="dark"]{
+  --ground:#101519; --surface:#171E23; --surface-2:#1F272D;
+  --ink:#DBE2E2; --muted:#8D9B9D; --faint:#6C787B;
+  --line:rgba(219,226,226,.17); --line-soft:rgba(219,226,226,.08);
+  --gate:#E07B5F; --gate-bg:rgba(224,123,95,.13);
+  --doc:#4FAEA5; --doc-bg:rgba(79,174,165,.13);
+  --warn:#D2A63F; --warn-bg:rgba(210,166,63,.14);
+  --shadow:0 1px 0 rgba(0,0,0,.35);
+}
+
+*{box-sizing:border-box}
+html{-webkit-text-size-adjust:100%}
+body{
+  margin:0;background:var(--ground);color:var(--ink);font-family:var(--f-body);
+  font-size:15px;line-height:1.75;-webkit-font-smoothing:antialiased;
+}
+.wrap{max-width:1180px;margin:0 auto;padding:0 28px 96px}
+
+/* ---------- masthead ---------- */
+.mast{padding:56px 0 30px;border-bottom:1px solid var(--line)}
+.eyebrow{font-family:var(--f-mono);font-size:11px;letter-spacing:.16em;text-transform:uppercase;color:var(--gate);margin:0 0 14px}
+h1{font-family:var(--f-display);font-weight:800;font-size:clamp(38px,6.4vw,72px);line-height:.98;letter-spacing:-.025em;margin:0;text-wrap:balance}
+h1 .sub{display:block;font-size:clamp(15px,2vw,20px);font-weight:600;letter-spacing:.01em;color:var(--muted);margin-top:16px;line-height:1.5}
+.lede{max-width:66ch;color:var(--muted);margin:24px 0 0;font-size:15.5px}
+.facts{display:flex;flex-wrap:wrap;gap:0;margin:30px 0 0;border-top:1px solid var(--line-soft)}
+.fact{flex:1 1 150px;padding:16px 20px 14px;border-right:1px solid var(--line-soft)}
+.fact:last-child{border-right:0}
+.fact b{display:block;font-family:var(--f-display);font-weight:700;font-size:26px;letter-spacing:-.02em;font-variant-numeric:tabular-nums}
+.fact span{display:block;font-size:11.5px;color:var(--faint);font-family:var(--f-mono);letter-spacing:.06em;text-transform:uppercase}
+
+/* ---------- nav ---------- */
+nav.jump{position:sticky;top:0;z-index:20;background:var(--ground);border-bottom:1px solid var(--line);margin-bottom:8px;display:flex;gap:2px;overflow-x:auto;scrollbar-width:thin}
+nav.jump a{font-family:var(--f-mono);font-size:11.5px;letter-spacing:.05em;text-transform:uppercase;color:var(--muted);text-decoration:none;padding:13px 12px;white-space:nowrap;border-bottom:2px solid transparent}
+nav.jump a:hover{color:var(--ink);border-bottom-color:var(--gate)}
+nav.jump a:focus-visible{outline:2px solid var(--gate);outline-offset:-3px}
+
+/* ---------- sections ---------- */
+section{padding:52px 0 8px;border-top:1px solid var(--line-soft);scroll-margin-top:56px}
+section:first-of-type{border-top:0}
+h2{font-family:var(--f-display);font-weight:700;font-size:26px;letter-spacing:-.015em;margin:0 0 6px;display:flex;align-items:baseline;gap:12px;text-wrap:balance}
+h2 .num{font-family:var(--f-mono);font-size:12px;font-weight:600;color:var(--gate);letter-spacing:.1em}
+.sec-note{color:var(--muted);max-width:74ch;margin:0 0 26px;font-size:14.5px}
+h3{font-family:var(--f-display);font-weight:700;font-size:16px;letter-spacing:.01em;margin:30px 0 10px}
+.sub-lab{margin:22px 0 8px;font-size:12px;font-family:var(--f-mono);letter-spacing:.1em;text-transform:uppercase;color:var(--faint);font-weight:600}
+
+/* ---------- figure ---------- */
+figure{margin:0 0 8px;padding:0}
+.scroll{overflow-x:auto;padding-bottom:6px}
+figure svg{display:block;min-width:760px;max-width:100%;height:auto;color:var(--ink)}
+figcaption{color:var(--faint);font-size:12.5px;margin-top:12px;max-width:78ch;line-height:1.65}
+
+/* ---------- panels ---------- */
+.cols{display:grid;grid-template-columns:1fr 1fr;gap:26px}
+@media(max-width:760px){.cols{grid-template-columns:1fr}}
+.panel{background:var(--surface);border:1px solid var(--line);border-radius:2px;padding:20px 22px 22px;box-shadow:var(--shadow)}
+.panel h3{margin-top:0}
+.panel ul{margin:0;padding-left:18px}
+.panel li{margin:6px 0;font-size:14px}
+.panel.no{border-left:3px solid var(--line)}
+.panel.yes{border-left:3px solid var(--gate)}
+.panel.doc{border-left:3px solid var(--doc)}
+.panel .meta{font-family:var(--f-mono);font-size:11px;letter-spacing:.08em;text-transform:uppercase;color:var(--faint);margin:0 0 10px}
+
+/* ---------- phase cards ---------- */
+.phases{display:grid;gap:14px}
+.pc{background:var(--surface);border:1px solid var(--line);border-radius:2px;display:grid;grid-template-columns:118px 1fr 330px;box-shadow:var(--shadow)}
+@media(max-width:900px){.pc{grid-template-columns:1fr}}
+.pc-id{padding:18px 16px;border-right:1px solid var(--line-soft);display:flex;flex-direction:column;gap:6px}
+@media(max-width:900px){.pc-id{border-right:0;border-bottom:1px solid var(--line-soft);flex-direction:row;align-items:center}}
+.pc-id .k{font-family:var(--f-mono);font-size:11px;font-weight:600;letter-spacing:.1em;color:var(--gate)}
+.pc-id .n{font-family:var(--f-mono);font-size:10.5px;letter-spacing:.04em;color:var(--doc);background:var(--doc-bg);padding:2px 6px;border-radius:2px;align-self:flex-start}
+.pc-body{padding:18px 22px;min-width:0}
+.pc-body h4{font-family:var(--f-display);font-weight:700;font-size:17px;margin:0 0 4px;letter-spacing:-.005em}
+.pc-body .focus{color:var(--muted);font-size:13.5px;margin:0 0 12px;line-height:1.65}
+.rows{list-style:none;margin:0;padding:0;display:flex;flex-wrap:wrap;gap:6px}
+.rows li{font-family:var(--f-mono);font-size:11.5px;padding:3px 8px;border:1px solid var(--line);border-radius:2px;color:var(--ink);background:var(--ground)}
+.rows li[data-req="cond"]{color:var(--muted);border-style:dashed}
+.pc-gate{padding:18px 20px;border-left:1px solid var(--line-soft);background:var(--gate-bg);min-width:0}
+@media(max-width:900px){.pc-gate{border-left:0;border-top:1px solid var(--line-soft)}}
+.pc-gate .lab{font-family:var(--f-mono);font-size:10px;letter-spacing:.13em;text-transform:uppercase;color:var(--gate);display:block;margin-bottom:7px}
+.pc-gate p{margin:0;font-size:12.5px;line-height:1.65;color:var(--ink)}
+.pc-gate .writes{margin-top:10px;font-size:12px;color:var(--muted);line-height:1.6;border-top:1px dashed var(--line);padding-top:8px}
+.pc-gate .writes b{font-family:var(--f-mono);font-size:10px;letter-spacing:.1em;text-transform:uppercase;color:var(--faint);font-weight:600;display:block}
+
+/* ---------- tables ---------- */
+.tw{overflow-x:auto;border:1px solid var(--line);border-radius:2px;background:var(--surface)}
+table{border-collapse:collapse;width:100%;min-width:620px;font-size:13.5px}
+th,td{text-align:left;padding:10px 14px;border-bottom:1px solid var(--line-soft);vertical-align:top}
+thead th{font-family:var(--f-mono);font-size:10.5px;letter-spacing:.1em;text-transform:uppercase;color:var(--faint);font-weight:600;background:var(--surface-2);border-bottom:1px solid var(--line)}
+tbody tr:last-child td{border-bottom:0}
+code{font-family:var(--f-mono);font-size:12.5px;background:var(--surface-2);padding:1px 5px;border-radius:2px}
+.tw code{background:transparent;padding:0;color:var(--doc);font-size:12px}
+.num-c{font-variant-numeric:tabular-nums;white-space:nowrap}
+.tag{font-family:var(--f-mono);font-size:10.5px;letter-spacing:.05em;padding:2px 7px;border-radius:2px;white-space:nowrap}
+.tag.req{color:var(--gate);background:var(--gate-bg)}
+.tag.cond{color:var(--muted);background:var(--surface-2)}
+.tag.doc{color:var(--doc);background:var(--doc-bg)}
+.tag.warn{color:var(--warn);background:var(--warn-bg)}
+
+pre{font-family:var(--f-mono);font-size:12.5px;line-height:1.7;background:var(--surface);border:1px solid var(--line);border-left:3px solid var(--doc);border-radius:2px;padding:16px 18px;overflow-x:auto;margin:0}
+.callout{border-left:3px solid var(--gate);background:var(--gate-bg);padding:14px 18px;margin:22px 0 0;font-size:14px;line-height:1.7;border-radius:0 2px 2px 0}
+.callout b{font-weight:700}
+.callout.q{border-left-color:var(--doc);background:var(--doc-bg)}
+
+.rule-list{list-style:none;margin:0;padding:0;display:grid;gap:10px}
+.rule-list li{padding-left:44px;position:relative;font-size:14px;line-height:1.7;color:var(--muted)}
+.rule-list li::before{content:attr(data-n);position:absolute;left:0;top:2px;font-family:var(--f-mono);font-size:10.5px;color:var(--gate);font-weight:600}
+.rule-list li b{color:var(--ink);font-weight:700}
+
+footer{border-top:1px solid var(--line);margin-top:56px;padding-top:22px;color:var(--faint);font-size:12.5px;line-height:1.8}
+footer code{background:transparent;padding:0}
+a{color:var(--gate)}
+a:focus-visible{outline:2px solid var(--gate);outline-offset:2px}
+@media(prefers-reduced-motion:reduce){*{transition:none!important;animation:none!important}}
+</style>
+</head>
+<body>
+
+<div class="wrap">
+
+<header class="mast">
+  <p class="eyebrow">Agent Skill / rough idea → locked specification</p>
+  <h1>Spec Dialogue<span class="sub">The dialogue is the work. The document is its crystallized output.</span></h1>
+  <p class="lede">Six phases, checkpoints an autonomous caller cannot skip, a seven-dimension quality gate, a panel of skeptics prompted to kill the spec, and an explicit human sign-off. What leaves at the end is a pair of documents: the specification, and the acceptance tests that decide whether it was met. It writes no code and runs no tests.</p>
+  <div class="facts">
+    <div class="fact"><b>6</b><span>phases</span></div>
+    <div class="fact"><b>18</b><span>analytical lenses</span></div>
+    <div class="fact"><b>7</b><span>gate dimensions</span></div>
+    <div class="fact"><b>4</b><span>claims attacked</span></div>
+    <div class="fact"><b>2</b><span>locked documents</span></div>
+    <div class="fact"><b>0</b><span>lines of code</span></div>
+  </div>
+</header>
+
+<nav class="jump">
+  <a href="#overview">Overview</a>
+  <a href="#when">When to use</a>
+  <a href="#depth">Depth</a>
+  <a href="#phases">Phases</a>
+  <a href="#documents">Documents</a>
+  <a href="#trace">Traceability</a>
+  <a href="#gate">Quality gate</a>
+  <a href="#panel">Refutation panel</a>
+  <a href="#lock">What blocks a lock</a>
+  <a href="#handoff">Handoff</a>
+  <a href="#dialogue">Dialogue rules</a>
+  <a href="#install">Install</a>
+  <a href="#traps">Gotchas</a>
+</nav>
+
+<!-- ========== 1. OVERVIEW ========== -->
+<section id="overview">
+  <h2><span class="num">01</span>The dialogue, including the way back</h2>
+  <p class="sec-note">The forward path is the easy half. What this figure exists to show is the <strong>return edges</strong> — where a circling dialogue, a gate finding and a successful refutation each send the work. Every phase boundary carries a checkpoint, and a checkpoint is part of the contract rather than a mode setting: an autonomous caller stops at it too.</p>
+
+  <figure>
+    <div class="scroll">
+    <svg viewBox="0 0 1200 440" role="img" aria-label="Spec Dialogue flow. FRAME, EXPAND, CHALLENGE, SHAPE, SPECIFY and LOCK run left to right, each preceded by a checkpoint. A dialogue that circles for two rounds returns from CHALLENGE to EXPAND; a Quality Gate finding returns from LOCK to SPECIFY; a refutation carried on evidence returns to CHALLENGE or SPECIFY. LOCK emits the locked spec and its acceptance test specification together. A downstream build that finds a must-have criterion unbuildable re-enters at SPECIFY.">
+      <defs>
+        <marker id="ar" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path d="M0,1 L9,5 L0,9 z" fill="currentColor"/></marker>
+        <marker id="arG" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path d="M0,1 L9,5 L0,9 z" fill="#9E3B26"/></marker>
+      </defs>
+
+      <text x="20" y="26" font-family="'JetBrains Mono',monospace" font-size="10" fill="currentColor" opacity=".55" letter-spacing=".04em">invoke · spec-dialogue [depth=…]</text>
+
+      <!-- checkpoint chips -->
+      <g>
+        <rect x="20"   y="44" width="170" height="24" rx="1" fill="#9E3B26" fill-opacity=".10" stroke="#9E3B26" stroke-width="1" stroke-dasharray="4 3"/>
+        <rect x="215"  y="44" width="170" height="24" rx="1" fill="#9E3B26" fill-opacity=".10" stroke="#9E3B26" stroke-width="1" stroke-dasharray="4 3"/>
+        <rect x="410"  y="44" width="170" height="24" rx="1" fill="#9E3B26" fill-opacity=".10" stroke="#9E3B26" stroke-width="1" stroke-dasharray="4 3"/>
+        <rect x="605"  y="44" width="170" height="24" rx="1" fill="#9E3B26" fill-opacity=".10" stroke="#9E3B26" stroke-width="1" stroke-dasharray="4 3"/>
+        <rect x="800"  y="44" width="170" height="24" rx="1" fill="#9E3B26" fill-opacity=".10" stroke="#9E3B26" stroke-width="1" stroke-dasharray="4 3"/>
+        <rect x="995"  y="44" width="170" height="24" rx="1" fill="#9E3B26" fill-opacity=".10" stroke="#9E3B26" stroke-width="1" stroke-dasharray="4 3"/>
+      </g>
+      <g font-family="'JetBrains Mono',monospace" font-size="9.5" fill="#9E3B26" text-anchor="middle">
+        <text x="105"  y="60">✓ problem confirmed</text>
+        <text x="300"  y="60">✓ steer the options</text>
+        <text x="495"  y="60">✓ the explicit pick</text>
+        <text x="690"  y="60">✓ edit the proposal</text>
+        <text x="885"  y="60">✓ section by section</text>
+        <text x="1080" y="60">✓ sign-off + build path</text>
+      </g>
+      <g stroke="#9E3B26" stroke-width="1" fill="none" marker-end="url(#arG)" opacity=".8">
+        <line x1="105" y1="68" x2="105" y2="92"/><line x1="300" y1="68" x2="300" y2="92"/>
+        <line x1="495" y1="68" x2="495" y2="92"/><line x1="690" y1="68" x2="690" y2="92"/>
+        <line x1="885" y1="68" x2="885" y2="92"/><line x1="1080" y1="68" x2="1080" y2="92"/>
+      </g>
+
+      <!-- phase boxes -->
+      <g>
+        <rect x="20" y="96" width="170" height="58" rx="1" fill="none" stroke="currentColor" stroke-width="1.4"/>
+        <text x="34" y="120" font-family="Archivo,sans-serif" font-weight="700" font-size="13" fill="currentColor">0 · FRAME</text>
+        <text x="34" y="139" font-family="'JetBrains Mono',monospace" font-size="10" fill="currentColor" opacity=".6">problem before solution</text>
+
+        <rect x="215" y="96" width="170" height="58" rx="1" fill="none" stroke="currentColor" stroke-width="1.4"/>
+        <text x="229" y="120" font-family="Archivo,sans-serif" font-weight="700" font-size="13" fill="currentColor">1 · EXPAND</text>
+        <text x="229" y="139" font-family="'JetBrains Mono',monospace" font-size="10" fill="currentColor" opacity=".6">3–5 directions</text>
+
+        <rect x="410" y="96" width="170" height="58" rx="1" fill="none" stroke="currentColor" stroke-width="1.4"/>
+        <text x="424" y="120" font-family="Archivo,sans-serif" font-weight="700" font-size="13" fill="currentColor">2 · CHALLENGE</text>
+        <text x="424" y="139" font-family="'JetBrains Mono',monospace" font-size="10" fill="currentColor" opacity=".6">four pressures, one pick</text>
+
+        <rect x="605" y="96" width="170" height="58" rx="1" fill="none" stroke="currentColor" stroke-width="1.4"/>
+        <text x="619" y="120" font-family="Archivo,sans-serif" font-weight="700" font-size="13" fill="currentColor">3 · SHAPE</text>
+        <text x="619" y="139" font-family="'JetBrains Mono',monospace" font-size="10" fill="currentColor" opacity=".6">structured proposal</text>
+
+        <rect x="800" y="96" width="170" height="58" rx="1" fill="none" stroke="currentColor" stroke-width="1.4"/>
+        <text x="814" y="120" font-family="Archivo,sans-serif" font-weight="700" font-size="13" fill="currentColor">4 · SPECIFY</text>
+        <text x="814" y="139" font-family="'JetBrains Mono',monospace" font-size="10" fill="currentColor" opacity=".6">L0→L3 + TC-n</text>
+
+        <rect x="995" y="96" width="170" height="58" rx="1" fill="#9E3B26" fill-opacity=".10" stroke="#9E3B26" stroke-width="1.4"/>
+        <text x="1009" y="120" font-family="Archivo,sans-serif" font-weight="700" font-size="13" fill="#9E3B26">5 · LOCK</text>
+        <text x="1009" y="139" font-family="'JetBrains Mono',monospace" font-size="10" fill="#9E3B26" opacity=".85">gate · panel · sign-off</text>
+      </g>
+      <g stroke="currentColor" stroke-width="1.4" fill="none" marker-end="url(#ar)">
+        <line x1="190" y1="125" x2="211" y2="125"/><line x1="385" y1="125" x2="406" y2="125"/>
+        <line x1="580" y1="125" x2="601" y2="125"/><line x1="775" y1="125" x2="796" y2="125"/>
+        <line x1="970" y1="125" x2="991" y2="125"/>
+      </g>
+
+      <!-- return edges -->
+      <g stroke="#9E3B26" stroke-width="1.5" fill="none" marker-end="url(#arG)">
+        <polyline points="460,154 460,208 300,208 300,158"/>
+        <polyline points="1060,154 1060,250 885,250 885,158"/>
+        <polyline points="1100,154 1100,296 530,296 530,158"/>
+      </g>
+      <g font-family="'JetBrains Mono',monospace" font-size="9.5" fill="#9E3B26">
+        <text x="380" y="226" text-anchor="middle">circling ≥ 2 rounds → re-diverge, or park it</text>
+        <text x="918" y="268" text-anchor="middle">Quality-Gate finding → fix, or downgrade to an OQ</text>
+        <text x="815" y="314" text-anchor="middle">majority refuted on evidence → CHALLENGE or SPECIFY</text>
+      </g>
+
+      <!-- downstream re-entry -->
+      <g>
+        <rect x="20" y="336" width="190" height="30" rx="1" fill="none" stroke="currentColor" stroke-width="1.1" stroke-dasharray="4 3" opacity=".65"/>
+        <text x="115" y="356" text-anchor="middle" font-family="'JetBrains Mono',monospace" font-size="10.5" fill="currentColor" opacity=".8">downstream build</text>
+      </g>
+      <g stroke="currentColor" stroke-width="1.2" fill="none" marker-end="url(#ar)" opacity=".7" stroke-dasharray="4 3">
+        <polyline points="115,336 115,182 830,182 830,158"/>
+      </g>
+      <text x="20" y="384" font-family="'JetBrains Mono',monospace" font-size="9" fill="currentColor" opacity=".6">must-have AC unbuildable as written → re-enters at SPECIFY</text>
+
+      <!-- output -->
+      <g stroke="currentColor" stroke-width="1.4" fill="none" marker-end="url(#ar)">
+        <polyline points="1180,154 1180,330 1120,330 1120,349"/>
+      </g>
+      <g>
+        <rect x="995" y="352" width="185" height="56" rx="1" fill="currentColor" fill-opacity=".07" stroke="currentColor" stroke-width="1.4"/>
+        <text x="1087" y="374" text-anchor="middle" font-family="Archivo,sans-serif" font-weight="700" font-size="12" fill="currentColor">LOCKED PAIR</text>
+        <text x="1087" y="392" text-anchor="middle" font-family="'JetBrains Mono',monospace" font-size="9.5" fill="currentColor" opacity=".7">spec + acceptance tests</text>
+      </g>
+      <text x="1110" y="344" text-anchor="end" font-family="'JetBrains Mono',monospace" font-size="9" fill="currentColor" opacity=".55">promoted together</text>
+    </svg>
+    </div>
+    <figcaption>Dashed chips are the checkpoints; oxide-red edges send work back. A dialogue that circles twice without new information is offered a choice — lock the leading candidate, or park the disagreement as an Open Question — rather than looping forever. A Quality-Gate finding is fixed or explicitly downgraded, never silently passed. A refutation blocks only when it is carried <em>on evidence</em>; unproven-because-new routes to <code>LOCK-with-flag</code>.</figcaption>
+  </figure>
+
+  <div class="callout"><b>A confirmed checkpoint is not a rubber stamp.</b> A checkpoint presentation fits about fifteen lines and shows the delta since the last turn, because an unreadable checkpoint produces a confirm that means nothing — which is worse than no checkpoint at all.</div>
+</section>
+
+<!-- ========== 2. WHEN ========== -->
+<section id="when">
+  <h2><span class="num">02</span>When this is the right skill</h2>
+  <p class="sec-note">Spec Dialogue is deliberately heavy on interaction turns. That heaviness buys the thing it exists for — a specification whose every load-bearing element someone actually agreed to — and it is the wrong price for a change whose shape is already settled.</p>
+  <div class="cols">
+    <div class="panel yes">
+      <p class="meta">Use it when</p>
+      <ul>
+        <li>a feature idea exists but is not yet buildable, and the user wants to <b>think it through in conversation</b></li>
+        <li>the deliverable needed is a <b>specification with acceptance criteria</b> — not code, not a verdict</li>
+        <li>several plausible directions exist and the choice between them should be made deliberately</li>
+        <li>a locked spec needs revising because reality moved</li>
+      </ul>
+    </div>
+    <div class="panel no">
+      <p class="meta">Use something else when</p>
+      <ul>
+        <li>the user wants code now and the shape is already settled — this skill writes none</li>
+        <li>the open question is <b>which</b> feature to build at all — decide that first, then spec the winner</li>
+        <li>the deliverable is a whole-repository architecture document rather than one feature</li>
+        <li>an existing feature needs excavating and explaining — that is archaeology, not specification</li>
+      </ul>
+    </div>
+  </div>
+</section>
+
+<!-- ========== 3. DEPTH ========== -->
+<section id="depth">
+  <h2><span class="num">03</span>Depth scales the dialogue, never the lock</h2>
+  <p class="sec-note">Forcing a settings toggle through six phases makes people abandon the skill and specify nothing. Depth is the release valve — and it is carefully drawn so that the valve releases <em>turns</em> and nothing else.</p>
+  <div class="tw">
+    <table>
+      <thead><tr><th>Depth</th><th>When</th><th>Phases</th><th>Panel</th><th class="num-c">Turns</th></tr></thead>
+      <tbody>
+        <tr><td><code>light</code></td><td>one bounded change, the problem is already agreed, no real option space</td><td>FRAME → SPECIFY → LOCK, the middle three collapsing into one confirm</td><td>skipped</td><td class="num-c">~3–5</td></tr>
+        <tr><td><code>standard</code> <span class="tag req">default</span></td><td>a normal feature with genuine alternatives</td><td>all six</td><td>2 skeptics — claims 1 and 3</td><td class="num-c">~8–15</td></tr>
+        <tr><td><code>deep</code></td><td>high-stakes, contested, or expensive to reverse; a spec several teams will build against</td><td>all six, with an extended EXPAND</td><td>4 skeptics — one per claim</td><td class="num-c">~15–30</td></tr>
+      </tbody>
+    </table>
+  </div>
+  <div class="callout"><b>The invariant.</b> Testable acceptance criteria, a test case behind every must-have one, the Quality Gate, the Provenance Gate and an explicit sign-off are lock preconditions at <em>every</em> depth. A <code>light</code> run that discovers a real option space escalates to <code>standard</code> and says so, rather than under-specifying quietly.</div>
+</section>
+
+<!-- ========== 4. PHASES ========== -->
+<section id="phases">
+  <h2><span class="num">04</span>The six phases</h2>
+  <p class="sec-note">Each phase names <strong>lenses</strong> — a framing question plus an output shape — not tools. Adopt them in sequence yourself, or spawn them as parallel subagents if your harness has them; the recipe is correct either way. Dashed chips are conditional. Nothing here requires a specific agent, model or tool to exist.</p>
+
+  <div class="phases">
+
+    <article class="pc">
+      <div class="pc-id"><span class="k">PHASE 0</span><span class="n">FRAME</span></div>
+      <div class="pc-body">
+        <h4>Problem before solution</h4>
+        <p class="focus">Establish the shared problem statement before any option is generated. On an existing codebase, survey what already ships first — a spec that re-derives shipped code is the expensive kind of wrong.</p>
+        <ul class="rows"><li>Demand</li><li data-req="cond">Research-grounding?</li><li data-req="cond">Persona?</li><li data-req="cond">Reuse-scan?</li></ul>
+      </div>
+      <div class="pc-gate">
+        <span class="lab">Checkpoint · mandatory</span>
+        <p>A 3–5 line problem statement, carrying the reuse and constraint findings. The user confirms or corrects it. <b>Option generation cannot start</b> until it is confirmed.</p>
+        <p class="writes"><b>writes</b>the draft is created: status <code>draft</code>, L0 filled</p>
+      </div>
+    </article>
+
+    <article class="pc">
+      <div class="pc-id"><span class="k">PHASE 1</span><span class="n">EXPAND</span></div>
+      <div class="pc-body">
+        <h4>Diverge before converging</h4>
+        <p class="focus">Run Divergence twice with different framings — once proposing, once reframing the assumptions or borrowing from another domain. Produce 3–5 candidate directions, each with a rationale and a rough shape.</p>
+        <ul class="rows"><li>Divergence ×2</li><li data-req="cond">Market?</li></ul>
+      </div>
+      <div class="pc-gate">
+        <span class="lab">Checkpoint</span>
+        <p>The user reacts, eliminates, combines, adds. Expect several turns here — this is the divergent heart of the dialogue. Keep the questions polarity-neutral: a leading question contaminates the data.</p>
+        <p class="writes"><b>writes</b>the surviving candidates</p>
+      </div>
+    </article>
+
+    <article class="pc">
+      <div class="pc-id"><span class="k">PHASE 2</span><span class="n">CHALLENGE</span></div>
+      <div class="pc-body">
+        <h4>Stress-test, then converge</h4>
+        <p class="focus">Narrow to one direction under four distinct pressures — is it necessary, is it over-scoped, is it feasible, and how does it fail.</p>
+        <ul class="rows"><li>Arbitration</li><li>Subtraction</li><li>Impact</li><li data-req="cond">Pre-mortem?</li></ul>
+      </div>
+      <div class="pc-gate">
+        <span class="lab">Checkpoint · mandatory</span>
+        <p>The user makes the <b>explicit pick</b>. Rejected directions are carried forward as “considered but rejected” so a resume never re-derives them. If the dialogue circles for two rounds with no new information, it offers a choice rather than looping.</p>
+        <p class="writes"><b>writes</b>the pick, and the rejected list</p>
+      </div>
+    </article>
+
+    <article class="pc">
+      <div class="pc-id"><span class="k">PHASE 3</span><span class="n">SHAPE</span></div>
+      <div class="pc-body">
+        <h4>The structured proposal</h4>
+        <p class="focus">Synthesize the chosen direction: problem → proposed solution → in scope → out of scope → assumptions → open questions.</p>
+        <ul class="rows"><li>Proposal</li><li data-req="cond">Prioritization?</li></ul>
+      </div>
+      <div class="pc-gate">
+        <span class="lab">Checkpoint</span>
+        <p>Edits are captured section by section, then written — not summarized back and assumed.</p>
+        <p class="writes"><b>writes</b>the agreed sections</p>
+      </div>
+    </article>
+
+    <article class="pc">
+      <div class="pc-id"><span class="k">PHASE 4</span><span class="n">SPECIFY</span></div>
+      <div class="pc-body">
+        <h4>Authoring, and the tests that decide it</h4>
+        <p class="focus">Staged elaboration: L0 Vision → L1 Requirements → L2 Detail → Behavior matrix → L3 Acceptance Criteria. The acceptance test specification is written <b>alongside</b> L3, not after it — writing the procedure is what exposes a criterion that only <em>reads</em> as testable, while it can still be rewritten.</p>
+        <ul class="rows"><li>Authoring</li><li>Verifiability</li><li data-req="cond">API-detail?</li><li data-req="cond">Data-model?</li><li data-req="cond">Demand?</li></ul>
+      </div>
+      <div class="pc-gate">
+        <span class="lab">Checkpoint</span>
+        <p>Iterate section by section. Every criterion is a Given / When / Then scenario with a named <b>oracle</b> — the thing that decides pass or fail. Every result in the test document is authored <code>NOT_RUN</code>.</p>
+        <p class="writes"><b>writes</b>both documents, incrementally</p>
+      </div>
+    </article>
+
+    <article class="pc">
+      <div class="pc-id"><span class="k">PHASE 5</span><span class="n">LOCK</span></div>
+      <div class="pc-body">
+        <h4>Sign-off, and nothing else</h4>
+        <p class="focus">The independent Quality Gate, then the refutation panel, then the user's explicit sign-off. On sign-off both documents are promoted to <code>locked</code> together, the build path is chosen with the user, and the Handoff Packet is emitted as a recommendation.</p>
+        <ul class="rows"><li>Adversarial-review</li><li>Verifiability</li><li>Skeptic ×2–4</li><li data-req="cond">Arbitration?</li></ul>
+      </div>
+      <div class="pc-gate">
+        <span class="lab">Checkpoint · mandatory</span>
+        <p>Sign-off is the user's, never the agent's. The build-path choice is contract-level and cannot be auto-picked, even under an autonomous caller.</p>
+        <p class="writes"><b>writes</b><code>&lt;slug&gt;.md</code> + <code>&lt;slug&gt;.acceptance.md</code>, both <code>locked</code></p>
+      </div>
+    </article>
+
+  </div>
+</section>
+
+<!-- ========== 5. DOCUMENTS ========== -->
+<section id="documents">
+  <h2><span class="num">05</span>What leaves at the end</h2>
+  <p class="sec-note">Two documents, locked together. They rot on different clocks — the criteria change when the feature changes, the procedures change when the environment or the tooling does — so folding them into one would let an environment note edit the acceptance contract. Every section is present, or marked <code>N/A</code> with a one-line reason; a <span class="tag req">required</span> section may not be <code>N/A</code>, a <span class="tag cond">conditional</span> one may.</p>
+
+  <div class="cols">
+    <div class="panel doc">
+      <p class="meta">docs/specs/&lt;slug&gt;.md — the specification</p>
+      <ul>
+        <li><b>L0 Vision</b> <span class="tag req">req</span> — problem, audience, job, success definition, existing assets and constraints</li>
+        <li><b>Glossary</b> <span class="tag req">req</span> — one concept one term, with a <em>not to be called</em> column so synonym drift is a grep rather than a feeling</li>
+        <li><b>L1 Requirements</b> <span class="tag req">req</span> — <code>REQ-n</code> and <code>CFR-n</code>; every cross-functional row carries a metric, a target and how it is measured</li>
+        <li><b>L2 Detail</b> <span class="tag cond">cond</span> — four fixed slots: data model, interface contract, state and transitions, validation rules</li>
+        <li><b>Behavior matrix</b> <span class="tag req">req</span> — the six conditions a spec forgets, each row citing a requirement and a criterion</li>
+        <li><b>Dependencies</b> · <b>Migration &amp; rollout</b> <span class="tag cond">cond</span> — what we do not control, and the point past which a change stops being reversible</li>
+        <li><b>L3 Acceptance Criteria</b> <span class="tag req">req</span> — Given / When / Then, verification mode, oracle, must-have flag</li>
+        <li><b>Scope</b> · <b>Considered but rejected</b> <span class="tag req">req</span></li>
+        <li><b>Assumption Ledger</b> · <b>Open Questions</b> <span class="tag req">req</span> — <code>ASSUME-n</code> and <code>OQ-n</code>, each with an owner and a level</li>
+        <li><b>Build-path decision</b> <span class="tag req">req</span></li>
+      </ul>
+    </div>
+    <div class="panel doc">
+      <p class="meta">docs/specs/&lt;slug&gt;.acceptance.md — the acceptance tests</p>
+      <ul>
+        <li><b>Test scope</b> — including <em>what passing this suite still does not prove</em>, stated up front rather than discovered at ship</li>
+        <li><b>Entry &amp; exit criteria</b> — the acceptance contract in one list. Anything not on it will not block acceptance</li>
+        <li><b>Environment</b> — build, data state, roles, flags, each dependency live or stubbed, clock and locale</li>
+        <li><b>Test data</b> — fixtures and their <b>reset procedure</b>, which is what makes a second run the same suite as the first</li>
+        <li><b>Test cases</b> — <code>TC-n</code> with concrete step values. “Enter a valid email” is not a step</li>
+        <li><b>Non-functional procedures</b> — one per <code>CFR-n</code>, its target cited from the spec, never restated</li>
+        <li><b>Coverage matrix</b> — the <code>AC → TC</code> half of the chain, with both gap directions named</li>
+        <li><b>Defect handling</b> — severities, and which of them block exit</li>
+        <li><b>Execution record</b> — authored empty; a re-run appends, so a flaky case is visible instead of overwritten</li>
+        <li><b>Residual risk</b> · <b>Sign-off</b></li>
+      </ul>
+    </div>
+  </div>
+
+  <div class="callout"><b>The test document decides nothing the spec left open.</b> Writing a case and finding no stated behaviour for an expired token does not license a decision there — it produces an <code>OQ-n</code> in the spec. A test document that answers its own questions is a shadow spec, and the build will follow whichever of the two it read last.</div>
+</section>
+
+<!-- ========== 6. TRACEABILITY ========== -->
+<section id="trace">
+  <h2><span class="num">06</span>Two hops, four directions</h2>
+  <p class="sec-note">The coverage claim is only checkable if it is a link rather than a paragraph. IDs are stable and never renumbered: a revision supersedes — <code>REQ-004_v2</code> — so a reader holding the old ID can find out what happened to it.</p>
+
+  <figure>
+    <div class="scroll">
+    <svg viewBox="0 0 1120 250" role="img" aria-label="Traceability chain. Requirements link forward to acceptance criteria and criteria link forward to test cases; each link is also checked backwards. A requirement with no criterion is unverifiable, a criterion with no requirement is an orphan, a must-have criterion with no test case is unexecutable, and a test case with no criterion is untraceable.">
+      <defs><marker id="ar2" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path d="M0,1 L9,5 L0,9 z" fill="currentColor"/></marker></defs>
+
+      <g>
+        <rect x="40" y="54" width="240" height="66" rx="1" fill="none" stroke="currentColor" stroke-width="1.4"/>
+        <text x="160" y="82" text-anchor="middle" font-family="Archivo,sans-serif" font-weight="700" font-size="15" fill="currentColor">REQ-n · CFR-n</text>
+        <text x="160" y="103" text-anchor="middle" font-family="'JetBrains Mono',monospace" font-size="10" fill="currentColor" opacity=".6">L1 — what must be true</text>
+
+        <rect x="440" y="54" width="240" height="66" rx="1" fill="none" stroke="currentColor" stroke-width="1.4"/>
+        <text x="560" y="82" text-anchor="middle" font-family="Archivo,sans-serif" font-weight="700" font-size="15" fill="currentColor">AC-n</text>
+        <text x="560" y="103" text-anchor="middle" font-family="'JetBrains Mono',monospace" font-size="10" fill="currentColor" opacity=".6">L3 — how we would know</text>
+
+        <rect x="840" y="54" width="240" height="66" rx="1" fill="#14615C" fill-opacity=".10" stroke="#14615C" stroke-width="1.4"/>
+        <text x="960" y="82" text-anchor="middle" font-family="Archivo,sans-serif" font-weight="700" font-size="15" fill="#14615C">TC-n</text>
+        <text x="960" y="103" text-anchor="middle" font-family="'JetBrains Mono',monospace" font-size="10" fill="#14615C" opacity=".85">acceptance doc — who decides</text>
+      </g>
+
+      <g stroke="currentColor" stroke-width="1.5" fill="none" marker-end="url(#ar2)">
+        <line x1="280" y1="76" x2="436" y2="76"/>
+        <line x1="680" y1="76" x2="836" y2="76"/>
+      </g>
+      <g stroke="currentColor" stroke-width="1.2" fill="none" marker-end="url(#ar2)" opacity=".55" stroke-dasharray="5 3">
+        <line x1="436" y1="102" x2="284" y2="102"/>
+        <line x1="836" y1="102" x2="684" y2="102"/>
+      </g>
+      <g font-family="'JetBrains Mono',monospace" font-size="9.5" fill="currentColor" text-anchor="middle">
+        <text x="358" y="68" opacity=".7">has ≥ 1</text>
+        <text x="758" y="68" opacity=".7">must-have has ≥ 1</text>
+        <text x="358" y="120" opacity=".55">names its requirement</text>
+        <text x="758" y="120" opacity=".55">names its criterion</text>
+      </g>
+
+      <g font-family="'JetBrains Mono',monospace" font-size="10" fill="#9E3B26">
+        <text x="160" y="170" text-anchor="middle">forward gap</text>
+        <text x="560" y="170" text-anchor="middle">backward gap · forward gap</text>
+        <text x="960" y="170" text-anchor="middle">backward gap</text>
+      </g>
+      <g font-family="'JetBrains Mono',monospace" font-size="9.5" fill="currentColor" opacity=".65" text-anchor="middle">
+        <text x="160" y="190">a requirement it cannot prove</text>
+        <text x="160" y="206">was delivered</text>
+        <text x="560" y="190">an orphan criterion, or one</text>
+        <text x="560" y="206">nobody can execute</text>
+        <text x="960" y="190">a case testing something</text>
+        <text x="960" y="206">nobody asked for</text>
+      </g>
+      <text x="560" y="236" text-anchor="middle" font-family="'JetBrains Mono',monospace" font-size="9.5" fill="currentColor" opacity=".5">all four are defects, not warnings — and all four are cheap at SPECIFY, expensive after a build starts</text>
+    </svg>
+    </div>
+    <figcaption>An acceptance criterion that “maps to” a requirement is not enough — it must <strong>entail</strong> it. The test: if an implementation passes <code>AC-n</code> and every other criterion under <code>REQ-m</code>, is <code>REQ-m</code> necessarily satisfied? A green criterion that does not entail its requirement is the most expensive defect a spec can ship, and it is the third claim the refutation panel attacks.</figcaption>
+  </figure>
+</section>
+
+<!-- ========== 7. GATE ========== -->
+<section id="gate">
+  <h2><span class="num">07</span>The Spec Quality Gate</h2>
+  <p class="sec-note">A seven-dimension review of the spec <strong>as an artifact, by a reviewer that is not its author</strong>. Independence is load-bearing: the author never scores its own gate. Where no separate agent is available, the gate runs as a distinct pass with the authoring context set aside — read as a stranger would, from the document alone. Each dimension must pass, or its finding is explicitly downgraded into Open Questions. Never silently passed.</p>
+  <div class="tw">
+    <table>
+      <thead><tr><th>Dimension</th><th>The question it asks</th></tr></thead>
+      <tbody>
+        <tr><td><b>Ambiguity</b></td><td>Is any requirement or criterion open to more than one reasonable interpretation?</td></tr>
+        <tr><td><b>Completeness</b></td><td>Does every in-scope requirement have at least one criterion, and every must-have criterion at least one test case? Both hops.</td></tr>
+        <tr><td><b>Consistency</b></td><td>Do scope, requirements and criteria contradict each other anywhere?</td></tr>
+        <tr><td><b>Testability</b></td><td>Is every criterion verifiable by a machine or a human — with a named oracle, not “verifiable in principle”?</td></tr>
+        <tr><td><b>Scope coherence</b></td><td>Are in-scope and out-of-scope collectively exhaustive and mutually exclusive?</td></tr>
+        <tr><td><b>Provenance</b></td><td>Is every load-bearing element <code>elicited</code>, <code>ratified</code> or <code>parked</code> — none <code>silent</code>?</td></tr>
+        <tr><td><b>Resolvability</b></td><td>Does every <code>UNKNOWN</code>, <code>TBD</code> and open assumption appear in Open Questions with an owner and a level — and is nothing left at <code>before-build</code>?</td></tr>
+      </tbody>
+    </table>
+  </div>
+  <p class="sub-lab">and the document rules underneath them</p>
+  <p class="sec-note">The seven dimensions decide whether the spec is <em>right</em>. A separate set of rules decides whether it can be <em>read and trusted</em>: a declared audience and decision, freshness metadata with a review trigger, every externally-checkable fact grounded or flagged, <code>UNKNOWN</code> over a plausible guess, one fact stated in exactly one place, one concept one term, and every template section present. Both are lock preconditions.</p>
+</section>
+
+<!-- ========== 8. PANEL ========== -->
+<section id="panel">
+  <h2><span class="num">08</span>The pre-lock refutation panel</h2>
+  <p class="sec-note">The seven dimensions audit the spec as a document. They do not ask the harder question: <em>should this be locked at all?</em> A spec that is internally consistent, fully traceable and completely wrong passes every one of them. So 2–4 independent skeptics run before sign-off, each prompted to <strong>kill</strong> the spec from one assigned angle rather than to evaluate it — a skeptic asked to evaluate will hedge.</p>
+  <div class="tw">
+    <table>
+      <thead><tr><th>Claim a locked spec silently asserts</th><th>The skeptic's angle</th></tr></thead>
+      <tbody>
+        <tr><td><b>The problem is real</b></td><td>the stated pain is assumed, not evidenced — no user, telemetry or research anchor backs it</td></tr>
+        <tr><td><b>This direction beats the rejected ones</b></td><td>a direction dropped in CHALLENGE is strictly better under the stated constraints — re-opened against the <em>final</em> scope, which moved after the pick</td></tr>
+        <tr><td><b>The criteria prove the requirements</b></td><td><code>AC-n</code> passes on an implementation that does not satisfy <code>REQ-m</code></td></tr>
+        <tr><td><b>The scope boundary holds</b></td><td>an out-of-scope item is load-bearing for an in-scope requirement — the boundary is not actually separable</td></tr>
+      </tbody>
+    </table>
+  </div>
+  <div class="callout"><b>Kill weak claims, not bold ones.</b> <em>Refuted-on-evidence</em> — a comparable feature already ships, the cited pain is contradicted by measured behaviour, a criterion demonstrably passes on a non-conforming build — sends the spec back. <em>Unproven-because-new</em> is the signature of a genuine novel bet, not grounds for rejection; it routes to <code>LOCK-with-flag</code>, the flag naming the assumption it rests on and, where possible, the observation that would falsify it after ship. Penalizing a feature for lacking proof that can only exist post-launch is the exact failure this protocol guards against.</div>
+  <p class="sub-lab">never decided on a panel vote alone</p>
+  <p class="sec-note">Safety-critical scope — auth, encryption, input validation, anything with a regulatory obligation — is not cut from a spec on a skeptic's vote; a panel does not authorize removing a control. Below 60 % confidence, the destructive reading is not acted on. And a verdict flips on new evidence, never on pressure: objection from the author, the user or a louder panel member is not a refutation. Name the triggering evidence, or do not flip.</p>
+</section>
+
+<!-- ========== 9. LOCK ========== -->
+<section id="lock">
+  <h2><span class="num">09</span>What actually blocks a lock</h2>
+  <p class="sec-note">A locked spec is not a spec with no unknowns. It is one where every unknown has an owner and a level — and where nothing that must be settled before a build begins is still open. The skill names three of the rows below as the <em>lock preconditions</em> proper — testable criteria, a procedure behind each, and the Quality Gate; the rest are the gates and the sign-off standing around them. All seven stop a lock.</p>
+  <div class="tw">
+    <table>
+      <thead><tr><th>What must hold</th><th>What it means</th><th>If it fails</th></tr></thead>
+      <tbody>
+        <tr><td><b>Testable criteria</b></td><td>every L3 criterion is checkable by a machine or a human, with a named oracle</td><td>back to SPECIFY</td></tr>
+        <tr><td><b>A procedure behind each</b></td><td>every <b>must-have</b> criterion is discharged by at least one <code>TC-n</code></td><td>back to SPECIFY</td></tr>
+        <tr><td><b>The Quality Gate</b></td><td>seven dimensions, reviewed independently of the author</td><td>fix, or downgrade the finding into Open Questions with the user's agreement</td></tr>
+        <tr><td><b>The Provenance Gate</b></td><td>no load-bearing element is <code>silent</code>; open assumptions are walked with the user one by one</td><td>the lock is blocked until each is ratified or parked</td></tr>
+        <tr><td><b>The refutation panel</b></td><td>skipped at <code>light</code>; otherwise 2–4 skeptics</td><td>majority refuted on evidence → CHALLENGE or SPECIFY</td></tr>
+        <tr><td><b>Explicit sign-off</b></td><td>the user says lock it — the agent never does</td><td>nothing is promoted</td></tr>
+        <tr><td><b>No <code>before-build</code> question</b></td><td>a spec may lock with open questions, but not with one nobody can hand to a build</td><td>resolve it, or lower it to <code>before-ship</code> / <code>deferred</code> and say so</td></tr>
+      </tbody>
+    </table>
+  </div>
+</section>
+
+<!-- ========== 10. HANDOFF ========== -->
+<section id="handoff">
+  <h2><span class="num">10</span>The Handoff Packet</h2>
+  <p class="sec-note">A handoff that ships only a file path forces whatever builds the feature to re-derive what the dialogue already settled. The packet carries the settled state in consumable fields, emitted at LOCK as a <strong>recommendation, not execution</strong>.</p>
+  <div class="tw">
+    <table>
+      <thead><tr><th>Field</th><th>What it carries</th></tr></thead>
+      <tbody>
+        <tr><td><code>spec_path</code></td><td>the locked specification</td></tr>
+        <tr><td><code>acceptance_criteria</code></td><td>the criteria with Given / When / Then, requirement mapping, mode, oracle and must-have flags — the build's completion contract</td></tr>
+        <tr><td><code>acceptance_test_path</code></td><td>the locked test document, every result <code>NOT_RUN</code>; its exit criteria are what “done” means</td></tr>
+        <tr><td><code>behavior_matrix</code></td><td>the error paths the build must not invent for itself</td></tr>
+        <tr><td><code>glossary</code></td><td>so the build names things the way the spec does</td></tr>
+        <tr><td><code>non_goals</code></td><td>the out-of-scope list, verbatim</td></tr>
+        <tr><td><code>dependencies</code></td><td>integration points, their contracts, and the declared fallback for each</td></tr>
+        <tr><td><code>assumption_ledger</code> · <code>open_questions</code></td><td>what is still open, with owners and levels — never silently dropped downstream</td></tr>
+        <tr><td><code>refutation_flags</code></td><td>each <code>LOCK-with-flag</code> claim and the assumption under it — a kill-criterion candidate for the build</td></tr>
+        <tr><td><code>reuse_findings</code> · <code>build_path</code></td><td>so the build skips re-scanning, and knows how it was meant to run</td></tr>
+      </tbody>
+    </table>
+  </div>
+  <div class="callout"><b>The contract rule cuts both ways.</b> A build that receives the packet does not re-open the settled decisions — it may surface a contradiction it discovers against real code, but re-litigating the direction is drift. And a build that finds a must-have criterion <em>unbuildable as written</em> returns for revision, re-entering at SPECIFY and re-running the lock preconditions, rather than quietly reinterpreting it.</div>
+</section>
+
+<!-- ========== 11. DIALOGUE ========== -->
+<section id="dialogue">
+  <h2><span class="num">11</span>How the questions are asked</h2>
+  <p class="sec-note">The dialogue is the work, so the question craft is part of the recipe rather than a matter of style. Sixteen rules govern it; these are the ones that change the transcript most.</p>
+  <ul class="rule-list">
+    <li data-n="D1"><b>One focus per turn.</b> One question, or one batched multiple-choice over at most four independent dimensions. Never a wall of open questions — each extra question halves the answer quality of all of them.</li>
+    <li data-n="D2–D4"><b>Recognition over recall, and no leading.</b> Offer concrete anchors to react to rather than asking someone to produce an answer from nothing, and keep the polarity neutral: a leading question contaminates the data it collects.</li>
+    <li data-n="D6–D8"><b>Paraphrase back before persisting.</b> A vague answer is probed, not swallowed. What gets written down is what the user recognised as theirs.</li>
+    <li data-n="D9"><b>The Assumption Ledger.</b> Every gap the user did not explicitly decide — a skipped question, a vague answer, a default chosen to keep moving — is recorded as <code>ASSUME-n</code>. Open entries never quietly disappear; at LOCK each is ratified or moved to Open Questions.</li>
+    <li data-n="D10–D12"><b>Envelope, and delta only.</b> About fifteen lines per checkpoint, showing what changed since the last turn plus an orientation line. The full state lives in the draft the user can open.</li>
+    <li data-n="D13–D15"><b>Depth follows signal.</b> Rich answers earn finer questions; answers trending shorter earn batching, proposed defaults and more of the Ledger. Matching the user's bandwidth is part of the contract, not a courtesy.</li>
+    <li data-n="D16"><b>The Provenance Gate.</b> Every load-bearing element of the locked spec is <code>elicited</code>, <code>ratified</code> or <code>parked</code>. An element that is none of these is <code>silent</code>, and a silent element blocks the lock.</li>
+    <li data-n="W14"><b>The reader's language.</b> Both documents are written in the language the user is conversing in. The IDs, metadata keys, enum values, paths and code identifiers stay verbatim, because something downstream cites them.</li>
+  </ul>
+</section>
+
+<!-- ========== 12. INSTALL ========== -->
+<section id="install">
+  <h2><span class="num">12</span>Install and invoke</h2>
+  <p class="sec-note">The skill lives at <code>skills/spec-dialogue/</code>. That directory is what gets linked — the repository README and the test battery stay behind. Any runtime that reads a <code>SKILL.md</code> with YAML frontmatter works the same way; nothing here is specific to one CLI beyond the default path.</p>
+
+  <p class="sub-lab">install</p>
+<pre>make link                      # -&gt; ~/.claude/skills/spec-dialogue
+make link PROJECT=/path/repo   # -&gt; /path/repo/.claude/skills/spec-dialogue
+make status                    # where is it linked?
+make unlink                    # remove the link</pre>
+
+  <p class="sub-lab">invoke</p>
+<pre>spec-dialogue                      # new dialogue
+spec-dialogue depth=light          # small, bounded change — fewer turns, same lock
+spec-dialogue depth=deep           # high-stakes or contested — full skeptic panel
+spec-dialogue resume [&lt;slug&gt;]      # re-enter from the last checkpoint
+spec-dialogue &lt;slug-or-path&gt;       # re-open a locked spec for revision</pre>
+
+  <p class="sub-lab">the checks that keep the skill honest</p>
+<pre>make check   # every cited path resolves inside the skill; no path reaches through
+             # a parent; no file in reference/ that SKILL.md never names; the lens
+             # and gate-dimension counts the prose claims match what is defined
+make test    # the fixture battery — each check is broken in a scratch copy and
+             # required to fail, so a check nobody has watched fail is not trusted</pre>
+
+  <div class="callout q"><b>Resumable by design.</b> The value here is a long multi-turn dialogue, so it must survive interruption. Each checkpoint writes to <code>docs/specs/&lt;slug&gt;.draft.md</code> with a current-phase marker and the Assumption Ledger delta. <code>spec-dialogue resume</code> replays the marker, summarizes the decisions so far in a few lines for confirmation, and continues — never silently restarting from FRAME.</div>
+</section>
+
+<!-- ========== 13. TRAPS ========== -->
+<section id="traps">
+  <h2><span class="num">13</span>The failures this is built against</h2>
+  <p class="sec-note">Each row is a way specifications go wrong in practice, and the specific mechanism that is supposed to stop it. A mechanism nobody can point at is a hope.</p>
+  <div class="tw">
+    <table>
+      <thead><tr><th>Failure</th><th>What stops it</th></tr></thead>
+      <tbody>
+        <tr><td>A single-pass spec reporting itself as dialogue</td><td>checkpoints are contract-level; an autonomous caller stops at them too</td></tr>
+        <tr><td>Specifying a half-baked idea</td><td>option generation cannot start before the problem statement is confirmed</td></tr>
+        <tr><td>Endless circling</td><td>the convergence check after two rounds, and the explicit LOCK gate</td></tr>
+        <tr><td>A spec without acceptance criteria</td><td>testable criteria are a lock precondition, not a section</td></tr>
+        <tr><td>A must-have criterion nobody can execute</td><td>every one carries a <code>TC-n</code> — the second lock precondition</td></tr>
+        <tr><td>“Testable in principle”, discovered at build time</td><td>the procedure is written at SPECIFY, while the criterion can still be rewritten</td></tr>
+        <tr><td>Ambiguity surviving in free-form detail prose</td><td>L2 is four fixed slots, each filled or <code>N/A</code> with a reason</td></tr>
+        <tr><td>Error paths described in prose and never tested</td><td>Behavior-matrix rows cite a requirement <em>and</em> a criterion</td></tr>
+        <tr><td>A cross-functional requirement that is an adjective</td><td><code>CFR-n</code> carries metric, target and measurement, or fails Testability</td></tr>
+        <tr><td>A <code>TBD</code> buried mid-document, found by the build</td><td>the Resolvability dimension and the Open Questions inventory rule</td></tr>
+        <tr><td>Silent assumptions inside a signed spec</td><td>the Assumption Ledger, and the Provenance Gate that blocks on <code>silent</code></td></tr>
+        <tr><td>An internally perfect but wrong spec</td><td>the refutation panel — the document dimensions cannot catch this</td></tr>
+        <tr><td>Synonym drift between spec and code</td><td>the Glossary's <em>not to be called</em> column; on an existing codebase the document adapts to the code</td></tr>
+        <tr><td>“All green” read as “everything works”</td><td>the test document's residual-risk section, and what it says is <em>not</em> proven</td></tr>
+        <tr><td>Ceremony driving people away from specifying at all</td><td>depth modes scale the dialogue without weakening any lock precondition</td></tr>
+        <tr><td>Downstream re-deriving the dialogue</td><td>the Handoff Packet carries the settled state in consumable fields</td></tr>
+        <tr><td>Losing a long dialogue to an interruption</td><td>incremental draft persistence and <code>spec-dialogue resume</code></td></tr>
+      </tbody>
+    </table>
+  </div>
+</section>
+
+<footer>
+  <p><b>Spec Dialogue</b> — a standalone Agent Skill. Fully self-contained: no other skill, agent, registry or repository is required.</p>
+  <p>This page is explanatory only. <code>skills/spec-dialogue/SKILL.md</code> and its <code>reference/</code> files stay canonical for the phase contract, the gate, the protocols and the templates — when one of them changes, this page is edited by hand to match. Nothing generates it, so nothing silently drifts without a diff to review.</p>
+</footer>
+
+</div>
+</body>
+</html>
