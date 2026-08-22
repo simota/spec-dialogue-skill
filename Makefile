@@ -1,75 +1,129 @@
 # spec-dialogue — install by symlink
 #
-#   make link                     link into ~/.claude/skills/spec-dialogue
-#   make link PROJECT=/path/repo  link into /path/repo/.claude/skills/spec-dialogue
-#   make unlink                   remove the link (same PROJECT rule)
-#   make status                   show where it is linked from
+#   make link                     link into every agent CLI installed here
+#   make link AGENT=codex         link into one of them (claude | codex | agy)
+#   make link PROJECT=/path/repo  link into that repository instead of the home directories
+#   make unlink                   remove only the links pointing at this repo (same rules)
+#   make status                   show where the skill is linked
 #
 # The skill itself is `skills/spec-dialogue/` — that directory, not the repository root, is
 # what gets linked, so the repo can carry a README and a test battery the skill does not ship.
 #
-# SKILLS_DIR overrides the destination directory outright:
+# Three CLIs read a `SKILL.md` with YAML frontmatter, and each looks somewhere different:
+#
+#   agent   global                             project
+#   claude  ~/.claude/skills                   <repo>/.claude/skills
+#   codex   $$CODEX_HOME/skills  (~/.codex)    <repo>/.agents/skills
+#   agy     ~/.gemini/config/skills            <repo>/.agents/skills
+#
+# codex and agy share `.agents/skills` at project scope, so one link there serves both — the
+# duplicate collapses in `$(sort ...)` below rather than in a special case.
+#
+# Each target carries the directory that must already exist for it to be written, as
+# `guard|destination`. Globally the guard is the CLI's own home: a missing `~/.gemini/config`
+# means agy is not installed here, and `make link` skips it rather than conjuring the tree for
+# a CLI the user does not run. Under PROJECT= the guard is the repository root instead — there
+# `.claude/` and `.agents/` are exactly what we are expected to create.
+#
+# SKILLS_DIR overrides the destination outright, for a runtime none of the three names:
 #   make link SKILLS_DIR=~/.config/agents/skills
+# A directory named that explicitly is not a probe for an installed CLI, so it has no guard to
+# skip on — `/` stands in — and is created in full rather than reported missing.
 
 NAME    := spec-dialogue
 REPO    := $(abspath $(dir $(lastword $(MAKEFILE_LIST))))
 SKILL   := $(REPO)/skills/$(NAME)
 PROJECT ?=
+AGENT   ?= claude codex agy
 PAGES    := $(REPO)/docs
 PAGES_PORT ?= 8000
 
+CODEX_HOME ?= $(HOME)/.codex
+
+# A `~` reaches make quoted, so nothing ever expands it: `PROJECT=~/repo` would resolve against
+# the current directory. Expand a leading `~/` here, before anything builds a path out of it.
+tilde     = $(abspath $(patsubst ~/%,$(HOME)/%,$(1)))
+PROJECTD := $(call tilde,$(PROJECT))
+SKILLSD  := $(call tilde,$(SKILLS_DIR))
+
 ifeq ($(strip $(PROJECT)),)
-SKILLS_DIR ?= $(HOME)/.claude/skills
+tgt_claude := $(HOME)/.claude|$(HOME)/.claude/skills
+tgt_codex  := $(CODEX_HOME)|$(CODEX_HOME)/skills
+tgt_agy    := $(HOME)/.gemini/config|$(HOME)/.gemini/config/skills
 else
-SKILLS_DIR ?= $(abspath $(PROJECT))/.claude/skills
+tgt_claude := $(PROJECTD)|$(PROJECTD)/.claude/skills
+tgt_codex  := $(PROJECTD)|$(PROJECTD)/.agents/skills
+tgt_agy    := $(PROJECTD)|$(PROJECTD)/.agents/skills
 endif
 
-DEST := $(SKILLS_DIR)/$(NAME)
+# An unknown AGENT is a typo, and a typo that silently links nothing is worse than a stop.
+UNKNOWN := $(filter-out claude codex agy,$(AGENT))
+ifneq ($(UNKNOWN),)
+$(error unknown AGENT: $(UNKNOWN) — pick from: claude codex agy)
+endif
+
+ifeq ($(strip $(SKILLS_DIR)),)
+TARGETS := $(sort $(foreach a,$(AGENT),$(tgt_$(a))))
+else
+TARGETS := /|$(SKILLSD)
+endif
+
+# `guard|destination` carries a `|`, which the shell reads as a pipe in an unquoted `for` list.
+QTARGETS := $(foreach t,$(TARGETS),'$(t)')
 
 .PHONY: help link unlink status check test pages
 
 help:
-	@echo "make link      [PROJECT=<repo>] [SKILLS_DIR=<dir>]  symlink $(NAME) into a skills directory"
-	@echo "make unlink    [PROJECT=<repo>] [SKILLS_DIR=<dir>]  remove that symlink"
-	@echo "make status    [PROJECT=<repo>] [SKILLS_DIR=<dir>]  report the current link"
-	@echo "make check                                          verify this skill is self-contained"
-	@echo "make test                                           run the fixture battery over make check"
+	@echo "make link      [AGENT=<a>] [PROJECT=<repo>] [SKILLS_DIR=<dir>]  symlink $(NAME) into each skills directory"
+	@echo "make unlink    [AGENT=<a>] [PROJECT=<repo>] [SKILLS_DIR=<dir>]  remove the links this repo owns"
+	@echo "make status    [AGENT=<a>] [PROJECT=<repo>] [SKILLS_DIR=<dir>]  report each destination"
+	@echo "make check                                                      verify this skill is self-contained"
+	@echo "make test                                                       run the fixture battery over make check"
 	@echo ""
-	@echo "make pages                                          preview the docs/ site (PAGES_PORT=$(PAGES_PORT))"
+	@echo "make pages                                                      preview the docs/ site (PAGES_PORT=$(PAGES_PORT))"
 	@echo ""
+	@echo "agents: $(AGENT)   (claude | codex | agy)"
 	@echo "repo:   $(REPO)"
 	@echo "skill:  $(SKILL)"
-	@echo "dest:   $(DEST)"
+	@$(foreach t,$(TARGETS),echo "dest:   $(word 2,$(subst |, ,$(t)))/$(NAME)";)
 
+# A destination that is already our link is reported and counted, not relinked. Anything else
+# occupying the name — a real directory, or a link into some other checkout — is refused and
+# left alone: the one thing `make link` must never do is delete a skill it did not install.
 link:
-	@set -e; \
-	if [ -e "$(DEST)" ] && [ ! -L "$(DEST)" ]; then \
-		echo "refusing: $(DEST) exists and is not a symlink — move it aside first"; exit 1; \
-	fi; \
-	if [ -L "$(DEST)" ] && [ "$$(readlink "$(DEST)")" = "$(SKILL)" ]; then \
-		echo "already linked: $(DEST) -> $(SKILL)"; exit 0; \
-	fi; \
-	mkdir -p "$(SKILLS_DIR)"; \
-	if [ -L "$(DEST)" ]; then \
-		echo "replacing existing link ($$(readlink "$(DEST)"))"; rm "$(DEST)"; \
-	fi; \
-	ln -s "$(SKILL)" "$(DEST)"; \
-	echo "linked: $(DEST) -> $(SKILL)"; \
+	@n=0; \
+	for t in $(QTARGETS); do \
+		guard=$${t%%|*}; dir=$${t##*|}; d="$$dir/$(NAME)"; \
+		if [ ! -d "$$guard" ]; then echo "skip     $$d — $$guard does not exist"; continue; fi; \
+		if [ -L "$$d" ]; then \
+			if [ "$$(readlink "$$d")" = "$(SKILL)" ]; then echo "ok       $$d already linked"; n=$$((n+1)); continue; fi; \
+			echo "refusing $$d is a symlink to $$(readlink "$$d") — resolve it, then re-run" >&2; exit 1; \
+		elif [ -e "$$d" ]; then \
+			echo "refusing $$d exists and is not a symlink — move it aside first" >&2; exit 1; \
+		fi; \
+		mkdir -p "$$dir" && ln -s "$(SKILL)" "$$d" || exit 1; \
+		echo "linked   $$d -> $(SKILL)"; n=$$((n+1)); \
+	done; \
+	if [ $$n -eq 0 ]; then echo "nothing linked — no skills directory found for: $(AGENT)" >&2; exit 1; fi; \
 	echo "invoke it with:  spec-dialogue   (or /spec-dialogue in a slash-command harness)"
 
 unlink:
-	@if [ -L "$(DEST)" ]; then \
-		rm "$(DEST)"; echo "unlinked: $(DEST)"; \
-	elif [ -e "$(DEST)" ]; then \
-		echo "refusing: $(DEST) is not a symlink — leaving it alone"; exit 1; \
-	else \
-		echo "nothing to unlink at $(DEST)"; \
-	fi
+	@for t in $(QTARGETS); do \
+		dir=$${t##*|}; d="$$dir/$(NAME)"; \
+		if [ -L "$$d" ] && [ "$$(readlink "$$d")" = "$(SKILL)" ]; then rm "$$d"; echo "unlinked $$d"; \
+		elif [ -L "$$d" ]; then echo "skip     $$d — links to $$(readlink "$$d"), not this repo"; \
+		elif [ -e "$$d" ]; then echo "skip     $$d — not a symlink, leaving it alone"; \
+		else echo "none     $$d"; fi; \
+	done
 
 status:
-	@if [ -L "$(DEST)" ]; then echo "linked: $(DEST) -> $$(readlink "$(DEST)")"; \
-	elif [ -e "$(DEST)" ]; then echo "present but not a symlink: $(DEST)"; \
-	else echo "not linked: $(DEST)"; fi
+	@echo "skill    $(SKILL)"
+	@for t in $(QTARGETS); do \
+		dir=$${t##*|}; d="$$dir/$(NAME)"; \
+		if [ -L "$$d" ]; then echo "link     $$d -> $$(readlink "$$d")"; \
+		elif [ -e "$$d" ]; then echo "other    $$d exists and is not a symlink"; \
+		else echo "none     $$d"; fi; \
+	done
 
 # Self-containment is this skill's whole premise: every path it cites must resolve inside
 # `skills/$(NAME)/`, every file in reference/ must be named by SKILL.md, no cited path may reach

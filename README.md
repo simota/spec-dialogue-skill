@@ -10,20 +10,32 @@ The skill lives at `skills/spec-dialogue/`; that directory is what gets linked, 
 root — the README and the test battery stay behind.
 
 ```sh
-make link                      # -> ~/.claude/skills/spec-dialogue
-make link PROJECT=/path/repo   # -> /path/repo/.claude/skills/spec-dialogue
+make link                      # every agent CLI installed here
+make link AGENT=codex          # just one — claude | codex | agy
+make link PROJECT=/path/repo   # that repository, instead of the home directories
 make status                    # where is it linked?
-make unlink                    # remove the link
+make unlink                    # remove the links that point at this repo
 make check                     # verify every reference resolves inside the skill directory
-make test                      # run the fixture battery over `make check` itself
+make test                      # run the fixture battery over `make check` and `make link`
 ```
 
-`make link` symlinks `skills/spec-dialogue/` in, so a `git pull` here updates the installed skill. It refuses
-to clobber a real directory at the destination, and replaces a stale symlink in place. Override the
-destination outright with `SKILLS_DIR=<dir>` when your runtime keeps skills elsewhere.
+Three CLIs read a `SKILL.md` with YAML frontmatter, and each looks somewhere different:
 
-Any agent runtime that reads a `SKILL.md` with YAML frontmatter works the same way; nothing here is
-Claude Code specific beyond the default path.
+| Agent | Global | Inside a project |
+|-------|--------|------------------|
+| `claude` | `~/.claude/skills` | `<repo>/.claude/skills` |
+| `codex` | `$CODEX_HOME/skills`, default `~/.codex/skills` | `<repo>/.agents/skills` |
+| `agy` | `~/.gemini/config/skills` | `<repo>/.agents/skills` |
+
+`make link` symlinks `skills/spec-dialogue/` into each of them, so a `git pull` here updates every
+installed copy at once. A CLI whose own directory does not exist is **skipped, not created** — linking
+does not conjure `~/.gemini/config` for someone who has never run agy — and `codex` and `agy` share
+`.agents/skills` inside a project, so one link there serves both.
+
+Nothing at the destination is ever overwritten: a real directory, or a symlink into some other
+checkout, is refused and left alone, and `make unlink` removes only the links pointing at this repo.
+Override the destination outright with `SKILLS_DIR=<dir>` when your runtime keeps skills somewhere
+none of the three names.
 
 ## Use
 
@@ -41,8 +53,8 @@ The dialogue writes `docs/specs/<slug>.draft.md` incrementally and promotes it t
 
 | Path | Purpose |
 |------|---------|
-| `Makefile` | `link` / `unlink` / `status` / `check` / `test` |
-| `tools/check.sh` | The fixture battery `make test` runs — what keeps `make check` honest |
+| `Makefile` | `link` / `unlink` / `status` per agent CLI, plus `check` / `test` |
+| `tools/check.sh` | The fixture battery `make test` runs — what keeps `make check` and `make link` honest |
 | `skills/spec-dialogue/` | The skill itself — the directory `make link` symlinks |
 | `docs/index.html` | The published site — one self-contained page explaining the workflow |
 

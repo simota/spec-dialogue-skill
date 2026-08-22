@@ -649,13 +649,25 @@ a:focus-visible{outline:2px solid var(--gate);outline-offset:2px}
 <!-- ========== 12. INSTALL ========== -->
 <section id="install">
   <h2><span class="num">12</span>Install and invoke</h2>
-  <p class="sec-note">The skill lives at <code>skills/spec-dialogue/</code>. That directory is what gets linked — the repository README and the test battery stay behind. Any runtime that reads a <code>SKILL.md</code> with YAML frontmatter works the same way; nothing here is specific to one CLI beyond the default path.</p>
+  <p class="sec-note">The skill lives at <code>skills/spec-dialogue/</code>. That directory is what gets linked — the repository README and the test battery stay behind. Three CLIs read a <code>SKILL.md</code> with YAML frontmatter and each looks somewhere different, so <code>make link</code> writes one symlink per CLI installed on the machine; one whose own directory does not exist is skipped rather than created, and inside a project <code>codex</code> and <code>agy</code> share <code>.agents/skills</code>, so a single link there serves both.</p>
 
   <p class="sub-lab">install</p>
-<pre>make link                      # -&gt; ~/.claude/skills/spec-dialogue
-make link PROJECT=/path/repo   # -&gt; /path/repo/.claude/skills/spec-dialogue
+<pre>make link                      # every agent CLI installed here
+make link AGENT=codex          # just one — claude | codex | agy
+make link PROJECT=/path/repo   # that repository, instead of the home directories
 make status                    # where is it linked?
-make unlink                    # remove the link</pre>
+make unlink                    # remove the links that point at this repo</pre>
+
+  <table>
+    <thead><tr><th>agent</th><th>global</th><th>inside a project</th></tr></thead>
+    <tbody>
+      <tr><td><code>claude</code></td><td><code>~/.claude/skills</code></td><td><code>&lt;repo&gt;/.claude/skills</code></td></tr>
+      <tr><td><code>codex</code></td><td><code>$CODEX_HOME/skills</code>, default <code>~/.codex/skills</code></td><td><code>&lt;repo&gt;/.agents/skills</code></td></tr>
+      <tr><td><code>agy</code></td><td><code>~/.gemini/config/skills</code></td><td><code>&lt;repo&gt;/.agents/skills</code></td></tr>
+    </tbody>
+  </table>
+
+  <p class="sec-note">Nothing at a destination is overwritten: a real directory, or a link into another checkout, is refused and left alone, and <code>make unlink</code> removes only the links pointing at this repository. <code>SKILLS_DIR=&lt;dir&gt;</code> overrides the destination outright for a runtime none of the three names.</p>
 
   <p class="sub-lab">invoke</p>
 <pre>spec-dialogue                      # new dialogue
@@ -669,7 +681,8 @@ spec-dialogue &lt;slug-or-path&gt;       # re-open a locked spec for revision</p
              # a parent; no file in reference/ that SKILL.md never names; the lens
              # and gate-dimension counts the prose claims match what is defined
 make test    # the fixture battery — each check is broken in a scratch copy and
-             # required to fail, so a check nobody has watched fail is not trusted</pre>
+             # required to fail, so a check nobody has watched fail is not trusted;
+             # `make link` runs there too, against a throwaway home directory</pre>
 
   <div class="callout q"><b>Resumable by design.</b> The value here is a long multi-turn dialogue, so it must survive interruption. Each checkpoint writes to <code>docs/specs/&lt;slug&gt;.draft.md</code> with a current-phase marker and the Assumption Ledger delta. <code>spec-dialogue resume</code> replays the marker, summarizes the decisions so far in a few lines for confirmation, and continues — never silently restarting from FRAME.</div>
 </section>

@@ -20,6 +20,16 @@ trap 'rm -rf "$TMP"' EXIT
 pass=0
 fail=0
 
+# copy_ <name> — a throwaway copy of the tree, printed as a path. Every case mutates its own.
+copy_() {
+	d=$TMP/$(printf '%s' "$1" | tr -c 'a-zA-Z0-9' '_')
+	rm -rf "$d"
+	mkdir -p "$d/skills" || exit 1
+	cp -R "$SRC/Makefile" "$SRC/README.md" "$SRC/docs" "$d/" || exit 1
+	cp -R "$SRC/$SKILL" "$d/skills/" || exit 1
+	printf '%s' "$d"
+}
+
 # case <name> <ok|fail> <setup-shell-run-inside-the-copy> [indir|foreign]
 case_() {
 	name=$1
@@ -27,11 +37,7 @@ case_() {
 	setup=$3
 	where=${4:-indir}
 
-	d=$TMP/$(printf '%s' "$name" | tr -c 'a-zA-Z0-9' '_')
-	rm -rf "$d"
-	mkdir -p "$d/skills" || exit 1
-	cp -R "$SRC/Makefile" "$SRC/README.md" "$SRC/docs" "$d/" || exit 1
-	cp -R "$SRC/$SKILL" "$d/skills/" || exit 1
+	d=$(copy_ "$name")
 
 	if [ -n "$setup" ]; then
 		( cd "$d" && eval "$setup" ) || { printf 'SETUP  %s\n' "$name"; fail=$((fail + 1)); return; }
@@ -102,6 +108,105 @@ case_ 'gate digit drifts in the page'    fail 'sed "s|>7</b><span>gate dimension
 # --- a non-lens heading must not inflate the count ----------------------------
 case_ 'non-lens ### in roles.md'         ok   'printf "\n### Notes — not a lens\ntext\n" >> $SKILL/reference/roles.md'
 case_ 'a 19th lens, prose not updated'   fail 'printf "\n### Fake — a lens\n**Question:** counts?\n" >> $SKILL/reference/roles.md'
+
+# --- `make link` places the skill where each CLI actually reads it ------------
+#
+# The three CLIs look in three different directories, and a link recipe is exactly the kind of
+# thing that is never watched failing: it either wrote a symlink somewhere or it did not. Each
+# case below runs the real recipe against a throwaway HOME and then asserts the tree it left —
+# a recipe that quietly links nothing, or links into a CLI that is not installed, fails here.
+#
+# Default fixture: claude and codex are installed (their home directories exist), agy is not.
+
+# link_case <name> <ok|fail> <make-args> <assertion> [<setup>]
+#   The assertion runs inside the copy with $H as the fake home and $S as the skill it should
+#   point at; a non-zero exit fails the case even when make itself exited as expected.
+link_case_() {
+	name=$1
+	want=$2
+	margs=$3
+	assert=$4
+	setup=${5:-}
+
+	d=$(copy_ "link_$name")
+	H=$d/home
+	mkdir -p "$H/.claude" "$H/.codex" || exit 1
+	# make resolves its own directory physically, so the link it writes names the physical path.
+	# Comparing against `$d` would fail on any machine where the scratch tree sits under a
+	# symlink — /tmp on macOS, for one — for a reason that has nothing to do with the recipe.
+	S=$(cd "$d/$SKILL" && pwd -P)
+
+	if [ -n "$setup" ]; then
+		( cd "$d" && H=$H S=$S eval "$setup" ) || { printf 'SETUP  %s\n' "$name"; fail=$((fail + 1)); return; }
+	fi
+
+	( cd "$d" && make HOME="$H" CODEX_HOME="$H/.codex" $margs ) >/dev/null 2>&1
+	got=$?
+
+	if [ "$want" = ok ] && [ "$got" -ne 0 ]; then
+		fail=$((fail + 1)); printf 'FAIL   link: %s (make exited %s, want 0)\n' "$name" "$got"; return
+	fi
+	if [ "$want" = fail ] && [ "$got" -eq 0 ]; then
+		fail=$((fail + 1)); printf 'FAIL   link: %s (make exited 0, want non-zero)\n' "$name"; return
+	fi
+
+	if ( cd "$d" && H=$H S=$S eval "$assert" ); then
+		pass=$((pass + 1)); printf 'ok     link: %s\n' "$name"
+	else
+		fail=$((fail + 1)); printf 'FAIL   link: %s (make exited %s as expected, tree is wrong)\n' "$name" "$got"
+	fi
+}
+
+link_case_ 'installed CLIs get a link'   ok   'link' \
+	'[ "$(readlink "$H/.claude/skills/spec-dialogue")" = "$S" ] &&
+	 [ "$(readlink "$H/.codex/skills/spec-dialogue")" = "$S" ]'
+
+link_case_ 'an absent CLI is skipped'    ok   'link' \
+	'[ ! -e "$H/.gemini" ]'
+
+link_case_ 'agy installed, agy linked'   ok   'link' \
+	'[ "$(readlink "$H/.gemini/config/skills/spec-dialogue")" = "$S" ]' \
+	'mkdir -p "$H/.gemini/config"'
+
+link_case_ 'no CLI installed at all'     fail 'link' \
+	'[ ! -e "$H/.claude/skills" ]' \
+	'rm -rf "$H/.claude" "$H/.codex"'
+
+link_case_ 'linking twice is idempotent' ok   'link' \
+	'[ "$(readlink "$H/.claude/skills/spec-dialogue")" = "$S" ]' \
+	'make HOME="$H" CODEX_HOME="$H/.codex" link >/dev/null 2>&1'
+
+link_case_ 'a foreign link is refused'   fail 'link' \
+	'[ "$(readlink "$H/.codex/skills/spec-dialogue")" = /elsewhere ]' \
+	'mkdir -p "$H/.codex/skills" && ln -s /elsewhere "$H/.codex/skills/spec-dialogue"'
+
+link_case_ 'a real directory is refused' fail 'link' \
+	'[ -f "$H/.codex/skills/spec-dialogue/keep-me" ]' \
+	'mkdir -p "$H/.codex/skills/spec-dialogue" && : > "$H/.codex/skills/spec-dialogue/keep-me"'
+
+link_case_ 'AGENT= links only that one'  ok   'link AGENT=codex' \
+	'[ -L "$H/.codex/skills/spec-dialogue" ] && [ ! -e "$H/.claude/skills/spec-dialogue" ]'
+
+link_case_ 'an unknown AGENT stops'      fail 'link AGENT=nope' \
+	'[ ! -e "$H/.claude/skills/spec-dialogue" ]'
+
+# codex and agy both read `<repo>/.agents/skills`, so a project link is two directories, not three.
+link_case_ 'PROJECT= links the repo'     ok   'link PROJECT=proj' \
+	'[ "$(readlink proj/.claude/skills/spec-dialogue)" = "$S" ] &&
+	 [ "$(readlink proj/.agents/skills/spec-dialogue)" = "$S" ] &&
+	 [ ! -e "$H/.claude/skills/spec-dialogue" ]' \
+	'mkdir -p proj'
+
+link_case_ 'SKILLS_DIR= overrides all'   ok   'link SKILLS_DIR=elsewhere/skills' \
+	'[ "$(readlink elsewhere/skills/spec-dialogue)" = "$S" ] &&
+	 [ ! -e "$H/.claude/skills/spec-dialogue" ]'
+
+link_case_ 'unlink removes only ours'    ok   'unlink' \
+	'[ ! -e "$H/.claude/skills/spec-dialogue" ] &&
+	 [ "$(readlink "$H/.gemini/config/skills/spec-dialogue")" = /elsewhere ]' \
+	'make HOME="$H" CODEX_HOME="$H/.codex" link >/dev/null 2>&1
+	 mkdir -p "$H/.gemini/config/skills" && ln -s /elsewhere "$H/.gemini/config/skills/spec-dialogue"'
+
 
 printf '\n%s passed, %s failed\n' "$pass" "$fail"
 [ "$fail" -eq 0 ]
