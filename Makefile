@@ -14,13 +14,13 @@
 #   agent   global                             project
 #   claude  ~/.claude/skills                   <repo>/.claude/skills
 #   codex   $$CODEX_HOME/skills  (~/.codex)    <repo>/.agents/skills
-#   agy     ~/.gemini/config/skills            <repo>/.agents/skills
+#   agy     ~/.gemini/antigravity-cli/skills            <repo>/.agents/skills
 #
 # codex and agy share `.agents/skills` at project scope, so one link there serves both — the
 # duplicate collapses in `$(sort ...)` below rather than in a special case.
 #
 # Each target carries the directory that must already exist for it to be written, as
-# `guard|destination`. Globally the guard is the CLI's own home: a missing `~/.gemini/config`
+# `guard|destination`. Globally the guard is the CLI's own home: a missing `~/.gemini/antigravity-cli`
 # means agy is not installed here, and `make link` skips it rather than conjuring the tree for
 # a CLI the user does not run. Under PROJECT= the guard is the repository root instead — there
 # `.claude/` and `.agents/` are exactly what we are expected to create.
@@ -49,7 +49,7 @@ SKILLSD  := $(call tilde,$(SKILLS_DIR))
 ifeq ($(strip $(PROJECT)),)
 tgt_claude := $(HOME)/.claude|$(HOME)/.claude/skills
 tgt_codex  := $(CODEX_HOME)|$(CODEX_HOME)/skills
-tgt_agy    := $(HOME)/.gemini/config|$(HOME)/.gemini/config/skills
+tgt_agy    := $(HOME)/.gemini/antigravity-cli|$(HOME)/.gemini/antigravity-cli/skills
 else
 tgt_claude := $(PROJECTD)|$(PROJECTD)/.claude/skills
 tgt_codex  := $(PROJECTD)|$(PROJECTD)/.agents/skills
