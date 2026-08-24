@@ -165,8 +165,8 @@ link_case_ 'an absent CLI is skipped'    ok   'link' \
 	'[ ! -e "$H/.gemini" ]'
 
 link_case_ 'agy installed, agy linked'   ok   'link' \
-	'[ "$(readlink "$H/.gemini/config/skills/spec-dialogue")" = "$S" ]' \
-	'mkdir -p "$H/.gemini/config"'
+	'[ "$(readlink "$H/.gemini/antigravity-cli/skills/spec-dialogue")" = "$S" ]' \
+	'mkdir -p "$H/.gemini/antigravity-cli"'
 
 link_case_ 'no CLI installed at all'     fail 'link' \
 	'[ ! -e "$H/.claude/skills" ]' \
@@ -203,9 +203,9 @@ link_case_ 'SKILLS_DIR= overrides all'   ok   'link SKILLS_DIR=elsewhere/skills'
 
 link_case_ 'unlink removes only ours'    ok   'unlink' \
 	'[ ! -e "$H/.claude/skills/spec-dialogue" ] &&
-	 [ "$(readlink "$H/.gemini/config/skills/spec-dialogue")" = /elsewhere ]' \
+	 [ "$(readlink "$H/.gemini/antigravity-cli/skills/spec-dialogue")" = /elsewhere ]' \
 	'make HOME="$H" CODEX_HOME="$H/.codex" link >/dev/null 2>&1
-	 mkdir -p "$H/.gemini/config/skills" && ln -s /elsewhere "$H/.gemini/config/skills/spec-dialogue"'
+	 mkdir -p "$H/.gemini/antigravity-cli/skills" && ln -s /elsewhere "$H/.gemini/antigravity-cli/skills/spec-dialogue"'
 
 
 printf '\n%s passed, %s failed\n' "$pass" "$fail"
