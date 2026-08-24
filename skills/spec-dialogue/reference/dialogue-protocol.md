@@ -89,6 +89,6 @@ A `silent` element routes back to one targeted question (D1–D3) or an explicit
 - **FRAME** — Socratic clarification runs D1–D8; D5's history and contrast probes are the tools that surface constraints the user forgot they had.
 - **Every checkpoint** — D10–D12 (envelope, delta-only, orientation line), calibrated per D13.
 - **The draft** — carries the Assumption Ledger (§3) as a named section from FRAME onward.
-- **The Spec Quality Gate** — carries **Provenance** (D16) as its sixth dimension alongside ambiguity, completeness, consistency, testability, scope coherence, and resolvability.
+- **The Spec Quality Gate** — carries **Provenance** (D16) as one of its dimensions, alongside ambiguity, completeness, consistency, testability, scope coherence, economy and resolvability.
 
 This protocol governs **your own conversation with the user**. It is not an instruction to pass to a spawned lens: lenses produce material; the dialogue that presents it is yours alone.

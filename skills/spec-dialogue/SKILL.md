@@ -9,7 +9,7 @@ CAPABILITIES_SUMMARY:
 - option_divergence: Generate 3-5 candidate directions and steer them with the user across multiple turns
 - adversarial_convergence: Narrow to one direction under necessity / scope / feasibility / failure pressure
 - staged_authoring: L0 Vision -> L1 Requirements -> L2 Detail -> Behavior matrix -> L3 Acceptance Criteria with REQ<->AC traceability
-- quality_gate: Seven-dimension independent review of the spec as an artifact (lock precondition)
+- quality_gate: Eight-dimension independent review of the spec as an artifact (lock precondition)
 - refutation_panel: Refute-polarity skeptic panel against the four load-bearing claims a locked spec asserts
 - draft_persistence: Incremental draft writes with phase markers and resume from the last checkpoint
 - acceptance_test_spec: A companion docs/specs/<slug>.acceptance.md authored with the spec — TC-n cases, environment, fixtures, exit criteria, results left NOT_RUN
@@ -24,7 +24,7 @@ PROJECT_AFFINITY: universal
 
 Take a rough feature idea — possibly as vague as "I want notifications" — and refine it **through deep human-in-the-loop dialogue** into a finalized, acceptance-criteria-bearing specification the user explicitly signs off on, together with the **acceptance test specification** that says how anyone decides whether it was met. **Stops at the documents; writes no code and runs no tests.**
 
-**Principles:** Problem before solution · Diverge before converging · Every criterion testable · No silent assumptions · The user signs, not the agent
+**Principles:** Problem before solution · Diverge before converging · Every criterion testable · No silent assumptions · **Ambiguity closed, not hedged** · **Every line load-bearing** · The user signs, not the agent
 
 This skill is **fully self-contained**. It needs no other skill, agent, registry, or repository. Everything it depends on lives in `reference/` next to this file:
 
@@ -34,7 +34,7 @@ This skill is **fully self-contained**. It needs no other skill, agent, registry
 | `reference/roles.md` | The 18 analytical lenses this recipe uses, each defined inline |
 | `reference/refutation-protocol.md` | Skeptic-panel composition, evidence-vs-novelty, aggregation |
 | `reference/traceability.md` | The `REQ-n` / `AC-n` ID scheme the L1↔L3 mapping rests on |
-| `reference/doc-quality.md` | Document-deliverable discipline (reader contract, grounding, readability) |
+| `reference/doc-quality.md` | Document-deliverable discipline (reader contract, grounding, readability, economy, precision) |
 | `reference/spec-template.md` | The spec document template and the Spec Handoff Packet |
 | `reference/acceptance-test-template.md` | The companion acceptance test specification — `TC-n` cases, environment, fixtures, exit criteria, sign-off |
 
@@ -118,6 +118,8 @@ The **Authoring lens** carries the spine — staged elaboration L0 Vision → L1
 - Give every L3 acceptance criterion a **traceable ID (`AC-001`, `AC-002`, … per `reference/traceability.md` §1) mapped to the L1 requirement it verifies**, written as a **Given / When / Then scenario with a named oracle** — the thing that decides pass or fail. This traceability is what the Quality Gate's Completeness check verifies and what any downstream build consumes as its verification contract.
 - **Walk the Behavior matrix explicitly with the user.** Its six condition classes — empty state, invalid input, unauthorized, dependency unavailable, concurrent modification, limit exceeded — are the questions a spec forgets and a build discovers. A class that genuinely does not apply is struck out **with a reason**; a class nobody discussed becomes an `OQ-n`, never a blank.
 - **Every cross-functional requirement carries a number.** `CFR-n` states its metric, its target, and how it is measured; an adjective in that table is a Testability failure, not a requirement.
+- **Ambiguity is closed, not written down.** A term or threshold with two readings gets one targeted question (D1–D3); if the user does not settle it, it becomes an `ASSUME-n` with your chosen default or an `OQ-n` with an owner. What it never becomes is a hedge — `appropriate`, `as needed`, `robust`, `etc.` are the words a build reinterprets under deadline pressure (`reference/doc-quality.md` W15).
+- **Say it once, then stop.** The documents carry the minimum that conveys intent: a value in the table that owns it and nowhere else (W10), prose only where reasoning changes a build decision, and no line that nobody would miss if it were deleted (W9). Length is not diligence — the Economy dimension scores this at the gate, and a padded spec buries the lines a builder must not miss.
 - **Lock preconditions (all three mandatory, verified at LOCK):** (1) the spec carries **testable L3 acceptance criteria** — the difference between a spec and a wish; the **Verifiability lens** sanity-checks that each AC is actually checkable by a machine or a human. (2) **every must-have AC is discharged by at least one `TC-n`** in the acceptance test specification (`reference/traceability.md` §2, hop 2). (3) the spec **passes the Spec Quality Gate** (below).
 - **Author the acceptance test specification alongside L3**, not after it. `docs/specs/<slug>.acceptance.md` per `reference/acceptance-test-template.md`: a `TC-n` for every must-have AC, with concrete step values, a named environment, fixtures and their reset, exit criteria, and defect severities. Writing the procedure is what exposes an AC that only *reads* as testable — which is why it happens at SPECIFY, while the AC can still be rewritten, rather than at build time. **Every result is authored `NOT_RUN`**: `spec-dialogue` writes the suite, never its outcome.
 - **The test spec decides nothing the spec left open.** A behaviour discovered missing while writing a case becomes an `OQ-n` in the spec (`reference/acceptance-test-template.md` T6), never a decision made in the test document.
@@ -152,15 +154,16 @@ The **Authoring lens** carries the spine — staged elaboration L0 Vision → L1
 
 Before sign-off, the spec is adversarially reviewed **as an artifact, by a reviewer that is not its author** — the **Adversarial-review lens**, plus the Verifiability lens for AC checkability and the Arbitration lens where requirements trade off. "Independent" is load-bearing: the spec's author never scores its own gate, and the gate is never implemented by telling the authoring pass to re-check itself. Where no separate agent is available, run the gate as a **distinct pass with the authoring context set aside** — read the spec as a stranger would, from the document alone.
 
-The gate scores seven dimensions; each must pass, or its finding is explicitly downgraded into Open Questions (never silently passed):
+The gate scores eight dimensions; each must pass, or its finding is explicitly downgraded into Open Questions (never silently passed):
 
 | Dimension | Question |
 |-----------|----------|
-| Ambiguity | Is any requirement/AC open to more than one reasonable interpretation? |
+| Ambiguity | Would two competent readers build different things from the same requirement / AC / scope line? A hedge (`appropriate`, `as needed`, `robust`, `etc.`) is an unclosed question, not brevity — quantify it or carry it as an `OQ-n` (`reference/doc-quality.md` W15) |
 | Completeness | Does every in-scope requirement have ≥ 1 L3 AC, and every must-have AC ≥ 1 `TC`? (both hops of `REQ → AC → TC`) |
 | Consistency | Do scope, requirements, and ACs contradict each other anywhere? |
 | Testability | Is every AC verifiable by a machine or a human? |
 | Scope coherence | Are in-scope / out-of-scope collectively exhaustive and mutually exclusive? |
+| Economy | Does every line change what gets built? Delete what does not — a fact stated twice, prose restating a table, a summary of a section next to it (`reference/doc-quality.md` W9, W10) |
 | Provenance | Is every load-bearing element `elicited` / `ratified` / `parked` — none `silent`? (`reference/dialogue-protocol.md` D16; open `ASSUME-n` entries are walked with the user here) |
 | Resolvability | Does every `UNKNOWN` / `TBD` / open `ASSUME-n` in the document appear in Open Questions with an owner and a `Resolve by` level — and is no remaining question marked `before-build`? (`reference/doc-quality.md` W13) |
 
@@ -168,7 +171,7 @@ The spec is also a **document deliverable**: `reference/doc-quality.md` adds the
 
 ### Pre-lock refutation panel (refute-polarity)
 
-The seven dimensions above audit the spec **as a document**. They do not ask the harder question: *should this be locked at all?* A spec that is internally consistent, fully traceable, and completely wrong passes every one of them. So before sign-off, a skeptic panel runs per `reference/refutation-protocol.md` — **refute-polarity, 2-4 independent skeptics**, each prompted to kill the spec rather than evaluate it. The four **load-bearing claims** a locked spec silently asserts:
+The eight dimensions above audit the spec **as a document**. They do not ask the harder question: *should this be locked at all?* A spec that is internally consistent, fully traceable, and completely wrong passes every one of them. So before sign-off, a skeptic panel runs per `reference/refutation-protocol.md` — **refute-polarity, 2-4 independent skeptics**, each prompted to kill the spec rather than evaluate it. The four **load-bearing claims** a locked spec silently asserts:
 
 | Claim under attack | Skeptic angle |
 |--------------------|---------------|
@@ -197,16 +200,18 @@ Panel size scales with depth: `light` skips the panel, `standard` runs 2 skeptic
 | Single-pass spec masquerading as dialogue | human-in-the-loop at every phase boundary; an autonomous caller cannot skip contract-level checkpoints |
 | Reinvent the wheel / out-of-context spec | FRAME's reuse-scan (skipped only for greenfield) |
 | Lost dialogue on interruption | incremental draft persistence + `spec-dialogue resume` |
-| Locking a low-quality spec | seven-dimension Quality Gate as a lock precondition |
+| Locking a low-quality spec | eight-dimension Quality Gate as a lock precondition |
 | Downstream can't consume the spec | standard template + L1↔L3 AC traceability |
 | Silent assumptions inside a signed spec | Assumption Ledger (D9) + Provenance Gate (D16) blocks LOCK on any `silent` element |
 | Wall-of-questions, leading questions, rubber-stamp checkpoints, swallowed vague answers | `reference/dialogue-protocol.md` D1–D15 |
-| An internally-perfect but wrong spec | pre-lock refutation panel — the seven document dimensions cannot catch this |
+| An internally-perfect but wrong spec | pre-lock refutation panel — the eight document dimensions cannot catch this |
 | Ceremony driving users away from specifying at all | depth modes scale the dialogue without weakening any lock precondition |
 | Error paths described in prose and never tested | Behavior matrix rows cite a requirement *and* an AC (`reference/traceability.md` §3) |
 | A cross-functional requirement that is an adjective | `CFR-n` carries metric / target / measurement, or fails Testability |
 | A `TBD` buried mid-document, found by the build | Resolvability dimension + the Open Questions inventory rule (W13) |
 | Ambiguity surviving in free-form detail prose | L2 is four fixed slots, each filled or `N/A` with a reason |
+| An open question written as a hedge word instead of asked | Ambiguity dimension + W15 — quantify, or carry it as an `OQ-n` |
+| Padding and restated facts burying the load-bearing line | Economy dimension + W9 deletion test + W10 single source of truth |
 | Synonym drift between spec and code | Glossary with a `Not to be called` column (`reference/doc-quality.md` W11) |
 | Downstream re-derives the dialogue | Spec Handoff Packet carries the settled state in machine-consumable fields |
 | A must-have AC nobody can actually execute | hop-2 lock precondition: every must-have AC carries a `TC-n` |
@@ -226,6 +231,6 @@ Panel size scales with depth: `light` skips the panel, `standard` runs 2 skeptic
 
 `FRAME (Demand +Research?/Persona? +Reuse-scan? + ✓depth-mode + Socratic dialogue) → ✓confirm-problem + draft-init → EXPAND (Divergence ×2 +Market?) → ✓steer + draft → CHALLENGE (Arbitration + Subtraction + Impact +Pre-mortem?) → ✓pick + convergence-check + draft → SHAPE (Proposal +Prioritization?) → ✓edit + draft → SPECIFY (Authoring +API?/Data-model? +Verifiability +Demand? + acceptance-test authoring) → ✓iterate + draft → LOCK (✓quality-gate: Review +Verifiability +Arbitration? → ✓refutation-panel: 2-4 skeptics [skipped at depth=light] → ✓sign-off → promote draft to docs/specs/<slug>.md + docs/specs/<slug>.acceptance.md → ✓build-path → emit Spec Handoff Packet) [NO CODE, NO TEST EXECUTION]`
 
-Gate content is not restated in the chain — the seven Quality-Gate dimensions live in § Spec Quality Gate, the panel's polarity and four claims in § Pre-lock refutation panel, the mandatory traceable L3 ACs in Phase 4.
+Gate content is not restated in the chain — the eight Quality-Gate dimensions live in § Spec Quality Gate, the panel's polarity and four claims in § Pre-lock refutation panel, the mandatory traceable L3 ACs in Phase 4.
 
 Resumable: `spec-dialogue resume [<slug>]` re-enters from the draft's current-phase marker; `spec-dialogue <slug-or-path>` re-opens a locked spec for revision.

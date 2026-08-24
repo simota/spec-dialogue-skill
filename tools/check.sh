@@ -92,18 +92,18 @@ case_ 'prose drifts from the check'      fail 'for f in $SKILL/SKILL.md README.m
                                                done'
 
 # --- the Quality-Gate dimension count drifts from the table -------------------
-case_ 'gate count drifts in SKILL.md'    fail 'sed "s/seven dimensions/six dimensions/" $SKILL/SKILL.md > _ && mv _ $SKILL/SKILL.md'
+case_ 'gate count drifts in SKILL.md'    fail 'sed "s/eight dimensions/six dimensions/" $SKILL/SKILL.md > _ && mv _ $SKILL/SKILL.md'
 case_ 'gate count drifts in a ref file'  fail 'printf "The six-dimension gate.\n" >> $SKILL/reference/doc-quality.md'
-case_ 'gate count drifts, word between'  fail 'sed "s/seven Quality-Gate dimensions/six Quality-Gate dimensions/" $SKILL/reference/roles.md > _ && mv _ $SKILL/reference/roles.md'
+case_ 'gate count drifts, word between'  fail 'sed "s/eight Quality-Gate dimensions/six Quality-Gate dimensions/" $SKILL/reference/roles.md > _ && mv _ $SKILL/reference/roles.md'
 case_ 'gate prose drifts from the check' fail 'for f in $SKILL/SKILL.md README.md $SKILL/reference/doc-quality.md $SKILL/reference/roles.md docs/index.html; do
-                                                 sed -E "s/[Ss]even( [A-Za-z-]+)?[- ]dimension/the dimension/g; s/>7<\/b><span>gate dimensions/>7<\/b><span>gate axes/" "$f" > _ && mv _ "$f"
+                                                 sed -E "s/[Ee]ight( [A-Za-z-]+)?[- ]dimension/the dimension/g; s/>8<\/b><span>gate dimensions/>8<\/b><span>gate axes/" "$f" > _ && mv _ "$f"
                                                done'
-case_ 'an 8th dimension, prose stale'    fail 'awk "{print} /^\\| Resolvability \\|/{print \"| Fake | Does it? |\"}" $SKILL/SKILL.md > _ && mv _ $SKILL/SKILL.md'
+case_ 'a 9th dimension, prose stale'    fail 'awk "{print} /^\\| Resolvability \\|/{print \"| Fake | Does it? |\"}" $SKILL/SKILL.md > _ && mv _ $SKILL/SKILL.md'
 
 # --- the published page drifts from what the skill defines --------------------
 case_ 'lens count drifts in the page'    fail 'sed "s|>18</b><span>analytical lenses|>17</b><span>analytical lenses|" docs/index.html > _ && mv _ docs/index.html'
-case_ 'gate count drifts in the page'    fail 'sed "s/seven-dimension/six-dimension/g" docs/index.html > _ && mv _ docs/index.html'
-case_ 'gate digit drifts in the page'    fail 'sed "s|>7</b><span>gate dimensions|>9</b><span>gate dimensions|" docs/index.html > _ && mv _ docs/index.html'
+case_ 'gate count drifts in the page'    fail 'sed "s/eight-dimension/six-dimension/g" docs/index.html > _ && mv _ docs/index.html'
+case_ 'gate digit drifts in the page'    fail 'sed "s|>8</b><span>gate dimensions|>9</b><span>gate dimensions|" docs/index.html > _ && mv _ docs/index.html'
 
 # --- a non-lens heading must not inflate the count ----------------------------
 case_ 'non-lens ### in roles.md'         ok   'printf "\n### Notes — not a lens\ntext\n" >> $SKILL/reference/roles.md'

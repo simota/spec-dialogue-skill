@@ -67,7 +67,7 @@ Paths below are relative to `skills/spec-dialogue/`.
 | `reference/roles.md` | The 18 analytical lenses, each defined inline |
 | `reference/refutation-protocol.md` | Skeptic-panel composition, evidence-vs-novelty, aggregation, exclusions |
 | `reference/traceability.md` | `REQ-n` / `AC-n` / `TC-n` / `OQ-n` ID scheme, the AC shape, and the two-hop `REQ → AC → TC` linking rule |
-| `reference/doc-quality.md` | W1–W13 — reader contract, grounding, readability, coherence, completeness |
+| `reference/doc-quality.md` | W1–W15 — reader contract, grounding, readability, coherence, completeness, precision |
 | `reference/spec-template.md` | The spec document template — section tiers, Behavior matrix, Given/When/Then ACs — and the Spec Handoff Packet |
 | `reference/acceptance-test-template.md` | The companion acceptance test specification — `TC-n` cases, environment, fixtures, exit criteria, defect severities, sign-off |
 
@@ -75,7 +75,7 @@ Paths below are relative to `skills/spec-dialogue/`.
 
 `docs/index.html` is a single self-contained page that explains the skill — the six phases and their
 checkpoints, the return edges a failing gate takes, the two documents it emits, the `REQ → AC → TC`
-chain, the seven-dimension gate, the refutation panel's four claims, and what actually blocks a lock.
+chain, the eight-dimension gate, the refutation panel's four claims, and what actually blocks a lock.
 No build step, no dependencies, one file.
 
 ```sh
@@ -88,7 +88,7 @@ lives at `https://<owner>.github.io/<repo>/`.
 The page is explanatory only; `skills/spec-dialogue/SKILL.md` and its `reference/` files stay
 canonical. Nothing generates the page, so nothing silently drifts without a diff to review — and
 `make check` reads the page with its tags stripped, so the two counts it states — 18 lenses and
-seven gate dimensions, in the fact strip and in the prose alike — cannot drift from what
+eight gate dimensions, in the fact strip and in the prose alike — cannot drift from what
 `reference/roles.md` and `SKILL.md` actually define.
 
 ## The idea

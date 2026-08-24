@@ -112,8 +112,8 @@ any other shape is prose, not a lens, and is not counted.
 ## LOCK lenses
 
 ### Adversarial-review — the spec as an artifact
-**Question:** Read only this document, knowing nothing of the conversation. Where is it ambiguous, incomplete, contradictory, untestable, or scope-incoherent?
-**Output:** findings against the seven Quality-Gate dimensions, each pointing at a specific line.
+**Question:** Read only this document, knowing nothing of the conversation. Where is it ambiguous, incomplete, contradictory, untestable, scope-incoherent, or padded with lines that change nothing?
+**Output:** findings against the eight Quality-Gate dimensions, each pointing at a specific line.
 **Discipline:** **the author never runs this on their own work.** With no separate agent available, run it as a distinct pass with the authoring context deliberately set aside — read the spec as a stranger would, from the document alone, and treat every place you have to remember the conversation to understand a line as a finding.
 
 ### Skeptic — kill the spec

@@ -2,7 +2,7 @@
 
 **Purpose:** The locked spec and its acceptance test specification are document deliverables. Code has tests; documents have readers — so quality means: the declared reader can make the declared decision from the artifact alone, every externally-checkable fact is grounded, and the document is internally coherent. These rules apply to both; where one names "the spec", read it as "each document".
 
-**Read when:** authoring in Phase 4 SPECIFY, and again at the Spec Quality Gate. The seven gate dimensions in `SKILL.md` audit the spec's *logic*; this file audits it as *prose someone will read at 3 a.m. six months from now*.
+**Read when:** authoring in Phase 4 SPECIFY, and again at the Spec Quality Gate. The eight gate dimensions in `SKILL.md` audit the spec's *logic*; this file audits it as *prose someone will read at 3 a.m. six months from now*.
 
 ---
 
@@ -29,7 +29,7 @@
 |---|------|-----------|
 | W7 | **Summary-first, layered** | The spec opens with what its reader needs in ~5 lines, then layers detail. That is exactly what the L0 → L1 → L2 → L3 staging is for. Never make the reader excavate the conclusion. Tables for enumerable facts; prose for reasoning. |
 | W8 | **Scannability envelope** | One idea per section; headings state findings, not topics. Section length matched to the reader's stake in it. A spec nobody finishes delivers nothing regardless of its accuracy. |
-| W9 | **No padding** | Cover the substance and stop. Filler sections, restated summaries, and boilerplate are not thoroughness — they are the material W7 and W8 exist to prevent, and they dilute the parts a builder must not miss. If a template section has nothing in it, write `N/A` with a one-line reason rather than padding it into plausibility. |
+| W9 | **Deletion test** | Every line earns its place by changing what a reader decides or a builder does; **delete the ones that do not.** Apply it literally: cut a sentence, and if no decision changes, it was padding — filler sections, restated summaries, prose paraphrasing the table beside it, boilerplate. Length is not diligence: what padding costs is the reader's attention on the lines a builder must not miss. If a template section has nothing in it, write `N/A` with a one-line reason rather than padding it into plausibility. This is what the gate's **Economy** dimension scores. |
 
 ## 4. Coherence (W10–W11)
 
@@ -49,6 +49,17 @@ W13 is what the Quality Gate's **Resolvability** dimension scans for, and it is 
 "no open questions" from a claim into a check: the inventory is a grep, and its result is either
 empty or a list with names against it.
 
+## 6. Precision (W15)
+
+| # | Rule | Discipline |
+|---|------|-----------|
+| W15 | **One reading** | A line passes only if two competent readers would build the same thing from it. The test is applied to the wording, not to the author's intent: **hedge vocabulary** — `appropriate`, `as needed`, `properly`, `robust`, `reasonable`, `fast`, `etc.`, `and so on` — marks a question the dialogue left open, so it is either replaced by a number, an enumeration, or a named condition, or carried as an `OQ-n` (W13) with the hedge removed. Same for an unbounded list: `etc.` after three examples hides whichever case the build will meet. This is the prose-level half of the gate's **Ambiguity** dimension — the gate asks whether a requirement has two readings, W15 says what to do with the words that give it two. |
+
+W15 and W9 pull in opposite directions on purpose, and the tension is the point: W15 forbids
+compressing a decision into a vague word, W9 forbids spending a paragraph on a decision a cell
+states. What survives both is the **minimum wording that admits one reading** — neither shorter
+nor longer.
+
 ## Failure Modes Prevented
 
 | Failure | Mitigation |
@@ -58,10 +69,11 @@ empty or a list with names against it.
 | Silent rot — facts age, nobody notices | W3 as-of + review trigger |
 | **Plausible-but-fabricated specifics** (numbers, names, endpoints) | W4 grounding + W5 UNKNOWN-over-fabrication + W6 quote fidelity |
 | Buried conclusions, spec nobody finishes | W7 summary-first + W8 scannability |
-| Padding read as thoroughness | W9 no-padding |
+| Padding read as thoroughness | W9 deletion test |
+| A hedge word standing in for a decision nobody made | W15 one reading — quantify, or carry it as an `OQ-n` |
 | Shared facts forking on the first edit | W10 single source of truth |
 | Synonym drift confusing the builder | W11 terminology ledger |
 | Missing section read as "considered and empty" | W12 present-or-`N/A`+reason, by tier |
 | A `TBD` buried mid-document, found by the build | W13 unresolved-marker inventory |
 
-These rules **specialize** the Spec Quality Gate rather than replacing it: the gate's seven dimensions decide whether the spec is *right*; the W rules decide whether it can be *read and trusted*. Both are lock preconditions.
+These rules **specialize** the Spec Quality Gate rather than replacing it: the gate's eight dimensions decide whether the spec is *right*; the W rules decide whether it can be *read and trusted*. Both are lock preconditions.

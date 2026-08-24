@@ -4,7 +4,7 @@ Both the draft (`docs/specs/<slug>.draft.md`) and the locked spec (`docs/specs/<
 
 The spec ships with a **companion**: `docs/specs/<slug>.acceptance.md`, the Acceptance Test Specification (`acceptance-test-template.md`). The spec says what must be true; the companion says how anyone decides whether it is. They are authored together in Phase 4 and locked together, linked by `AC-n ← TC-n`.
 
-The structure exists to make *unstated* things visible. A spec is rarely wrong because someone wrote a falsehood; it is wrong because nobody wrote the empty-state behaviour, the latency number, or the word "member" meaning two different things. Every table below is shaped so that a gap in it is a **blank cell**, not silence.
+The structure exists to make *unstated* things visible. A spec is rarely wrong because someone wrote a falsehood; it is wrong because nobody wrote the empty-state behaviour, the latency number, or the word "member" meaning two different things. Every table below is shaped so that a gap in it is a **blank cell**, not silence — and so that each fact has exactly one cell. Prose between the tables carries reasoning that changes a build decision; it never restates what a cell already says, and a cell never holds a hedge where a value belongs (`doc-quality.md` W9, W15).
 
 ---
 

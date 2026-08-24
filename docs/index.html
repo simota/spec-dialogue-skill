@@ -4,7 +4,7 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>Spec Dialogue · Skill Reference</title>
-<meta name="description" content="Six phases, seven gate dimensions and two locked documents: how the Spec Dialogue Agent Skill turns a rough feature idea into a specification and the acceptance tests that decide it.">
+<meta name="description" content="Six phases, eight gate dimensions and two locked documents: how the Spec Dialogue Agent Skill turns a rough feature idea into a specification and the acceptance tests that decide it.">
 <meta name="color-scheme" content="light dark">
 <meta property="og:title" content="Spec Dialogue · Skill Reference">
 <meta property="og:description" content="The dialogue is the work. The document is its crystallized output.">
@@ -170,11 +170,11 @@ a:focus-visible{outline:2px solid var(--gate);outline-offset:2px}
 <header class="mast">
   <p class="eyebrow">Agent Skill / rough idea → locked specification</p>
   <h1>Spec Dialogue<span class="sub">The dialogue is the work. The document is its crystallized output.</span></h1>
-  <p class="lede">Six phases, checkpoints an autonomous caller cannot skip, a seven-dimension quality gate, a panel of skeptics prompted to kill the spec, and an explicit human sign-off. What leaves at the end is a pair of documents: the specification, and the acceptance tests that decide whether it was met. It writes no code and runs no tests.</p>
+  <p class="lede">Six phases, checkpoints an autonomous caller cannot skip, an eight-dimension quality gate, a panel of skeptics prompted to kill the spec, and an explicit human sign-off. What leaves at the end is a pair of documents: the specification, and the acceptance tests that decide whether it was met. It writes no code and runs no tests.</p>
   <div class="facts">
     <div class="fact"><b>6</b><span>phases</span></div>
     <div class="fact"><b>18</b><span>analytical lenses</span></div>
-    <div class="fact"><b>7</b><span>gate dimensions</span></div>
+    <div class="fact"><b>8</b><span>gate dimensions</span></div>
     <div class="fact"><b>4</b><span>claims attacked</span></div>
     <div class="fact"><b>2</b><span>locked documents</span></div>
     <div class="fact"><b>0</b><span>lines of code</span></div>
@@ -547,29 +547,30 @@ a:focus-visible{outline:2px solid var(--gate);outline-offset:2px}
 <!-- ========== 7. GATE ========== -->
 <section id="gate">
   <h2><span class="num">07</span>The Spec Quality Gate</h2>
-  <p class="sec-note">A seven-dimension review of the spec <strong>as an artifact, by a reviewer that is not its author</strong>. Independence is load-bearing: the author never scores its own gate. Where no separate agent is available, the gate runs as a distinct pass with the authoring context set aside — read as a stranger would, from the document alone. Each dimension must pass, or its finding is explicitly downgraded into Open Questions. Never silently passed.</p>
+  <p class="sec-note">An eight-dimension review of the spec <strong>as an artifact, by a reviewer that is not its author</strong>. Independence is load-bearing: the author never scores its own gate. Where no separate agent is available, the gate runs as a distinct pass with the authoring context set aside — read as a stranger would, from the document alone. Each dimension must pass, or its finding is explicitly downgraded into Open Questions. Never silently passed.</p>
   <div class="tw">
     <table>
       <thead><tr><th>Dimension</th><th>The question it asks</th></tr></thead>
       <tbody>
-        <tr><td><b>Ambiguity</b></td><td>Is any requirement or criterion open to more than one reasonable interpretation?</td></tr>
+        <tr><td><b>Ambiguity</b></td><td>Would two competent readers build different things from the same requirement, criterion or scope line? A hedge — <code>appropriate</code>, <code>as needed</code>, <code>robust</code>, <code>etc.</code> — is an unclosed question, not brevity.</td></tr>
         <tr><td><b>Completeness</b></td><td>Does every in-scope requirement have at least one criterion, and every must-have criterion at least one test case? Both hops.</td></tr>
         <tr><td><b>Consistency</b></td><td>Do scope, requirements and criteria contradict each other anywhere?</td></tr>
         <tr><td><b>Testability</b></td><td>Is every criterion verifiable by a machine or a human — with a named oracle, not “verifiable in principle”?</td></tr>
         <tr><td><b>Scope coherence</b></td><td>Are in-scope and out-of-scope collectively exhaustive and mutually exclusive?</td></tr>
+        <tr><td><b>Economy</b></td><td>Does every line change what gets built? A fact stated twice, prose restating the table beside it, a summary of the section above it — deleted. Length is not diligence.</td></tr>
         <tr><td><b>Provenance</b></td><td>Is every load-bearing element <code>elicited</code>, <code>ratified</code> or <code>parked</code> — none <code>silent</code>?</td></tr>
         <tr><td><b>Resolvability</b></td><td>Does every <code>UNKNOWN</code>, <code>TBD</code> and open assumption appear in Open Questions with an owner and a level — and is nothing left at <code>before-build</code>?</td></tr>
       </tbody>
     </table>
   </div>
   <p class="sub-lab">and the document rules underneath them</p>
-  <p class="sec-note">The seven dimensions decide whether the spec is <em>right</em>. A separate set of rules decides whether it can be <em>read and trusted</em>: a declared audience and decision, freshness metadata with a review trigger, every externally-checkable fact grounded or flagged, <code>UNKNOWN</code> over a plausible guess, one fact stated in exactly one place, one concept one term, and every template section present. Both are lock preconditions.</p>
+  <p class="sec-note">The eight dimensions decide whether the spec is <em>right</em>. A separate set of rules decides whether it can be <em>read and trusted</em>: a declared audience and decision, freshness metadata with a review trigger, every externally-checkable fact grounded or flagged, <code>UNKNOWN</code> over a plausible guess, one fact stated in exactly one place, one concept one term, every template section present, and no line that changes nothing if deleted. Both are lock preconditions.</p>
 </section>
 
 <!-- ========== 8. PANEL ========== -->
 <section id="panel">
   <h2><span class="num">08</span>The pre-lock refutation panel</h2>
-  <p class="sec-note">The seven dimensions audit the spec as a document. They do not ask the harder question: <em>should this be locked at all?</em> A spec that is internally consistent, fully traceable and completely wrong passes every one of them. So 2–4 independent skeptics run before sign-off, each prompted to <strong>kill</strong> the spec from one assigned angle rather than to evaluate it — a skeptic asked to evaluate will hedge.</p>
+  <p class="sec-note">The eight dimensions audit the spec as a document. They do not ask the harder question: <em>should this be locked at all?</em> A spec that is internally consistent, fully traceable and completely wrong passes every one of them. So 2–4 independent skeptics run before sign-off, each prompted to <strong>kill</strong> the spec from one assigned angle rather than to evaluate it — a skeptic asked to evaluate will hedge.</p>
   <div class="tw">
     <table>
       <thead><tr><th>Claim a locked spec silently asserts</th><th>The skeptic's angle</th></tr></thead>
@@ -596,7 +597,7 @@ a:focus-visible{outline:2px solid var(--gate);outline-offset:2px}
       <tbody>
         <tr><td><b>Testable criteria</b></td><td>every L3 criterion is checkable by a machine or a human, with a named oracle</td><td>back to SPECIFY</td></tr>
         <tr><td><b>A procedure behind each</b></td><td>every <b>must-have</b> criterion is discharged by at least one <code>TC-n</code></td><td>back to SPECIFY</td></tr>
-        <tr><td><b>The Quality Gate</b></td><td>seven dimensions, reviewed independently of the author</td><td>fix, or downgrade the finding into Open Questions with the user's agreement</td></tr>
+        <tr><td><b>The Quality Gate</b></td><td>eight dimensions, reviewed independently of the author</td><td>fix, or downgrade the finding into Open Questions with the user's agreement</td></tr>
         <tr><td><b>The Provenance Gate</b></td><td>no load-bearing element is <code>silent</code>; open assumptions are walked with the user one by one</td><td>the lock is blocked until each is ratified or parked</td></tr>
         <tr><td><b>The refutation panel</b></td><td>skipped at <code>light</code>; otherwise 2–4 skeptics</td><td>majority refuted on evidence → CHALLENGE or SPECIFY</td></tr>
         <tr><td><b>Explicit sign-off</b></td><td>the user says lock it — the agent never does</td><td>nothing is promoted</td></tr>

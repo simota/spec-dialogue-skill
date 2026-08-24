@@ -167,6 +167,7 @@ section is what stops "all green" from being read as "everything works".
 | T6 | The test spec decides nothing the spec left open | an unspecified behaviour discovered here becomes an `OQ-n` in the spec, not a decision here |
 | T7 | Results are authored as `NOT_RUN` | `spec-dialogue` writes the suite, never its outcome; a pre-filled pass is a fabricated result (`doc-quality.md` W5) |
 | T8 | Every section present, or `N/A` with a one-line reason | same tier discipline as the spec (`doc-quality.md` W12) |
+| T9 | A second `TC` on the same `AC` exercises a **different** path, or it does not exist | duplicate coverage costs a run every time and raises confidence once; the suite is sized by the paths that can fail, not by the cases someone can write (`doc-quality.md` W9) |
 
 ## Failure Modes Prevented
 
@@ -180,3 +181,4 @@ section is what stops "all green" from being read as "everything works".
 | A threshold that drifts between spec and test | T5 cite-never-restate |
 | A flaky case disappearing into a re-run | §9 appends runs rather than overwriting |
 | Error paths specified but never tested | §5 covers the Behavior matrix rows, not just happy paths |
+| A suite that is long rather than discriminating | T9 — a second case per AC only for a different path |
