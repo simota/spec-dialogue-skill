@@ -31,8 +31,8 @@ The panel must **kill weak claims, not bold ones.** The distinction that does th
 
 ## 3. Verdict aggregation
 
-- **Majority on evidence decides.** Majority refuted-on-evidence → **back to CHALLENGE (the direction is wrong) or SPECIFY (the ACs or the scope boundary are wrong)** — not a park, because the spec is defective rather than incomplete. Majority merely-unproven → **LOCK-with-flag**.
-- **Carry forward the survivors' failures.** Record which refutations the spec survived and which it failed, and whether each open risk is "refuted-on-evidence" or "unproven-because-new". On a loop back to CHALLENGE, **carry refuted directions forward as exclusions** so the reframe does not re-derive an already-refuted option.
+- **Majority on evidence decides.** Majority refuted-on-evidence → **back to the earliest invalidated decision** (`SKILL.md` § Draft persistence & resume) — not a park, because the spec is defective rather than incomplete. Majority merely-unproven → **LOCK-with-flag**.
+- **Carry forward the survivors' failures.** Record which refutations the spec survived and which it failed, and whether each open risk is "refuted-on-evidence" or "unproven-because-new". On a loop back to CHALLENGE, **carry refuted directions forward as exclusions** while the defeating evidence still applies, so the reframe does not re-derive an already-refuted option from unchanged premises.
 - **Surface, don't bury.** The Open Questions section states the surviving and failed refutations so the sign-off is auditable. A panel whose findings do not appear in the locked document did not run.
 
 ---
@@ -42,6 +42,8 @@ The panel must **kill weak claims, not bold ones.** The distinction that does th
 - **Safety-critical scope** (auth, encryption, input validation, anything with a regulatory obligation) is **not cut from a spec on a skeptic panel's vote** — a panel does not authorize removing a control. Park it and escalate to a human with the relevant authority.
 - **Confidence `< 60%`** → do not act on the destructive reading; route to "defer + gather evidence" and park it as an Open Question.
 - **A verdict flips on new evidence, never on pressure.** Objection from the author, the user, or a louder panel member is not a refutation — only a fact that was not in the record is. Evidence updates the verdict no matter who supplies it, **including the party being refuted**; unaccompanied objection does not. Name the triggering evidence, or do not flip.
+
+Parking under this protocol does not waive the dependency-based Lock rule (`spec-template.md`). An unresolved mandatory control or acceptance dependency still blocks LOCK.
 
 **Three ways over-correcting fails.** The goal is independence from pressure, not refusal to move:
 

@@ -68,16 +68,19 @@ banned words instead of noticing the drift by feel.
 | REQ-001 | … | CRITICAL | elicited (turn 4) \| ratified \| derived from REQ-002 |
 
 ### Cross-functional (`CFR-n`)
-A cross-functional requirement without a number is an opinion. Every row states what is measured,
-the threshold, and where the measurement comes from — an empty `Target` or `Measured how` fails the
-Quality Gate's Testability dimension rather than passing as prose.
+Every cross-functional requirement needs an objective pass/fail condition, not necessarily a number.
+For quantitative claims, retain a justified threshold and measurement conditions. For categorical
+or normative claims, name the required state or applicable criterion/version and the evidence
+that decides conformance. Do not invent percentages; an uncheckable condition fails Testability.
 
-| ID | Requirement | Metric | Target | Measured how | Priority | Source |
-|----|-------------|--------|--------|--------------|----------|--------|
-| CFR-001 | the list loads fast | p95 latency | ≤ 300 ms | existing APM dashboard `<name>` | HIGH | ratified |
+| ID | Requirement | Measure / criterion | Target / required outcome | Verified how | Priority | Source |
+|----|-------------|---------------------|---------------------------|--------------|----------|--------|
+| CFR-001 | … | metric or applicable criterion | sourced or agreed threshold / condition | observation + pass/fail rule | HIGH | elicited / ratified / grounded |
 
 `Source` on both tables is what the Provenance Gate reads (`dialogue-protocol.md` D16) — every
-load-bearing row is `elicited` / `ratified` / `derived from <ID>` / `parked (OQ-n)`, never blank.
+load-bearing row has decision provenance (`elicited` / `ratified`), factual evidence (`grounded`),
+or is `parked (OQ-n)`. `derived from <ID>` must trace to such support without adding a choice or
+empirical premise. Grounding records source, version/date and applicability; assent is not evidence.
 See `traceability.md` §1 for the ID scheme.
 
 ## L2 — Detail
@@ -159,29 +162,35 @@ Collectively exhaustive and mutually exclusive. An out-of-scope item that an in-
 depends on is a boundary defect, and the refutation panel attacks exactly that.
 
 ## Considered but rejected
-Directions dropped in CHALLENGE, one line each on why — so a resume or revision does not re-derive them.
+Directions dropped in CHALLENGE, one line each on why. Reuse the rejection while its premises remain valid; revision may reopen it when those premises change.
 
 ## Assumption Ledger
 `dialogue-protocol.md` §3. Draft-time this is live; at LOCK every remaining `open` entry is either
-ratified into a decision or moved to Open Questions as an `OQ-n`.
+ratified into a decision or moved to Open Questions as an `OQ-n`; parking does not waive the Lock rule below.
 
 | ID | Assumption | Default chosen | Why | Status |
 |----|-----------|----------------|-----|--------|
 
 ## Open Questions / Deferred Decisions
 Every unresolved thing in the document, in one place with an owner. Parked items, Quality-Gate
-findings downgraded rather than fixed, and any `LOCK-with-flag` refutation with the assumption it
+non-blocking findings parked with the user's agreement, and any `LOCK-with-flag` refutation with the assumption it
 rests on. Nothing is dropped silently.
 
 | ID | Question | Blocks | Owner | Resolve by | Impact if wrong |
 |----|----------|--------|-------|-----------|-----------------|
-| OQ-1 | … | REQ-003 \| nothing | <who> | before-build \| before-ship \| deferred | … |
+| OQ-1 | … | REQ-003 — dependent decision + reason, or nothing — reason | <who> | before-build \| before-ship \| deferred | … |
 
-**Lock rule.** `Resolve by` is the load-bearing column — it is what the lock is decided on. A spec
-may be `locked` with open questions, but not with one whose `Resolve by` is `before-build`, because
-that spec cannot be handed to a build. Either resolve it, or lower it to `before-ship` / `deferred`
-with the user's agreement and say so. `Blocks` names what the question hangs over, so a reader can
-tell which requirement is standing on an unanswered question; it never sets the level itself.
+**Lock rule.** Derive `Resolve by` from dependencies, not a desired schedule. In `Blocks`, name the
+dependent decision/requirement/AC and why it needs the answer (or `nothing` with a reason).
+An answer that changes implementation, architecture, must-have behavior or acceptance meaning is
+`before-build` and blocks LOCK regardless of its label or user consent. Resolve it or explicitly
+revise the affected scope and its obligations, then revalidate; relabeling or a priority downgrade
+alone cannot remove the dependency. `before-ship` is for release-only choices or execution-time
+bindings whose required capabilities and pass/fail contract are already settled (for example,
+the actual build identifier). `deferred` requires no dependency in the current build or acceptance
+contract. Explain that independence in `Blocks`. Missing mandatory behavior, security obligations,
+consistent ACs, an acceptance oracle or a must-have TC procedure cannot be waived into an OQ.
+Only non-blocking findings may be parked with an owner and the user's agreement.
 
 **Inventory rule.** Every `UNKNOWN`, `TBD(<owner>)` and open `ASSUME-n` anywhere in this document
 appears here as an `OQ-n`. A marker buried in L2 that never reaches this table is the failure this
@@ -210,9 +219,9 @@ Emitted at LOCK. A handoff that ships only a file path forces whatever builds th
 | `non_goals` | the out-of-scope list, verbatim — carried into the scope bound of every downstream work item |
 | `dependencies` | the integration points, their contracts, and the declared fallback for each |
 | `assumption_ledger` | remaining `ASSUME-n` entries and their status — risk input for the build |
-| `open_questions` | the `OQ-n` set with `Blocks` / `Owner` / `Resolve by` — never silently dropped downstream, and never containing a `before-build` entry at LOCK |
+| `open_questions` | the `OQ-n` set with `Blocks` / `Owner` / `Resolve by` — never silently dropped downstream, and never carrying an unresolved build/acceptance dependency at LOCK, regardless of label |
 | `refutation_flags` | any `LOCK-with-flag` claim and the assumption it rests on — each is a kill-criterion candidate for the build |
-| `reuse_findings` | the existing-asset and constraint map from FRAME, so the build skips re-scanning |
+| `reuse_findings` | the existing-asset and constraint map from FRAME with source versions; avoid re-scanning unchanged premises, not freshness checks |
 | `build_path` | the path chosen at LOCK |
 
-**Contract rule.** A build that receives the packet **does not re-open the settled decisions** — it may surface a contradiction it discovers against real code, but re-litigating the direction is drift. A build that finds a **must-have AC unbuildable as written** returns to `spec-dialogue <slug>` for revision, re-entering at SPECIFY and re-running the lock preconditions, rather than quietly reinterpreting it.
+**Contract rule.** A build that receives the packet **does not re-open the settled decisions** — it may surface a contradiction it discovers against real code, but re-litigating the direction is drift. A build that finds a **must-have AC unbuildable as written** returns to `spec-dialogue <slug>` for revision, returning to the earliest invalidated decision under `SKILL.md` § Draft persistence & resume and re-running the lock preconditions, rather than quietly reinterpreting it.

@@ -204,7 +204,7 @@ a:focus-visible{outline:2px solid var(--gate);outline-offset:2px}
 
   <figure>
     <div class="scroll">
-    <svg viewBox="0 0 1200 440" role="img" aria-label="Spec Dialogue flow. FRAME, EXPAND, CHALLENGE, SHAPE, SPECIFY and LOCK run left to right, each preceded by a checkpoint. A dialogue that circles for two rounds returns from CHALLENGE to EXPAND; a Quality Gate finding returns from LOCK to SPECIFY; a refutation carried on evidence returns to CHALLENGE or SPECIFY. LOCK emits the locked spec and its acceptance test specification together. A downstream build that finds a must-have criterion unbuildable re-enters at SPECIFY.">
+    <svg viewBox="0 0 1200 440" role="img" aria-label="Spec Dialogue flow. FRAME, EXPAND, CHALLENGE, SHAPE, SPECIFY and LOCK run left to right, each preceded by a checkpoint. The shown return arrows illustrate renewed exploration, an AC fix at SPECIFY and a direction fix at CHALLENGE; actual revisions return to the earliest invalidated decision. LOCK emits the locked spec and its acceptance test specification together. A downstream contradiction returns to the earliest invalidated decision, retaining unaffected work.">
       <defs>
         <marker id="ar" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path d="M0,1 L9,5 L0,9 z" fill="currentColor"/></marker>
         <marker id="arG" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path d="M0,1 L9,5 L0,9 z" fill="#9E3B26"/></marker>
@@ -275,8 +275,8 @@ a:focus-visible{outline:2px solid var(--gate);outline-offset:2px}
       </g>
       <g font-family="'JetBrains Mono',monospace" font-size="9.5" fill="#9E3B26">
         <text x="380" y="226" text-anchor="middle">circling ≥ 2 rounds → re-diverge, or park it</text>
-        <text x="918" y="268" text-anchor="middle">Quality-Gate finding → fix, or downgrade to an OQ</text>
-        <text x="815" y="314" text-anchor="middle">majority refuted on evidence → CHALLENGE or SPECIFY</text>
+        <text x="918" y="268" text-anchor="middle">gate finding → fix; park only if non-blocking</text>
+        <text x="815" y="314" text-anchor="middle">majority refuted → earliest invalidated decision</text>
       </g>
 
       <!-- downstream re-entry -->
@@ -287,7 +287,7 @@ a:focus-visible{outline:2px solid var(--gate);outline-offset:2px}
       <g stroke="currentColor" stroke-width="1.2" fill="none" marker-end="url(#ar)" opacity=".7" stroke-dasharray="4 3">
         <polyline points="115,336 115,182 830,182 830,158"/>
       </g>
-      <text x="20" y="384" font-family="'JetBrains Mono',monospace" font-size="9" fill="currentColor" opacity=".6">must-have AC unbuildable as written → re-enters at SPECIFY</text>
+      <text x="20" y="384" font-family="'JetBrains Mono',monospace" font-size="9" fill="currentColor" opacity=".6">unbuildable AC → earliest invalidated decision; keep valid work</text>
 
       <!-- output -->
       <g stroke="currentColor" stroke-width="1.4" fill="none" marker-end="url(#ar)">
@@ -301,7 +301,7 @@ a:focus-visible{outline:2px solid var(--gate);outline-offset:2px}
       <text x="1110" y="344" text-anchor="end" font-family="'JetBrains Mono',monospace" font-size="9" fill="currentColor" opacity=".55">promoted together</text>
     </svg>
     </div>
-    <figcaption>Dashed chips are the checkpoints; oxide-red edges send work back. A dialogue that circles twice without new information is offered a choice — lock the leading candidate, or park the disagreement as an Open Question — rather than looping forever. A Quality-Gate finding is fixed or explicitly downgraded, never silently passed. A refutation blocks only when it is carried <em>on evidence</em>; unproven-because-new routes to <code>LOCK-with-flag</code>.</figcaption>
+    <figcaption>Dashed chips are the checkpoints; oxide-red edges send work back. A dialogue that circles twice without new information is offered a choice — lock the leading candidate, or park the disagreement as an Open Question — rather than looping forever. Only non-blocking findings may be parked; unresolved build or acceptance dependencies block LOCK despite user consent. The return arrows illustrate branches, not fixed restart phases. A refutation blocks only when it is carried <em>on evidence</em>; unproven-because-new routes to <code>LOCK-with-flag</code>.</figcaption>
   </figure>
 
   <div class="callout"><b>A confirmed checkpoint is not a rubber stamp.</b> A checkpoint presentation fits about fifteen lines and shows the delta since the last turn, because an unreadable checkpoint produces a confirm that means nothing — which is worse than no checkpoint at all.</div>
@@ -310,7 +310,7 @@ a:focus-visible{outline:2px solid var(--gate);outline-offset:2px}
 <!-- ========== 2. WHEN ========== -->
 <section id="when">
   <h2><span class="num">02</span>When this is the right skill</h2>
-  <p class="sec-note">Spec Dialogue is deliberately heavy on interaction turns. That heaviness buys the thing it exists for — a specification whose every load-bearing element someone actually agreed to — and it is the wrong price for a change whose shape is already settled.</p>
+  <p class="sec-note">Spec Dialogue is deliberately heavy on interaction turns. That heaviness buys the thing it exists for — a specification whose product decisions were agreed and whose factual constraints have sources — and it is the wrong price for a change whose shape is already settled.</p>
   <div class="cols">
     <div class="panel yes">
       <p class="meta">Use it when</p>
@@ -380,7 +380,7 @@ a:focus-visible{outline:2px solid var(--gate);outline-offset:2px}
       </div>
       <div class="pc-gate">
         <span class="lab">Checkpoint</span>
-        <p>The user reacts, eliminates, combines, adds. Expect several turns here — this is the divergent heart of the dialogue. Keep the questions polarity-neutral: a leading question contaminates the data.</p>
+        <p>The user reacts, eliminates, combines, adds. Expect several turns here — this is the divergent heart of the dialogue. Keep the questions polarity-neutral: no recommendation or ranking during divergence. Recommendations belong to convergence after the user's unprimed reaction.</p>
         <p class="writes"><b>writes</b>the surviving candidates</p>
       </div>
     </article>
@@ -455,7 +455,7 @@ a:focus-visible{outline:2px solid var(--gate);outline-offset:2px}
       <ul>
         <li><b>L0 Vision</b> <span class="tag req">req</span> — problem, audience, job, success definition, existing assets and constraints</li>
         <li><b>Glossary</b> <span class="tag req">req</span> — one concept one term, with a <em>not to be called</em> column so synonym drift is a grep rather than a feeling</li>
-        <li><b>L1 Requirements</b> <span class="tag req">req</span> — <code>REQ-n</code> and <code>CFR-n</code>; every cross-functional row carries a metric, a target and how it is measured</li>
+        <li><b>L1 Requirements</b> <span class="tag req">req</span> — <code>REQ-n</code> and <code>CFR-n</code>; quantitative rows carry a justified metric and threshold; categorical or normative rows name a required condition and conformance evidence</li>
         <li><b>L2 Detail</b> <span class="tag cond">cond</span> — four fixed slots: data model, interface contract, state and transitions, validation rules</li>
         <li><b>Behavior matrix</b> <span class="tag req">req</span> — the six conditions a spec forgets, each row citing a requirement and a criterion</li>
         <li><b>Dependencies</b> · <b>Migration &amp; rollout</b> <span class="tag cond">cond</span> — what we do not control, and the point past which a change stops being reversible</li>
@@ -547,7 +547,7 @@ a:focus-visible{outline:2px solid var(--gate);outline-offset:2px}
 <!-- ========== 7. GATE ========== -->
 <section id="gate">
   <h2><span class="num">07</span>The Spec Quality Gate</h2>
-  <p class="sec-note">An eight-dimension review of the spec <strong>as an artifact, by a reviewer that is not its author</strong>. Independence is load-bearing: the author never scores its own gate. Where no separate agent is available, the gate runs as a distinct pass with the authoring context set aside — read as a stranger would, from the document alone. Each dimension must pass, or its finding is explicitly downgraded into Open Questions. Never silently passed.</p>
+  <p class="sec-note">An eight-dimension review of the spec <strong>as an artifact, by a reviewer that is not its author</strong>. Independence is load-bearing: the author never scores its own gate. Where no separate agent is available, the gate runs as a distinct pass with the authoring context set aside — read as a stranger would, from the document alone. Missing lock preconditions block sign-off. Only non-blocking findings may be parked with an owner and user agreement; a waiver cannot supply missing behavior or an acceptance oracle.</p>
   <div class="tw">
     <table>
       <thead><tr><th>Dimension</th><th>The question it asks</th></tr></thead>
@@ -558,8 +558,8 @@ a:focus-visible{outline:2px solid var(--gate);outline-offset:2px}
         <tr><td><b>Testability</b></td><td>Is every criterion verifiable by a machine or a human — with a named oracle, not “verifiable in principle”?</td></tr>
         <tr><td><b>Scope coherence</b></td><td>Are in-scope and out-of-scope collectively exhaustive and mutually exclusive?</td></tr>
         <tr><td><b>Economy</b></td><td>Does every line change what gets built? A fact stated twice, prose restating the table beside it, a summary of the section above it — deleted. Length is not diligence.</td></tr>
-        <tr><td><b>Provenance</b></td><td>Is every load-bearing element <code>elicited</code>, <code>ratified</code> or <code>parked</code> — none <code>silent</code>?</td></tr>
-        <tr><td><b>Resolvability</b></td><td>Does every <code>UNKNOWN</code>, <code>TBD</code> and open assumption appear in Open Questions with an owner and a level — and is nothing left at <code>before-build</code>?</td></tr>
+        <tr><td><b>Provenance</b></td><td>Is every load-bearing element <code>elicited</code>, <code>ratified</code>, <code>grounded</code> or <code>parked</code> — none <code>silent</code>?</td></tr>
+        <tr><td><b>Resolvability</b></td><td>Does every <code>UNKNOWN</code>, <code>TBD</code> and open assumption appear in Open Questions with an owner and a dependency reason in <code>Blocks</code> — and is no build or acceptance dependency unresolved, regardless of its deadline label?</td></tr>
       </tbody>
     </table>
   </div>
@@ -595,13 +595,13 @@ a:focus-visible{outline:2px solid var(--gate);outline-offset:2px}
     <table>
       <thead><tr><th>What must hold</th><th>What it means</th><th>If it fails</th></tr></thead>
       <tbody>
-        <tr><td><b>Testable criteria</b></td><td>every L3 criterion is checkable by a machine or a human, with a named oracle</td><td>back to SPECIFY</td></tr>
-        <tr><td><b>A procedure behind each</b></td><td>every <b>must-have</b> criterion is discharged by at least one <code>TC-n</code></td><td>back to SPECIFY</td></tr>
-        <tr><td><b>The Quality Gate</b></td><td>eight dimensions, reviewed independently of the author</td><td>fix, or downgrade the finding into Open Questions with the user's agreement</td></tr>
-        <tr><td><b>The Provenance Gate</b></td><td>no load-bearing element is <code>silent</code>; open assumptions are walked with the user one by one</td><td>the lock is blocked until each is ratified or parked</td></tr>
-        <tr><td><b>The refutation panel</b></td><td>skipped at <code>light</code>; otherwise 2–4 skeptics</td><td>majority refuted on evidence → CHALLENGE or SPECIFY</td></tr>
+        <tr><td><b>Testable criteria</b></td><td>every L3 criterion is checkable by a machine or a human, with a named oracle</td><td>fix at the earliest invalidated decision (SPECIFY for an AC-only defect)</td></tr>
+        <tr><td><b>A procedure behind each</b></td><td>every <b>must-have</b> criterion is discharged by at least one <code>TC-n</code></td><td>fix at the earliest invalidated decision (SPECIFY for an AC-only defect)</td></tr>
+        <tr><td><b>The Quality Gate</b></td><td>eight dimensions, reviewed independently of the author</td><td>fix; only non-blocking findings may be parked with the user's agreement</td></tr>
+        <tr><td><b>The Provenance Gate</b></td><td>no load-bearing element is <code>silent</code>; open assumptions are walked with the user one by one</td><td>decisions need elicitation/ratification; facts need evidence; parking is allowed only for non-blocking items</td></tr>
+        <tr><td><b>The refutation panel</b></td><td>skipped at <code>light</code>; otherwise 2–4 skeptics</td><td>majority refuted → earliest invalidated decision</td></tr>
         <tr><td><b>Explicit sign-off</b></td><td>the user says lock it — the agent never does</td><td>nothing is promoted</td></tr>
-        <tr><td><b>No <code>before-build</code> question</b></td><td>a spec may lock with open questions, but not with one nobody can hand to a build</td><td>resolve it, or lower it to <code>before-ship</code> / <code>deferred</code> and say so</td></tr>
+        <tr><td><b>No <code>before-build</code> question</b></td><td>a spec may lock with open questions, but not with one nobody can hand to a build</td><td>resolve the dependency or explicitly revise scope and revalidate; a later deadline or priority downgrade alone cannot clear it</td></tr>
       </tbody>
     </table>
   </div>
@@ -622,13 +622,13 @@ a:focus-visible{outline:2px solid var(--gate);outline-offset:2px}
         <tr><td><code>glossary</code></td><td>so the build names things the way the spec does</td></tr>
         <tr><td><code>non_goals</code></td><td>the out-of-scope list, verbatim</td></tr>
         <tr><td><code>dependencies</code></td><td>integration points, their contracts, and the declared fallback for each</td></tr>
-        <tr><td><code>assumption_ledger</code> · <code>open_questions</code></td><td>what is still open, with owners and levels — never silently dropped downstream</td></tr>
+        <tr><td><code>assumption_ledger</code> · <code>open_questions</code></td><td>what is still open, with owners and dependency-derived levels — never silently dropped downstream</td></tr>
         <tr><td><code>refutation_flags</code></td><td>each <code>LOCK-with-flag</code> claim and the assumption under it — a kill-criterion candidate for the build</td></tr>
-        <tr><td><code>reuse_findings</code> · <code>build_path</code></td><td>so the build skips re-scanning, and knows how it was meant to run</td></tr>
+        <tr><td><code>reuse_findings</code> · <code>build_path</code></td><td>so the build reuses unchanged findings, checks changed premises, and knows how it was meant to run</td></tr>
       </tbody>
     </table>
   </div>
-  <div class="callout"><b>The contract rule cuts both ways.</b> A build that receives the packet does not re-open the settled decisions — it may surface a contradiction it discovers against real code, but re-litigating the direction is drift. And a build that finds a must-have criterion <em>unbuildable as written</em> returns for revision, re-entering at SPECIFY and re-running the lock preconditions, rather than quietly reinterpreting it.</div>
+  <div class="callout"><b>The contract rule cuts both ways.</b> A build that receives the packet does not re-open the settled decisions — it may surface a contradiction it discovers against real code, but re-litigating the direction is drift. And a build that finds a must-have criterion <em>unbuildable as written</em> returns for revision, returning to the earliest invalidated decision and re-running the lock preconditions, rather than quietly reinterpreting it.</div>
 </section>
 
 <!-- ========== 11. DIALOGUE ========== -->
@@ -637,12 +637,12 @@ a:focus-visible{outline:2px solid var(--gate);outline-offset:2px}
   <p class="sec-note">The dialogue is the work, so the question craft is part of the recipe rather than a matter of style. Sixteen rules govern it; these are the ones that change the transcript most.</p>
   <ul class="rule-list">
     <li data-n="D1"><b>One focus per turn.</b> One question, or one batched multiple-choice over at most four independent dimensions. Never a wall of open questions — each extra question halves the answer quality of all of them.</li>
-    <li data-n="D2–D4"><b>Recognition over recall, and no leading.</b> Offer concrete anchors to react to rather than asking someone to produce an answer from nothing, and keep the polarity neutral: a leading question contaminates the data it collects.</li>
+    <li data-n="D2–D4"><b>Recognition over recall, and no leading.</b> Use real candidates for known preferences; for unknown factual inputs, inspect sources or ask a short free-text question rather than inventing options. Keep divergence neutral; recommend only during convergence after an unprimed reaction.</li>
     <li data-n="D6–D8"><b>Paraphrase back before persisting.</b> A vague answer is probed, not swallowed. What gets written down is what the user recognised as theirs.</li>
-    <li data-n="D9"><b>The Assumption Ledger.</b> Every gap the user did not explicitly decide — a skipped question, a vague answer, a default chosen to keep moving — is recorded as <code>ASSUME-n</code>. Open entries never quietly disappear; at LOCK each is ratified or moved to Open Questions.</li>
+    <li data-n="D9"><b>The Assumption Ledger.</b> Unconfirmed decision defaults are recorded as <code>ASSUME-n</code>. Sourced facts use <code>grounded</code>; unknown factual inputs remain unknown. Open entries never quietly disappear; parking an entry does not waive its build or acceptance dependency.</li>
     <li data-n="D10–D12"><b>Envelope, and delta only.</b> About fifteen lines per checkpoint, showing what changed since the last turn plus an orientation line. The full state lives in the draft the user can open.</li>
     <li data-n="D13–D15"><b>Depth follows signal.</b> Rich answers earn finer questions; answers trending shorter earn batching, proposed defaults and more of the Ledger. Matching the user's bandwidth is part of the contract, not a courtesy.</li>
-    <li data-n="D16"><b>The Provenance Gate.</b> Every load-bearing element of the locked spec is <code>elicited</code>, <code>ratified</code> or <code>parked</code>. An element that is none of these is <code>silent</code>, and a silent element blocks the lock.</li>
+    <li data-n="D16"><b>The Provenance Gate.</b> Every load-bearing element of the locked spec is <code>elicited</code>, <code>ratified</code>, <code>grounded</code> or <code>parked</code>. Grounding names the source, version/date and applicability; approval does not verify a fact. An unsupported element is <code>silent</code> and blocks the lock. Parked items must be non-blocking.</li>
     <li data-n="W14"><b>The reader's language.</b> Both documents are written in the language the user is conversing in. The IDs, metadata keys, enum values, paths and code identifiers stay verbatim, because something downstream cites them.</li>
   </ul>
 </section>
@@ -674,7 +674,7 @@ make unlink                    # remove the links that point at this repo</pre>
 <pre>spec-dialogue                      # new dialogue
 spec-dialogue depth=light          # small, bounded change — fewer turns, same lock
 spec-dialogue depth=deep           # high-stakes or contested — full skeptic panel
-spec-dialogue resume [&lt;slug&gt;]      # re-enter from the last checkpoint
+spec-dialogue resume [&lt;slug&gt;]      # re-enter from the last valid checkpoint
 spec-dialogue &lt;slug-or-path&gt;       # re-open a locked spec for revision</pre>
 
   <p class="sub-lab">the checks that keep the skill honest</p>
@@ -685,7 +685,7 @@ make test    # the fixture battery — each check is broken in a scratch copy an
              # required to fail, so a check nobody has watched fail is not trusted;
              # `make link` runs there too, against a throwaway home directory</pre>
 
-  <div class="callout q"><b>Resumable by design.</b> The value here is a long multi-turn dialogue, so it must survive interruption. Each checkpoint writes to <code>docs/specs/&lt;slug&gt;.draft.md</code> with a current-phase marker and the Assumption Ledger delta. <code>spec-dialogue resume</code> replays the marker, summarizes the decisions so far in a few lines for confirmation, and continues — never silently restarting from FRAME.</div>
+  <div class="callout q"><b>Resumable by design.</b> The value here is a long multi-turn dialogue, so it must survive interruption. Each checkpoint writes to <code>docs/specs/&lt;slug&gt;.draft.md</code> with a current-phase marker and the Assumption Ledger delta. <code>spec-dialogue resume</code> checks changed intent and relevant grounded premises before trusting the marker. If a decision was invalidated, return to its earliest phase: problem → FRAME, options → EXPAND, direction → CHALLENGE, scope → SHAPE, detail/AC/wording → SPECIFY. Preserve unaffected decisions and IDs; explain the return, never silently restart FRAME.</div>
 </section>
 
 <!-- ========== 13. TRAPS ========== -->
@@ -704,7 +704,7 @@ make test    # the fixture battery — each check is broken in a scratch copy an
         <tr><td>“Testable in principle”, discovered at build time</td><td>the procedure is written at SPECIFY, while the criterion can still be rewritten</td></tr>
         <tr><td>Ambiguity surviving in free-form detail prose</td><td>L2 is four fixed slots, each filled or <code>N/A</code> with a reason</td></tr>
         <tr><td>Error paths described in prose and never tested</td><td>Behavior-matrix rows cite a requirement <em>and</em> a criterion</td></tr>
-        <tr><td>A cross-functional requirement that is an adjective</td><td><code>CFR-n</code> carries metric, target and measurement, or fails Testability</td></tr>
+        <tr><td>A cross-functional requirement that is an adjective</td><td><code>CFR-n</code> carries an objective condition and its pass/fail evidence; arbitrary numbers and unchecked standard names fail Testability</td></tr>
         <tr><td>A <code>TBD</code> buried mid-document, found by the build</td><td>the Resolvability dimension and the Open Questions inventory rule</td></tr>
         <tr><td>Silent assumptions inside a signed spec</td><td>the Assumption Ledger, and the Provenance Gate that blocks on <code>silent</code></td></tr>
         <tr><td>An internally perfect but wrong spec</td><td>the refutation panel — the document dimensions cannot catch this</td></tr>

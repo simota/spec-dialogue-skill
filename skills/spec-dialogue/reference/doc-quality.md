@@ -43,7 +43,7 @@
 | # | Rule | Discipline |
 |---|------|-----------|
 | W12 | **Template completeness, by tier** | The spec carries every section of `spec-template.md`, and its companion every section of `acceptance-test-template.md`. A **conditional** section may be `N/A` with a one-line reason; a **required** one may not — `N/A` on a required section is a lock failure, not a shortcut. A silently missing section reads as "considered and empty" when it means "never considered", and the reader cannot tell which. This is the cheapest check in the file and the one most often skipped. |
-| W13 | **Unresolved-marker inventory** | Every `UNKNOWN`, `TBD(<owner>)` and open `ASSUME-n` anywhere in the document appears in Open Questions as an `OQ-n` with an owner and a `Resolve by` level. W5 makes a gap honest; W13 makes it **findable**. A `TBD` buried in an L2 table is indistinguishable from a decision nobody made, and the reader who needs it is the one least able to spot it. |
+| W13 | **Unresolved-marker inventory** | Every `UNKNOWN`, `TBD(<owner>)` and open `ASSUME-n` anywhere in the document appears in Open Questions as an `OQ-n` with an owner, the dependent decision and reason in `Blocks`, and a dependency-derived `Resolve by` level (`spec-template.md` Lock rule). W5 makes a gap honest; W13 makes it **findable**. A `TBD` buried in an L2 table is indistinguishable from a decision nobody made, and the reader who needs it is the one least able to spot it. |
 
 W13 is what the Quality Gate's **Resolvability** dimension scans for, and it is the rule that turns
 "no open questions" from a claim into a check: the inventory is a grep, and its result is either
