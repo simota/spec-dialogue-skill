@@ -96,14 +96,14 @@ Then drive Socratic clarification with the user per `reference/dialogue-protocol
 
 Generate the option space. Run the **Divergence lens twice with different framings** — once in propose mode (what could this be), once in reframe mode (challenge the assumptions, borrow from another domain). Produce **3-5 candidate directions**, each with a one-line rationale and rough shape. **+Market lens** when differentiation or prior art matters.
 
-- **Checkpoint:** present the candidates; the user reacts, eliminates, combines, or adds. Expect **multiple turns** here — this is the divergent heart of the dialogue. Do not converge prematurely. Keep polarity neutral (D4): a leading question here contaminates the data. On checkpoint pass, append the surviving candidates to the draft.
+- **Checkpoint:** present the candidates; the user reacts, eliminates, combines, or adds. Expect **multiple turns** here — this is the divergent heart of the dialogue. Do not converge prematurely. Keep polarity neutral (D4): no recommendation or ranking during divergence; D11 recommendations belong to convergence after the user's unprimed reaction. On checkpoint pass, append the surviving candidates to the draft.
 
 ### Phase 2 — CHALLENGE (stress-test + converge)
 
 Narrow to ONE direction *with the user*, under four distinct pressures: **Arbitration lens** (is it necessary — multi-perspective trade-off), **Subtraction lens** (is it over-scoped — YAGNI), **Impact lens** (is it feasible — blast radius and dependencies), **+Pre-mortem lens** (how does it fail — when stakes are high).
 
 - **Checkpoint (mandatory):** the user makes the **explicit pick** of the single direction to specify. Carry forward rejected directions as recorded "considered but rejected" so the dialogue does not re-derive them. Record the pick and the rejected list to the draft.
-- **Convergence check:** before looping back to EXPAND, ask "are we converging, or circling?" If circling ≥ 2 rounds with no new information, offer to (a) lock the leading candidate, or (b) park the disagreement as an Open Question and proceed. Never loop indefinitely.
+- **Convergence check:** before looping back to EXPAND, ask "are we converging, or circling?" If circling ≥ 2 rounds with no new information, offer to (a) lock the leading candidate, or (b) park the disagreement as an Open Question and continue only work independent of its answer. Parking does not waive LOCK preconditions. Never loop indefinitely.
 
 ### Phase 3 — SHAPE (proposal)
 
@@ -117,7 +117,7 @@ The **Authoring lens** carries the spine — staged elaboration L0 Vision → L1
 
 - Give every L3 acceptance criterion a **traceable ID (`AC-001`, `AC-002`, … per `reference/traceability.md` §1) mapped to the L1 requirement it verifies**, written as a **Given / When / Then scenario with a named oracle** — the thing that decides pass or fail. This traceability is what the Quality Gate's Completeness check verifies and what any downstream build consumes as its verification contract.
 - **Walk the Behavior matrix explicitly with the user.** Its six condition classes — empty state, invalid input, unauthorized, dependency unavailable, concurrent modification, limit exceeded — are the questions a spec forgets and a build discovers. A class that genuinely does not apply is struck out **with a reason**; a class nobody discussed becomes an `OQ-n`, never a blank.
-- **Every cross-functional requirement carries a number.** `CFR-n` states its metric, its target, and how it is measured; an adjective in that table is a Testability failure, not a requirement.
+- **Every cross-functional requirement is objectively verifiable.** Quantitative `CFR-n` rows need a justified metric, target and measurement conditions. Categorical or normative rows need a precise required condition or applicable criterion/version, and observable pass/fail evidence. An adjective, arbitrary percentage or standard name without an applicable check is a Testability failure.
 - **Ambiguity is closed, not written down.** A term or threshold with two readings gets one targeted question (D1–D3); if the user does not settle it, it becomes an `ASSUME-n` with your chosen default or an `OQ-n` with an owner. What it never becomes is a hedge — `appropriate`, `as needed`, `robust`, `etc.` are the words a build reinterprets under deadline pressure (`reference/doc-quality.md` W15).
 - **Say it once, then stop.** The documents carry the minimum that conveys intent: a value in the table that owns it and nowhere else (W10), prose only where reasoning changes a build decision, and no line that nobody would miss if it were deleted (W9). Length is not diligence — the Economy dimension scores this at the gate, and a padded spec buries the lines a builder must not miss.
 - **Lock preconditions (all three mandatory, verified at LOCK):** (1) the spec carries **testable L3 acceptance criteria** — the difference between a spec and a wish; the **Verifiability lens** sanity-checks that each AC is actually checkable by a machine or a human. (2) **every must-have AC is discharged by at least one `TC-n`** in the acceptance test specification (`reference/traceability.md` §2, hop 2). (3) the spec **passes the Spec Quality Gate** (below).
@@ -129,7 +129,7 @@ The **Authoring lens** carries the spine — staged elaboration L0 Vision → L1
 
 **Gate:** do not present for sign-off until **all three lock preconditions pass** — testable L3 ACs, a `TC-n` behind every must-have AC, **and** the Spec Quality Gate. Then present the complete spec and require the user's **explicit sign-off** ("lock it"). On sign-off:
 
-- **Finalize both documents:** promote `docs/specs/<slug>.draft.md` to the locked `docs/specs/<slug>.md` (status `locked`; override the path on request), following `reference/spec-template.md`, and promote the companion `docs/specs/<slug>.acceptance.md` to `locked` with it. The two are locked together — an accepted spec whose test procedure is still a draft has no executable definition of done. Include an explicit **Open Questions / Deferred Decisions** section — parked items, including any Quality-Gate findings downgraded rather than fixed, are recorded, never silently dropped. Archive or remove the `.draft.md` once promoted.
+- **Finalize both documents:** promote `docs/specs/<slug>.draft.md` to the locked `docs/specs/<slug>.md` (status `locked`; override the path on request), following `reference/spec-template.md`, and promote the companion `docs/specs/<slug>.acceptance.md` to `locked` with it. The two are locked together — an accepted spec whose test procedure is still a draft has no executable definition of done. Include an explicit **Open Questions / Deferred Decisions** section — parked items, including any non-blocking Quality-Gate findings parked under the dependency-based Lock rule, are recorded, never silently dropped. Archive or remove the `.draft.md` once promoted.
 - **Build-path selection (mandatory checkpoint):** before recommending a handoff, ask the user **how** they want the locked spec built. Present the choice in terms of the build's shape, not a tool name:
 
   | Path | Pick when | What the spec provides |
@@ -147,14 +147,15 @@ The **Authoring lens** carries the spine — staged elaboration L0 Vision → L1
 
 `spec-dialogue`'s value is a long multi-turn dialogue, so it must survive interruption. Its bound is structural, not a rubric loop: the Phase 2 convergence check ends exploration, and the explicit **LOCK gate** ends the recipe — a dialogue that will not converge exits with the open questions listed, never by burning turns. Each phase's checkpoint above states what gets written to `docs/specs/<slug>.draft.md` at that boundary, plus a **current-phase marker** and the **Assumption Ledger** delta (`reference/dialogue-protocol.md` §3). From SPECIFY onward the acceptance test specification is written incrementally beside it and resumes with it.
 
-- **Invocation forms:** `spec-dialogue` (new dialogue) · `spec-dialogue resume [<slug>]` (re-enter from the last checkpoint; omitted `<slug>` → most-recent draft) · `spec-dialogue <slug-or-path>` (re-open a locked spec for revision — re-enters at SPECIFY and re-runs the lock preconditions before re-locking).
-- **Resume behavior:** read the draft, replay the current-phase marker, summarize decisions-so-far back to the user in 3-5 lines for confirmation, then continue from that checkpoint. Never silently restart from FRAME.
+- **Invocation forms:** `spec-dialogue` (new dialogue) · `spec-dialogue resume [<slug>]` (omitted `<slug>` → most-recent draft) · `spec-dialogue <slug-or-path>` (re-open a locked spec for revision). Re-lock requires the lock preconditions and explicit user sign-off again.
+- **Resume freshness:** before trusting the saved marker, check for changed intent and changes to the relevant grounded premises (code, API, dependency, policy/regulation). Recheck only evidence that could affect the resumed decisions, using its recorded version/date and applicability; unresolved freshness holds the dependent work, not unrelated work. Summarize the valid decisions and changed premises in 3–5 lines for confirmation. Continue from the marker if still valid, otherwise explain the return below; never silently restart FRAME.
+- **Revision / resume return rule:** identify the earliest decision invalidated, not merely the changed section: problem, audience or framing constraint → FRAME; genuine option space → EXPAND; chosen direction or its feasibility → CHALLENGE; proposal / scope boundary → SHAPE; detail, AC or wording only → SPECIFY. Use the decision history: a changed API does not automatically invalidate the direction. Preserve unaffected decisions and stable IDs; revalidate only invalidated descendants in both documents, then re-run the lock preconditions.
 
 ## Spec Quality Gate (lock precondition)
 
 Before sign-off, the spec is adversarially reviewed **as an artifact, by a reviewer that is not its author** — the **Adversarial-review lens**, plus the Verifiability lens for AC checkability and the Arbitration lens where requirements trade off. "Independent" is load-bearing: the spec's author never scores its own gate, and the gate is never implemented by telling the authoring pass to re-check itself. Where no separate agent is available, run the gate as a **distinct pass with the authoring context set aside** — read the spec as a stranger would, from the document alone.
 
-The gate scores eight dimensions; each must pass, or its finding is explicitly downgraded into Open Questions (never silently passed):
+The gate scores eight dimensions. Missing lock preconditions block sign-off; user agreement is not a substitute for buildability. Only non-blocking findings may be parked under the dependency-based Lock rule in `reference/spec-template.md` (never silently passed):
 
 | Dimension | Question |
 |-----------|----------|
@@ -164,10 +165,10 @@ The gate scores eight dimensions; each must pass, or its finding is explicitly d
 | Testability | Is every AC verifiable by a machine or a human? |
 | Scope coherence | Are in-scope / out-of-scope collectively exhaustive and mutually exclusive? |
 | Economy | Does every line change what gets built? Delete what does not — a fact stated twice, prose restating a table, a summary of a section next to it (`reference/doc-quality.md` W9, W10) |
-| Provenance | Is every load-bearing element `elicited` / `ratified` / `parked` — none `silent`? (`reference/dialogue-protocol.md` D16; open `ASSUME-n` entries are walked with the user here) |
-| Resolvability | Does every `UNKNOWN` / `TBD` / open `ASSUME-n` in the document appear in Open Questions with an owner and a `Resolve by` level — and is no remaining question marked `before-build`? (`reference/doc-quality.md` W13) |
+| Provenance | Is every load-bearing element `elicited` / `ratified` / `grounded` / `parked` — none `silent`, and factual support not replaced by user approval? (`reference/dialogue-protocol.md` D16; open `ASSUME-n` entries are walked with the user here) |
+| Resolvability | Does every `UNKNOWN` / `TBD` / open `ASSUME-n` appear in Open Questions with an owner, a dependent decision and reason in `Blocks`, and a matching `Resolve by` — with no unresolved build or acceptance dependency regardless of label? (`reference/doc-quality.md` W13) |
 
-The spec is also a **document deliverable**: `reference/doc-quality.md` adds the dimensions this gate does not natively carry (freshness metadata, grounding of externally-checkable facts, summary-first readability). A gate failure routes back to SPECIFY for a fix, or — with the user's agreement — the gap is parked in Open Questions. The gate is a **lock precondition**: an autonomous caller cannot skip it.
+The spec is also a **document deliverable**: `reference/doc-quality.md` adds the dimensions this gate does not natively carry (freshness metadata, grounding of externally-checkable facts, summary-first readability). A gate failure routes to the earliest invalidated decision for a fix (see **Draft persistence & resume**). Only a non-blocking finding may be parked with the user's agreement; ambiguity in must-have behavior, contradictory ACs, missing security obligations or a missing oracle/TC procedure still blocks LOCK. The gate is a **lock precondition**: an autonomous caller cannot skip it.
 
 ### Pre-lock refutation panel (refute-polarity)
 
@@ -180,7 +181,7 @@ The eight dimensions above audit the spec **as a document**. They do not ask the
 | **The ACs actually prove the requirements** | "AC-n passes on an implementation that does not satisfy REQ-m" — a green AC that does not entail its requirement is the most expensive defect a spec can ship |
 | **The scope boundary holds** | "an out-of-scope item is load-bearing for an in-scope requirement" — the boundary is not actually separable |
 
-Aggregation follows the protocol §3: **majority refuted-on-evidence → back to CHALLENGE or SPECIFY** (not a park); majority **merely-unproven-because-new → LOCK-with-flag**, the flag recorded in Open Questions with the assumption it rests on. The evidence-vs-novelty discipline (§2) is load-bearing here — a genuinely novel feature must not be blocked for lacking evidence that can only exist after it ships; only an evidence-based refutation blocks. Hard exclusions per §4 apply unchanged.
+Aggregation follows the protocol §3: **majority refuted-on-evidence → back to the earliest invalidated decision** per **Draft persistence & resume** (not a park); majority **merely-unproven-because-new → LOCK-with-flag**, the flag recorded in Open Questions with the assumption it rests on. The evidence-vs-novelty discipline (§2) is load-bearing here — a genuinely novel feature must not be blocked for lacking evidence that can only exist after it ships; only an evidence-based refutation blocks. Hard exclusions per §4 apply unchanged.
 
 Panel size scales with depth: `light` skips the panel, `standard` runs 2 skeptics on claims 1 and 3, `deep` runs 4 — one per claim, so no claim goes unattacked and no skeptic blends two angles.
 
@@ -207,7 +208,7 @@ Panel size scales with depth: `light` skips the panel, `standard` runs 2 skeptic
 | An internally-perfect but wrong spec | pre-lock refutation panel — the eight document dimensions cannot catch this |
 | Ceremony driving users away from specifying at all | depth modes scale the dialogue without weakening any lock precondition |
 | Error paths described in prose and never tested | Behavior matrix rows cite a requirement *and* an AC (`reference/traceability.md` §3) |
-| A cross-functional requirement that is an adjective | `CFR-n` carries metric / target / measurement, or fails Testability |
+| A cross-functional requirement that is an adjective | `CFR-n` carries a quantitative or categorical condition and verification evidence, or fails Testability |
 | A `TBD` buried mid-document, found by the build | Resolvability dimension + the Open Questions inventory rule (W13) |
 | Ambiguity surviving in free-form detail prose | L2 is four fixed slots, each filled or `N/A` with a reason |
 | An open question written as a hedge word instead of asked | Ambiguity dimension + W15 — quantify, or carry it as an `OQ-n` |
@@ -225,7 +226,7 @@ Panel size scales with depth: `light` skips the panel, `standard` runs 2 skeptic
 
 `spec-dialogue` is upstream of whatever builds the feature, and a handoff that ships only a file path forces the builder to re-derive what the dialogue already settled. The **Spec Handoff Packet** (`reference/spec-template.md` § Handoff Packet) is the contract, emitted at LOCK.
 
-**Contract rule:** a downstream build that receives the packet **does not re-open the settled decisions** — it may surface a contradiction it discovers against real code, but re-litigating the direction is drift. Conversely, a build that finds a **must-have AC unbuildable as written** returns to `spec-dialogue <slug>` for revision — re-entering at SPECIFY, re-running the lock preconditions — rather than quietly reinterpreting it.
+**Contract rule:** a downstream build that receives the packet **does not re-open the settled decisions** — it may surface a contradiction it discovers against real code, but re-litigating the direction is drift. Conversely, a build that finds a **must-have AC unbuildable as written** returns to `spec-dialogue <slug>` for revision — returning to the earliest invalidated decision per **Draft persistence & resume**, re-running the lock preconditions — rather than quietly reinterpreting it.
 
 ## Chain template
 
@@ -233,4 +234,4 @@ Panel size scales with depth: `light` skips the panel, `standard` runs 2 skeptic
 
 Gate content is not restated in the chain — the eight Quality-Gate dimensions live in § Spec Quality Gate, the panel's polarity and four claims in § Pre-lock refutation panel, the mandatory traceable L3 ACs in Phase 4.
 
-Resumable: `spec-dialogue resume [<slug>]` re-enters from the draft's current-phase marker; `spec-dialogue <slug-or-path>` re-opens a locked spec for revision.
+Resumable: `spec-dialogue resume [<slug>]` checks relevant premise freshness before using the draft's current-phase marker; `spec-dialogue <slug-or-path>` re-opens a locked spec for revision.

@@ -19,7 +19,7 @@ IDs are **stable** — never renumber. When a revision changes an item's meaning
 | `AC-{n}` | Acceptance criterion — the verifiable unit | L3 | `AC-001` |
 | `TC-{n}` | Test case — the executable procedure that discharges an AC | `<slug>.acceptance.md` | `TC-001` |
 | `ASSUME-{n}` | Open assumption (Assumption Ledger, `dialogue-protocol.md` §3) | draft + Open Questions | `ASSUME-1` |
-| `OQ-{n}` | An unresolved question carrying an owner and a `Blocks` level | Open Questions | `OQ-1` |
+| `OQ-{n}` | An unresolved question carrying an owner and a `Blocks` dependency | Open Questions | `OQ-1` |
 | `DEC-{n}` | A decision persisted during the dialogue | draft | `DEC-2` |
 
 **Optional feature-scoping.** In a repository that will hold many specs, scope AC IDs by feature — `AC-LOGIN-001` — so IDs stay unique when specs are read together. Pick one form per spec and stay in it.
@@ -108,10 +108,10 @@ This is optional for a small spec and worth the cost for anything a build will r
 ## 5. Adoption checklist
 
 - New criterion → give it an `AC-{n}`, a Given/When/Then, and the requirement it verifies. Never a bare bullet.
-- Every requirement → at least one AC, or an explicit `OQ-n` saying why it has none.
+- Every requirement → at least one AC; an explicit `OQ-n` may explain a draft gap, but does not waive the LOCK precondition.
 - Every AC → a verification mode, an oracle, and a must-have flag.
 - Every must-have AC → at least one `TC-{n}` in `docs/specs/<slug>.acceptance.md`.
 - Every TC → the AC it discharges, concrete step values, and an observable expected result (`acceptance-test-template.md` T1–T4).
 - Every Behavior-matrix row → a requirement in `Applies to` and an AC in `Verifies`.
-- Revision → supersede, never renumber.
+- Meaning-changing revision → supersede, never renumber; wording-only edits retain the ID.
 - Before LOCK → walk both hops, forward and backward; that walk *is* the Completeness check.

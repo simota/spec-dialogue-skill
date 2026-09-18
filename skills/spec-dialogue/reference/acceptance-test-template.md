@@ -100,12 +100,15 @@ Cover the **Behavior matrix** rows as well as the happy paths: an error path wit
 case is the gap the matrix exists to close, half-closed.
 
 ## 6. Non-functional procedures (`CFR-n`)
-A cross-functional requirement is only as real as the procedure that measures it. The target comes
-from the spec — never restated with a different number here (`doc-quality.md` W10).
+A cross-functional requirement needs a procedure that can decide its required outcome. Cite that
+outcome from the spec; do not replace it with a different number or condition (`doc-quality.md` W10).
+Quantitative procedures state workload, sample and measurement conditions. Categorical or normative
+procedures identify the inspected surface, applicable criterion and pass/fail evidence; no invented
+score, duration or percentage is needed. Tool or reviewer names alone do not define the observation.
 
-| CFR | Metric | Target (from spec) | Procedure | Tool | Sample / duration | Measured value | Verdict |
-|-----|--------|--------------------|-----------|------|-------------------|----------------|---------|
-| CFR-001 | p95 latency | ≤ 300 ms | … | … | 100 rps × 10 min | NOT_RUN | |
+| CFR | Measure / criterion | Required outcome (from spec) | Procedure | Tool / observer | Conditions / sample | Observed result | Verdict |
+|-----|---------------------|------------------------------|-----------|-----------------|---------------------|-----------------|---------|
+| CFR-001 | … | see spec CFR-001 | … | … | … | NOT_RUN | |
 
 ## 7. Coverage matrix
 The `AC → TC` half of the chain `REQ → AC → TC` (`traceability.md` §2).

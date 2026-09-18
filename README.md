@@ -43,9 +43,11 @@ none of the three names.
 spec-dialogue                      # new dialogue
 spec-dialogue depth=light          # small, bounded change — fewer turns, same lock preconditions
 spec-dialogue depth=deep           # high-stakes or contested — extended divergence, full skeptic panel
-spec-dialogue resume [<slug>]      # re-enter from the last checkpoint
+spec-dialogue resume [<slug>]      # re-enter from the last valid checkpoint
 spec-dialogue <slug-or-path>       # re-open a locked spec for revision
 ```
+
+Resume checks changed intent and relevant source freshness before trusting its marker. Revision returns to the earliest invalidated decision, retaining unaffected decisions and IDs; re-lock still needs the gates and the user's sign-off.
 
 The dialogue writes `docs/specs/<slug>.draft.md` incrementally and promotes it to `docs/specs/<slug>.md` at sign-off, together with its companion `docs/specs/<slug>.acceptance.md` — the `TC-n` test cases, the environment and fixtures they need, and the exit criteria that define acceptance. Every result is left `NOT_RUN`: the skill writes the suite, never its outcome.
 
@@ -99,7 +101,7 @@ Most spec tooling treats user confirmation as a gate around autonomous work. `sp
 - **Every criterion is testable and traceable.** The difference between a spec and a wish is that a machine or a human can decide pass or fail — and that a green criterion actually entails the requirement it claims to verify. Each AC is a Given/When/Then scenario with a **named oracle**: the thing that decides.
 - **Every must-have criterion has a procedure behind it.** An AC that reads as testable is not the same as an AC someone has written concrete steps, data and an environment for — and the difference only surfaces when you try to write them. That happens at SPECIFY, while the AC can still be rewritten.
 - **The gaps are shaped as blank cells, not silence.** A spec is rarely wrong because someone wrote a falsehood; it is wrong because nobody wrote the empty-state behaviour or the latency number. The template's fixed slots — the Behavior matrix, the four L2 tables, the measured `CFR-n` — turn a forgotten question into a visible hole.
-- **Nothing is silent.** Every load-bearing element of the locked spec is traceable to something the user said, ratified, or explicitly parked. The Provenance Gate blocks the lock otherwise.
+- **Nothing is silent.** Every load-bearing element has a user decision, a grounded factual source, or an explicitly parked question. User approval does not verify an external fact. The Provenance Gate blocks the lock otherwise.
 
 ## Runs anywhere
 
