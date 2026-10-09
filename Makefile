@@ -11,10 +11,10 @@
 #
 # Three CLIs read a `SKILL.md` with YAML frontmatter, and each looks somewhere different:
 #
-#   agent   global                             project
-#   claude  ~/.claude/skills                   <repo>/.claude/skills
-#   codex   $$CODEX_HOME/skills  (~/.codex)    <repo>/.agents/skills
-#   agy     ~/.gemini/antigravity-cli/skills            <repo>/.agents/skills
+#   agent   global                              project
+#   claude  ~/.claude/skills                    <repo>/.claude/skills
+#   codex   $$CODEX_HOME/skills  (~/.codex)     <repo>/.agents/skills
+#   agy     ~/.gemini/antigravity-cli/skills    <repo>/.agents/skills
 #
 # codex and agy share `.agents/skills` at project scope, so one link there serves both — the
 # duplicate collapses in `$(sort ...)` below rather than in a special case.
@@ -40,6 +40,14 @@ PAGES_PORT ?= 8000
 
 CODEX_HOME ?= $(HOME)/.codex
 
+# Each CLI's global skills directory, relative to $(HOME). The targets below are built from these,
+# and `make check` reads the same list to verify that the README and the published page document
+# the directories `make link` actually writes — an install table that names a stale path sends
+# readers to a directory their CLI never reads, and nothing else would notice.
+GLOBAL_claude := .claude/skills
+GLOBAL_codex  := .codex/skills
+GLOBAL_agy    := .gemini/antigravity-cli/skills
+
 # A `~` reaches make quoted, so nothing ever expands it: `PROJECT=~/repo` would resolve against
 # the current directory. Expand a leading `~/` here, before anything builds a path out of it.
 tilde     = $(abspath $(patsubst ~/%,$(HOME)/%,$(1)))
@@ -47,9 +55,11 @@ PROJECTD := $(call tilde,$(PROJECT))
 SKILLSD  := $(call tilde,$(SKILLS_DIR))
 
 ifeq ($(strip $(PROJECT)),)
-tgt_claude := $(HOME)/.claude|$(HOME)/.claude/skills
+# The guard is the CLI's home: the global skills directory with its last component dropped.
+cli_home   = $(HOME)/$(patsubst %/,%,$(dir $(GLOBAL_$(1))))
+tgt_claude := $(call cli_home,claude)|$(HOME)/$(GLOBAL_claude)
 tgt_codex  := $(CODEX_HOME)|$(CODEX_HOME)/skills
-tgt_agy    := $(HOME)/.gemini/antigravity-cli|$(HOME)/.gemini/antigravity-cli/skills
+tgt_agy    := $(call cli_home,agy)|$(HOME)/$(GLOBAL_agy)
 else
 tgt_claude := $(PROJECTD)|$(PROJECTD)/.claude/skills
 tgt_codex  := $(PROJECTD)|$(PROJECTD)/.agents/skills
@@ -78,7 +88,7 @@ help:
 	@echo "make unlink    [AGENT=<a>] [PROJECT=<repo>] [SKILLS_DIR=<dir>]  remove the links this repo owns"
 	@echo "make status    [AGENT=<a>] [PROJECT=<repo>] [SKILLS_DIR=<dir>]  report each destination"
 	@echo "make check                                                      verify this skill is self-contained"
-	@echo "make test                                                       run the fixture battery over make check"
+	@echo "make test                                                       run the fixture battery over make check and make link"
 	@echo ""
 	@echo "make pages                                                      preview the docs/ site (PAGES_PORT=$(PAGES_PORT))"
 	@echo ""
@@ -143,6 +153,10 @@ status:
 # The reference sweep runs the other direction from the citation scan — cited-but-missing is one
 # failure, present-but-uncited is the other, and only the first is visible to someone reading.
 #
+# The install-path scan reads README.md and docs/index.html (tags stripped) for every `~/…skills`
+# path they show and holds it against GLOBAL_*: a documented path make link never writes is one
+# failure, a directory make link writes that neither page documents is the other.
+#
 # DOCS is one list for every scan that reads prose: a check that names its own subset is how a file
 # quietly escapes every one of them. It spans the repo README as well as the skill, because the README
 # cites the same reference files and repeats the same lens count. The shell globs it after the cd,
@@ -197,6 +211,17 @@ check:
 			[ "$$c" = "$$n" ] || { echo "MISS lens count claims $$c, reference/roles.md defines $$n" >&2; fail=1; }; \
 		done; \
 	fi; \
+	for f in README.md docs/index.html; do \
+		[ -f "$$f" ] || continue; \
+		paths=$$(sed 's/<[^>]*>/ /g' "$$f" | grep -oE '~/\.[A-Za-z0-9._/-]*skills' | sort -u); \
+		for p in $$paths; do \
+			case " $(addprefix ~/,$(GLOBAL_claude) $(GLOBAL_codex) $(GLOBAL_agy)) " in *" $$p "*) ;; \
+			*) echo "MISS $$f documents $$p, which make link never writes" >&2; fail=1;; esac; \
+		done; \
+		for p in $(foreach g,$(GLOBAL_claude) $(GLOBAL_codex) $(GLOBAL_agy),'~/$(g)'); do \
+			printf '%s\n' "$$paths" | grep -qxF "$$p" || { echo "MISS $$f never documents $$p, where make link writes" >&2; fail=1; }; \
+		done; \
+	done; \
 	if [ $$fail -eq 0 ]; then echo "self-contained: all references resolve inside $(SKILL), $$n lenses, $$d gate dimensions"; else exit 1; fi
 
 # GitHub Pages serves docs/ as static files on `main`; this only previews the same tree locally,

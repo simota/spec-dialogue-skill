@@ -13,7 +13,7 @@ any other shape is prose, not a lens, and is not counted.
 
 **Two rules bind every lens:**
 
-1. **A lens produces material; it never talks to the user.** The dialogue is the hub's alone (`dialogue-protocol.md` § closing note). A lens that asks the user a question has broken the one-focus-per-turn rule on the hub's behalf.
+1. **A lens produces material; it never talks to the user.** The dialogue is the hub's alone (`dialogue-protocol.md` § Wiring into `spec-dialogue`). A lens that asks the user a question has broken the one-focus-per-turn rule on the hub's behalf.
 2. **A lens states its confidence and its evidence.** "This already exists in the codebase" and "I would guess this exists" are different findings, and only the first can block a direction.
 
 ---
@@ -46,7 +46,7 @@ any other shape is prose, not a lens, and is not counted.
 **Question (pass 1, propose):** What are genuinely different shapes this could take?
 **Question (pass 2, reframe):** Which assumption in the framing, if dropped, opens a direction nobody has considered? What does another domain do about this exact problem?
 **Output:** 3-5 candidate directions, each with a one-line rationale and rough shape, spanning genuinely different trade-offs.
-**Discipline:** run both passes — a single propose pass yields three variations on one idea. Distinctness is the quality bar (D11): if two candidates differ only in wording, one of them is not a candidate.
+**Discipline:** run both passes — a single propose pass yields three variations on one idea. Distinctness is the quality bar (D11): if two candidates differ only in wording, one of them is not a candidate. When a grounded constraint leaves fewer than three, return fewer and name the constraint — padding the list is the same defect as a duplicate.
 
 ### Market — prior art and differentiation
 **Question:** Who already solves this, how, and what does that imply about which direction is worth building?
@@ -80,7 +80,7 @@ any other shape is prose, not a lens, and is not counted.
 ### Proposal — the structured synthesis
 **Question:** What is the chosen direction, stated so someone who missed the conversation understands it?
 **Output:** problem → proposed solution → in-scope → out-of-scope → assumptions → open questions.
-**Discipline:** this is the last stop before authoring, so the in-scope/out-of-scope split must already be **collectively exhaustive and mutually exclusive** — the Quality Gate will check exactly that.
+**Discipline:** this is the last stop before authoring, so every item the dialogue raised must already sit in exactly one of in-scope / out-of-scope — the Quality Gate's Scope-coherence dimension checks exactly that.
 
 ### Prioritization — what is Must
 **Question:** If this decomposes into sub-features, which are Must, Should, Could, Won't — and by what stated criterion?
@@ -97,7 +97,7 @@ any other shape is prose, not a lens, and is not counted.
 ### API-detail — the interface
 **Question:** What are the endpoints, payloads, error shapes, and versioning implications?
 **Output:** the interface contract in L2, at the fidelity the reader needs to build against it.
-**Discipline:** run only when the feature has an interface others consume. Signatures are externally-checkable facts (W5) — verified against real code, or marked as proposed.
+**Discipline:** run only when the feature has an interface others consume. Signatures are externally-checkable facts (W4/W5) — verified against real code, or marked as proposed.
 
 ### Data-model — the storage
 **Question:** What entities, relationships, migrations, and access constraints does this imply?
@@ -106,7 +106,7 @@ any other shape is prose, not a lens, and is not counted.
 
 ### Verifiability — is each AC actually checkable
 **Question:** For each AC — what exactly would someone run or look at to decide pass or fail, and does a `TC-n` actually spell it out? Could an implementation pass this AC while failing its requirement?
-**Output:** per-AC verdict (verifiable / vague / no named oracle / no test case / not entailing its requirement) with the specific defect named.
+**Output:** per-AC verdict (verifiable / vague / no named oracle / oracle names a person but no observation or pass/fail rule / no test case / not entailing its requirement) with the specific defect named.
 **Discipline:** this is the lock precondition's teeth. "The system is fast" fails; "p95 under 200 ms on the listed endpoint at 100 rps" passes. The entailment question (`traceability.md` §3) matters more than the wording one.
 
 ## LOCK lenses

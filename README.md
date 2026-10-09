@@ -25,11 +25,11 @@ Three CLIs read a `SKILL.md` with YAML frontmatter, and each looks somewhere dif
 |-------|--------|------------------|
 | `claude` | `~/.claude/skills` | `<repo>/.claude/skills` |
 | `codex` | `$CODEX_HOME/skills`, default `~/.codex/skills` | `<repo>/.agents/skills` |
-| `agy` | `~/.gemini/config/skills` | `<repo>/.agents/skills` |
+| `agy` | `~/.gemini/antigravity-cli/skills` | `<repo>/.agents/skills` |
 
 `make link` symlinks `skills/spec-dialogue/` into each of them, so a `git pull` here updates every
 installed copy at once. A CLI whose own directory does not exist is **skipped, not created** — linking
-does not conjure `~/.gemini/config` for someone who has never run agy — and `codex` and `agy` share
+does not conjure `~/.gemini/antigravity-cli` for someone who has never run agy — and `codex` and `agy` share
 `.agents/skills` inside a project, so one link there serves both.
 
 Nothing at the destination is ever overwritten: a real directory, or a symlink into some other
@@ -47,7 +47,7 @@ spec-dialogue resume [<slug>]      # re-enter from the last valid checkpoint
 spec-dialogue <slug-or-path>       # re-open a locked spec for revision
 ```
 
-Resume checks changed intent and relevant source freshness before trusting its marker. Revision returns to the earliest invalidated decision, retaining unaffected decisions and IDs; re-lock still needs the gates and the user's sign-off.
+A request that already carries settled, attributable decisions — a confirmed problem, a chosen direction — is not walked back through them: FRAME ratifies them in one checkpoint and the dialogue enters at the earliest phase still open. Resume checks changed intent and relevant source freshness before trusting its marker. Revision returns to the earliest invalidated decision, retaining unaffected decisions and IDs; re-lock still needs the gates and the user's sign-off.
 
 The dialogue writes `docs/specs/<slug>.draft.md` incrementally and promotes it to `docs/specs/<slug>.md` at sign-off, together with its companion `docs/specs/<slug>.acceptance.md` — the `TC-n` test cases, the environment and fixtures they need, and the exit criteria that define acceptance. Every result is left `NOT_RUN`: the skill writes the suite, never its outcome.
 
@@ -59,6 +59,7 @@ The dialogue writes `docs/specs/<slug>.draft.md` incrementally and promotes it t
 | `tools/check.sh` | The fixture battery `make test` runs — what keeps `make check` and `make link` honest |
 | `skills/spec-dialogue/` | The skill itself — the directory `make link` symlinks |
 | `docs/index.html` | The published site — one self-contained page explaining the workflow |
+| `eval/` | The fixed request set and before/after review behind the dialogue-contract changes — review material, not part of the installed skill |
 
 Paths below are relative to `skills/spec-dialogue/`.
 
@@ -95,7 +96,7 @@ eight gate dimensions, in the fact strip and in the prose alike — cannot drift
 
 ## The idea
 
-Most spec tooling treats user confirmation as a gate around autonomous work. `spec-dialogue` inverts it: **the back-and-forth is the work**, and the document is its crystallized output. Three things make that hold up rather than drift:
+Most spec tooling treats user confirmation as a gate around autonomous work. `spec-dialogue` inverts it: **the back-and-forth is the work**, and the document is its crystallized output. Five things make that hold up rather than drift:
 
 - **Checkpoints are contract-level.** Even an autonomous caller stops at them. A single-pass spec that reports itself as dialogue is the failure this exists to prevent.
 - **Every criterion is testable and traceable.** The difference between a spec and a wish is that a machine or a human can decide pass or fail — and that a green criterion actually entails the requirement it claims to verify. Each AC is a Given/When/Then scenario with a **named oracle**: the thing that decides.

@@ -31,7 +31,8 @@ The panel must **kill weak claims, not bold ones.** The distinction that does th
 
 ## 3. Verdict aggregation
 
-- **Majority on evidence decides.** Majority refuted-on-evidence → **back to the earliest invalidated decision** (`SKILL.md` § Draft persistence & resume) — not a park, because the spec is defective rather than incomplete. Majority merely-unproven → **LOCK-with-flag**.
+- **Evidence decides, not headcount.** The verdict is set by the strongest *verified* evidence on the table, not by how many skeptics agree. One skeptic holding a current primary source (the contract, the code, the measured log) outweighs three repeating a secondary one; **skeptics whose findings rest on the same source count as one**, however many of them there are. Rank evidence before counting anything: primary and current › primary but dated › secondary › inference.
+- **Routing.** A refutation that stands on verified evidence → **back to the earliest invalidated decision** (`SKILL.md` § Draft persistence & resume) — not a park, because the spec is defective rather than incomplete. Only merely-unproven findings → **LOCK-with-flag**. Two verified sources that contradict each other are not averaged: the contradiction itself is a `before-build` Open Question with an owner who can resolve it.
 - **Carry forward the survivors' failures.** Record which refutations the spec survived and which it failed, and whether each open risk is "refuted-on-evidence" or "unproven-because-new". On a loop back to CHALLENGE, **carry refuted directions forward as exclusions** while the defeating evidence still applies, so the reframe does not re-derive an already-refuted option from unchanged premises.
 - **Surface, don't bury.** The Open Questions section states the surviving and failed refutations so the sign-off is auditable. A panel whose findings do not appear in the locked document did not run.
 
@@ -40,8 +41,9 @@ The panel must **kill weak claims, not bold ones.** The distinction that does th
 ## 4. Hard exclusions (never decide on a panel vote alone)
 
 - **Safety-critical scope** (auth, encryption, input validation, anything with a regulatory obligation) is **not cut from a spec on a skeptic panel's vote** — a panel does not authorize removing a control. Park it and escalate to a human with the relevant authority.
-- **Confidence `< 60%`** → do not act on the destructive reading; route to "defer + gather evidence" and park it as an Open Question.
+- **Evidence the skeptic cannot produce** — second-hand, unverifiable from here, or "I believe" — does not drive a destructive reading (cutting scope, reversing the pick). Route it to "defer + gather evidence" and park it as an Open Question naming the source that would settle it. A self-reported confidence number is not evidence and sets no threshold.
 - **A verdict flips on new evidence, never on pressure.** Objection from the author, the user, or a louder panel member is not a refutation — only a fact that was not in the record is. Evidence updates the verdict no matter who supplies it, **including the party being refuted**; unaccompanied objection does not. Name the triggering evidence, or do not flip.
+- **A changed decision is not a disputed fact.** This rule governs *factual* verdicts. When the user who owns the product changes what they want ("I've changed my mind — I want dark mode now"), that is a new decision, and their authority over it is the point of the dialogue: surface the conflict with the earlier decision (`dialogue-protocol.md` D8), record the new one as `elicited`, and route it through the revision return rule. What does not change is the *evidence*: an empirical claim that was unsupported before ("users churn without it") stays unsupported after the preference changes, and is not written into the spec as grounded.
 
 Parking under this protocol does not waive the dependency-based Lock rule (`spec-template.md`). An unresolved mandatory control or acceptance dependency still blocks LOCK.
 

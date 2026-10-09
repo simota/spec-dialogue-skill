@@ -63,9 +63,16 @@ An AC is written as a **scenario**, not an adjective — `Given` a starting stat
 criteria; they are the ambiguity a criterion exists to remove. The three parts are the contract;
 `spec-template.md` renders them as table columns for the common case and as a block for the rest.
 
+**Invariants keep the shape without inventing an actor.** Some requirements are properties that
+hold always rather than responses to an action — "the schema rejects nulls", "no endpoint returns
+another tenant's rows". For these, `When` names the **check event** — `at build`, `on every write`,
+`for every endpoint in the route table` — and `Then` the property. Inventing a user action to fill
+`When` makes the criterion test that one action and nothing else, which is exactly the entailment
+failure above.
+
 Each AC additionally states:
 - **Its verification mode** — machine-checkable (a test can assert it) or human-checkable (someone must look). "Verifiable in principle" is not a mode.
-- **Its oracle** — the specific thing that decides pass or fail: a test file or case name, a dashboard query, a named reviewer. A mode without an oracle defers the hardest question — *who decides?* — to whoever is under deadline pressure later.
+- **Its oracle** — the specific thing that decides pass or fail: a test file or case name, a dashboard query, a named reviewer **plus what they observe and the rule that turns it into a verdict**. "QA reviewer" alone is not an oracle — it names who looks, not what they look at or where the line between pass and fail sits; "QA reviewer compares the export against fixture `F-3`; any missing column fails" is. A mode without an oracle defers the hardest question — *who decides, by what?* — to whoever is under deadline pressure later.
 - **Its must-have flag** — must-have ACs gate the build's completion; nice-to-have ACs do not. An unflagged AC set forces the builder to guess which failures block ship.
 
 ### Error paths are requirements too
@@ -109,7 +116,7 @@ This is optional for a small spec and worth the cost for anything a build will r
 
 - New criterion → give it an `AC-{n}`, a Given/When/Then, and the requirement it verifies. Never a bare bullet.
 - Every requirement → at least one AC; an explicit `OQ-n` may explain a draft gap, but does not waive the LOCK precondition.
-- Every AC → a verification mode, an oracle, and a must-have flag.
+- Every AC → a verification mode, an oracle (observation + pass/fail rule, not just a name), and a must-have flag. An invariant names its check event in `When`.
 - Every must-have AC → at least one `TC-{n}` in `docs/specs/<slug>.acceptance.md`.
 - Every TC → the AC it discharges, concrete step values, and an observable expected result (`acceptance-test-template.md` T1–T4).
 - Every Behavior-matrix row → a requirement in `Applies to` and an AC in `Verifies`.
