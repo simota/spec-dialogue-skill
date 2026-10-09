@@ -350,8 +350,8 @@ a:focus-visible{outline:2px solid var(--gate);outline-offset:2px}
       </tbody>
     </table>
   </div>
-  <div class="callout"><b>The invariant.</b> Testable acceptance criteria, a test case behind every must-have one, the Quality Gate, the Provenance Gate and an explicit sign-off are lock preconditions at <em>every</em> depth. A <code>light</code> run that discovers a real option space escalates to <code>standard</code> and says so, rather than under-specifying quietly.</div>
-  <div class="callout q"><b>Start where the open decisions are.</b> A request that arrives with decisions already made and attributable — a confirmed problem, a chosen direction, a contracted provider — is not walked back through them. FRAME becomes one ratification checkpoint: the supplied decisions paraphrased back with their sources, confirmed in a single turn. The dialogue then enters at the earliest phase whose decision is still open. Nothing is skipped silently; what was supplied is recorded with its provenance.</div>
+  <div class="callout"><b>The invariant.</b> Testable acceptance criteria, a test case behind every must-have one, the Quality Gate (Provenance included) and an explicit sign-off hold at <em>every</em> depth. A <code>light</code> run that discovers a real option space escalates to <code>standard</code> and says so, rather than under-specifying quietly.</div>
+  <div class="callout q"><b>Start where the open decisions are.</b> A request that arrives with decisions already made and attributable — a confirmed problem, a chosen direction, a contracted provider — is not walked back through them. FRAME becomes one ratification checkpoint: each supplied decision paraphrased back with its source and confirmed or corrected by the user — ratifying a supplied direction is the CHALLENGE pick. The dialogue then enters at the earliest phase whose decision is still open. Nothing is skipped silently; what was supplied is recorded with its provenance.</div>
 </section>
 
 <!-- ========== 4. PHASES ========== -->
@@ -722,6 +722,7 @@ make test    # the fixture battery — each check is broken in a scratch copy an
         <tr><td>Losing a long dialogue to an interruption</td><td>incremental draft persistence and <code>spec-dialogue resume</code></td></tr>
         <tr><td>Re-asking what the user already settled</td><td>the entry point — FRAME ratifies supplied, attributable decisions in one checkpoint, then the dialogue starts at the earliest open phase</td></tr>
         <tr><td>A fake choice padded to three options</td><td>EXPAND names the constraint that closes the space instead of inventing alternatives</td></tr>
+        <tr><td>An acceptance oracle invented for something only a prototype can know</td><td>CHALLENGE specifies the experiment, or parks the choice as a blocking open question</td></tr>
         <tr><td>A checklist walked to <code>N/A</code> while the domain's own failure goes unasked</td><td>the six Behavior-matrix classes are a floor; domain-specific conditions get rows of their own</td></tr>
       </tbody>
     </table>

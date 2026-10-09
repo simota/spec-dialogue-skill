@@ -68,7 +68,9 @@ hold always rather than responses to an action — "the schema rejects nulls", "
 another tenant's rows". For these, `When` names the **check event** — `at build`, `on every write`,
 `for every endpoint in the route table` — and `Then` the property. Inventing a user action to fill
 `When` makes the criterion test that one action and nothing else, which is exactly the entailment
-failure above.
+failure above. Because the invariant claims *every* case, its `TC` states how every case is covered —
+a static check, a property test, an enumerated list — and the Verifiability lens confirms no
+user-triggered path is being relabelled as an invariant to escape a scenario.
 
 Each AC additionally states:
 - **Its verification mode** — machine-checkable (a test can assert it) or human-checkable (someone must look). "Verifiable in principle" is not a mode.

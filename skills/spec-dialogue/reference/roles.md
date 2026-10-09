@@ -45,7 +45,7 @@ any other shape is prose, not a lens, and is not counted.
 ### Divergence — the option space
 **Question (pass 1, propose):** What are genuinely different shapes this could take?
 **Question (pass 2, reframe):** Which assumption in the framing, if dropped, opens a direction nobody has considered? What does another domain do about this exact problem?
-**Output:** 3-5 candidate directions, each with a one-line rationale and rough shape, spanning genuinely different trade-offs.
+**Output:** 3-5 candidate directions (fewer only when a named constraint closes the space), each with a one-line rationale and rough shape, spanning genuinely different trade-offs.
 **Discipline:** run both passes — a single propose pass yields three variations on one idea. Distinctness is the quality bar (D11): if two candidates differ only in wording, one of them is not a candidate. When a grounded constraint leaves fewer than three, return fewer and name the constraint — padding the list is the same defect as a duplicate.
 
 ### Market — prior art and differentiation

@@ -169,7 +169,7 @@ exactly one list: exhaustive over what was raised, mutually exclusive. An out-of
 in-scope requirement depends on is a boundary defect, and the refutation panel attacks exactly that.
 
 ## Considered but rejected
-Directions dropped in CHALLENGE, one line each on why. Reuse the rejection while its premises remain valid; revision may reopen it when those premises change. When no genuine alternative existed, the content is `none —` plus the grounded constraint that closed the space (`none — the signed provider contract fixes the vendor`); that is content, not `N/A`.
+Directions dropped in CHALLENGE, one line each on why. Reuse the rejection while its premises remain valid; revision may reopen it when those premises change. When no genuine alternative existed, the content is `none —` plus the constraint that closed the space and its source (`none — the signed provider contract fixes the vendor`); when the direction was decided before this dialogue, it is `decided upstream — <source>` plus the alternatives that were considered there, so the refutation panel still has something to attack. Either is content, not `N/A`.
 
 ## Assumption Ledger
 `dialogue-protocol.md` §3. Draft-time this is live; at LOCK every remaining `open` entry is either

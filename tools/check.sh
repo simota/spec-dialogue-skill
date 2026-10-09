@@ -109,6 +109,9 @@ case_ 'gate digit drifts in the page'    fail 'sed "s|>8</b><span>gate dimension
 case_ 'stale agy path in README.md'      fail 'sed "s|~/.gemini/antigravity-cli/skills|~/.gemini/config/skills|" README.md > _ && mv _ README.md'
 case_ 'stale agy path in the page'       fail 'sed "s|~/.gemini/antigravity-cli/skills|~/.gemini/config/skills|" docs/index.html > _ && mv _ docs/index.html'
 case_ 'install row dropped from README'  fail 'grep -v "^| \`claude\` |" README.md > _ && mv _ README.md'
+case_ 'stale CLI home in README prose'   fail 'sed "s|conjure \`~/.gemini/antigravity-cli\`|conjure \`~/.gemini/config\`|" README.md > _ && mv _ README.md'
+case_ 'stale \$HOME-form path in README' fail 'printf "Or copy it into \`\$HOME/.gemini/config/skills\`.\n" >> README.md'
+case_ 'a path inside a skills dir is ok'  ok   'printf "It lands at \`~/.claude/skills/spec-dialogue\`.\n" >> README.md'
 case_ 'Makefile moves agy, docs stale'   fail 'sed "s|^GLOBAL_agy    := .*|GLOBAL_agy    := .gemini/elsewhere/skills|" Makefile > _ && mv _ Makefile'
 
 # --- a non-lens heading must not inflate the count ----------------------------

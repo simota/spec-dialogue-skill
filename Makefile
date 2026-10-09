@@ -38,8 +38,6 @@ AGENT   ?= claude codex agy
 PAGES    := $(REPO)/docs
 PAGES_PORT ?= 8000
 
-CODEX_HOME ?= $(HOME)/.codex
-
 # Each CLI's global skills directory, relative to $(HOME). The targets below are built from these,
 # and `make check` reads the same list to verify that the README and the published page document
 # the directories `make link` actually writes — an install table that names a stale path sends
@@ -47,6 +45,10 @@ CODEX_HOME ?= $(HOME)/.codex
 GLOBAL_claude := .claude/skills
 GLOBAL_codex  := .codex/skills
 GLOBAL_agy    := .gemini/antigravity-cli/skills
+# codex reads $CODEX_HOME rather than a fixed directory; GLOBAL_codex is its default.
+CODEX_HOME ?= $(HOME)/$(patsubst %/,%,$(dir $(GLOBAL_codex)))
+
+GLOBALS       := $(foreach g,$(GLOBAL_claude) $(GLOBAL_codex) $(GLOBAL_agy),'~/$(g)')
 
 # A `~` reaches make quoted, so nothing ever expands it: `PROJECT=~/repo` would resolve against
 # the current directory. Expand a leading `~/` here, before anything builds a path out of it.
@@ -153,9 +155,11 @@ status:
 # The reference sweep runs the other direction from the citation scan — cited-but-missing is one
 # failure, present-but-uncited is the other, and only the first is visible to someone reading.
 #
-# The install-path scan reads README.md and docs/index.html (tags stripped) for every `~/…skills`
-# path they show and holds it against GLOBAL_*: a documented path make link never writes is one
-# failure, a directory make link writes that neither page documents is the other.
+# The install-path scan reads README.md and docs/index.html (tags stripped) for every home-relative
+# path they show — `~/.x`, `$HOME/.x`, `${HOME}/.x` — and holds it against GLOBAL_*. A documented
+# path that is neither a global skills directory, one of its parents (a CLI home), nor something
+# inside one is a stale path; a global skills directory that either page fails to document is the
+# other failure.
 #
 # DOCS is one list for every scan that reads prose: a check that names its own subset is how a file
 # quietly escapes every one of them. It spans the repo README as well as the skill, because the README
@@ -213,13 +217,17 @@ check:
 	fi; \
 	for f in README.md docs/index.html; do \
 		[ -f "$$f" ] || continue; \
-		paths=$$(sed 's/<[^>]*>/ /g' "$$f" | grep -oE '~/\.[A-Za-z0-9._/-]*skills' | sort -u); \
+		paths=$$(sed 's/<[^>]*>/ /g' "$$f" | grep -oE '(~|\$$HOME|\$$\{HOME\})/\.[A-Za-z0-9._/-]*[A-Za-z0-9_-]' | sed 's|^[^/]*/|~/|' | sort -u); \
 		for p in $$paths; do \
-			case " $(addprefix ~/,$(GLOBAL_claude) $(GLOBAL_codex) $(GLOBAL_agy)) " in *" $$p "*) ;; \
-			*) echo "MISS $$f documents $$p, which make link never writes" >&2; fail=1;; esac; \
+			ok=; \
+			for g in $(GLOBALS); do \
+				case "$$p" in "$$g"|"$$g"/*) ok=1;; esac; \
+				case "$$g" in "$$p"/*) ok=1;; esac; \
+			done; \
+			[ -n "$$ok" ] || { echo "MISS $$f documents $$p, which is not on any path make link writes" >&2; fail=1; }; \
 		done; \
-		for p in $(foreach g,$(GLOBAL_claude) $(GLOBAL_codex) $(GLOBAL_agy),'~/$(g)'); do \
-			printf '%s\n' "$$paths" | grep -qxF "$$p" || { echo "MISS $$f never documents $$p, where make link writes" >&2; fail=1; }; \
+		for g in $(GLOBALS); do \
+			printf '%s\n' "$$paths" | grep -qxF "$$g" || { echo "MISS $$f never documents $$g, where make link writes" >&2; fail=1; }; \
 		done; \
 	done; \
 	if [ $$fail -eq 0 ]; then echo "self-contained: all references resolve inside $(SKILL), $$n lenses, $$d gate dimensions"; else exit 1; fi

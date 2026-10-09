@@ -49,7 +49,7 @@ accepted. Anything that could block acceptance and is not on this list will not 
 
 | | Criterion |
 |---|-----------|
-| **Entry** | the spec is `locked`; a build identifying itself by commit is deployed to the named environment; fixtures loaded |
+| **Entry** | the spec is `locked`; a build identifying itself by commit is deployed to the named environment — or, while its binding is `TBD`, to one shown to provide every §3 capability; fixtures loaded |
 | **Exit** | every **must-have** `TC` is PASS · every `CFR` procedure has a recorded measurement meeting its target · no open defect at a blocking severity (§8) · every non-must-have failure is recorded as a defect, not dropped |
 
 ## 3. Environment
@@ -69,7 +69,8 @@ Under-specified environment is the most common reason a result cannot be reprodu
 
 **Nothing built yet is the normal case**, not an exception: the suite is authored at SPECIFY, before
 any environment exists. Then `Value` states the **capabilities the environment must provide** — "a
-tenant with two roles and a stubbed payment provider that can be forced to time out" — and the
+tenant with two roles and a stubbed payment provider that can be forced to time out", each one
+checkable; "staging-like" is not a capability — and the
 concrete binding (host, URL, account name) is a `TBD(<owner>)` carried as a `before-ship` `OQ-n`
 in the spec. That is legitimate only because the capability contract is settled (`spec-template.md`
 Lock rule). Never invent a hostname, a staging URL or an account to make the row look filled — an

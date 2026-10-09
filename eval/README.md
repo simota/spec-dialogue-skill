@@ -7,6 +7,7 @@
 | [requests.md](requests.md) | 編集前に固定した80 requestと文脈、期待owner/depth/phase。日本語40件 |
 | [predictions.md](predictions.md) | 編集前の反証可能な予測P1–P5、反例、変更理由、選択しなかった候補 |
 | [results.md](results.md) | 同じ80件の変更前後判定。主たる反例ごとの結果 |
+| [followup.md](followup.md) | 後続変更: 下記「今回変更していないもの」の大半への対応と、still-ambiguous 24件の後続判定 |
 
 3ファイルは、依頼者へ渡したレビュー成果物とbyte単位で同じです。本文に登場するrequests.jsonl、専門suite、全362専門fixture行、集計・データ検査script、詳細ログ、Git bundleは元のレビューアーカイブ側の資料であり、このPRには含めていません。この抜粋だけで元の集計scriptを実行できるとはしていません。
 
@@ -41,6 +42,8 @@ PR作成時に変更済みローカルtreeで`make check`と`make test`を再実
 既存makeは参照・lens/gate数・link動作の検査です。対話品質、sourceの真偽、anchoring、fake options、gate severity、revision routingの意味的正しさを保証しません。合成挙動例にも独立性はありません。
 
 ## 今回変更していないもの
+
+> 後続変更で、ここに挙げた項目の大半を扱った。結果は[followup.md](followup.md)を参照。この節は当時の記録として残す。
 
 routing frontmatterとclarify後の反復FRAME、lightの必須section・別acceptance document・build-path、3–5案とONE direction、D6の別語強制、全ACのGWT、固定Behavior matrix、scopeのexhaustiveness、refutationの多数決・60%・owner authorityには反例が残ります。README/siteのagy install path driftも別件として残しています。
 
