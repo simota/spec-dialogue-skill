@@ -112,6 +112,9 @@ case_ 'install row dropped from README'  fail 'grep -v "^| \`claude\` |" README.
 case_ 'stale CLI home in README prose'   fail 'sed "s|conjure \`~/.gemini/antigravity-cli\`|conjure \`~/.gemini/config\`|" README.md > _ && mv _ README.md'
 case_ 'stale \$HOME-form path in README' fail 'printf "Or copy it into \`\$HOME/.gemini/config/skills\`.\n" >> README.md'
 case_ 'a path inside a skills dir is ok'  ok   'printf "It lands at \`~/.claude/skills/spec-dialogue\`.\n" >> README.md'
+case_ 'stale $CODEX_HOME path in README' fail 'sed "s|\`\$CODEX_HOME/skills\`|\`\$CODEX_HOME/plugins\`|" README.md > _ && mv _ README.md'
+case_ 'stale $CODEX_HOME path in page'   fail 'sed "s|<code>\$CODEX_HOME/skills</code>|<code>\$CODEX_HOME/plugins</code>|" docs/index.html > _ && mv _ docs/index.html'
+case_ 'SKILLS_DIR= example is allowed'   ok   'printf "\n\`\`\`sh\nmake link SKILLS_DIR=~/.config/agents/skills\n\`\`\`\n" >> README.md'
 case_ 'Makefile moves agy, docs stale'   fail 'sed "s|^GLOBAL_agy    := .*|GLOBAL_agy    := .gemini/elsewhere/skills|" Makefile > _ && mv _ Makefile'
 
 # --- a non-lens heading must not inflate the count ----------------------------

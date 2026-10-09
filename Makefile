@@ -60,7 +60,7 @@ ifeq ($(strip $(PROJECT)),)
 # The guard is the CLI's home: the global skills directory with its last component dropped.
 cli_home   = $(HOME)/$(patsubst %/,%,$(dir $(GLOBAL_$(1))))
 tgt_claude := $(call cli_home,claude)|$(HOME)/$(GLOBAL_claude)
-tgt_codex  := $(CODEX_HOME)|$(CODEX_HOME)/skills
+tgt_codex  := $(CODEX_HOME)|$(CODEX_HOME)/$(notdir $(GLOBAL_codex))
 tgt_agy    := $(call cli_home,agy)|$(HOME)/$(GLOBAL_agy)
 else
 tgt_claude := $(PROJECTD)|$(PROJECTD)/.claude/skills
@@ -159,7 +159,8 @@ status:
 # path they show — `~/.x`, `$HOME/.x`, `${HOME}/.x` — and holds it against GLOBAL_*. A documented
 # path that is neither a global skills directory, one of its parents (a CLI home), nor something
 # inside one is a stale path; a global skills directory that either page fails to document is the
-# other failure.
+# other failure. `$CODEX_HOME/…` paths are held to the codex skills subdirectory the same way.
+# A `SKILLS_DIR=<dir>` example names an override, not a default, so it is left out of the scan.
 #
 # DOCS is one list for every scan that reads prose: a check that names its own subset is how a file
 # quietly escapes every one of them. It spans the repo README as well as the skill, because the README
@@ -217,7 +218,13 @@ check:
 	fi; \
 	for f in README.md docs/index.html; do \
 		[ -f "$$f" ] || continue; \
-		paths=$$(sed 's/<[^>]*>/ /g' "$$f" | grep -oE '(~|\$$HOME|\$$\{HOME\})/\.[A-Za-z0-9._/-]*[A-Za-z0-9_-]' | sed 's|^[^/]*/|~/|' | sort -u); \
+		text=$$(sed 's/<[^>]*>/ /g; s/SKILLS_DIR=[^ `]*//g' "$$f"); \
+		paths=$$(printf '%s\n' "$$text" | grep -oE '(~|\$$HOME|\$$\{HOME\})/\.[A-Za-z0-9._/-]*[A-Za-z0-9_-]' | sed 's|^[^/]*/|~/|' | sort -u); \
+		cpaths=$$(printf '%s\n' "$$text" | grep -oE '\$$(CODEX_HOME|\{CODEX_HOME\})/[A-Za-z0-9._/-]*[A-Za-z0-9_-]' | sed 's|^[^/]*/|$$CODEX_HOME/|' | sort -u); \
+		for p in $$cpaths; do \
+			[ "$$p" = '$$CODEX_HOME/$(notdir $(GLOBAL_codex))' ] || { echo "MISS $$f documents $$p, but make link writes $$CODEX_HOME/$(notdir $(GLOBAL_codex))" >&2; fail=1; }; \
+		done; \
+		[ -n "$$cpaths" ] || { echo "MISS $$f never documents $$CODEX_HOME/$(notdir $(GLOBAL_codex)), where make link writes for codex" >&2; fail=1; }; \
 		for p in $$paths; do \
 			ok=; \
 			for g in $(GLOBALS); do \
