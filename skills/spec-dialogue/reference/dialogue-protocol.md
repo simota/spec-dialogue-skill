@@ -20,7 +20,7 @@
 
 | # | Rule | Discipline |
 |---|------|-----------|
-| D6 | **Paraphrase-back before persist** | Before writing any user decision to the draft, reflect it back in 1–2 lines in *different words* than the user used — echoing their words verbatim tests nothing. Persist only the confirmed paraphrase. |
+| D6 | **Paraphrase-back before persist** | Before writing any user decision to the draft, reflect it back in 1–2 lines in *different words* than the user used — echoing their words verbatim tests nothing. Persist only the confirmed paraphrase. **Protected terms are the exception:** a domain term the user defines or insists on ("delete marker — it does *not* mean permanent deletion"), or a Glossary term the user has confirmed, is kept verbatim and the paraphrase goes *around* it — restate what it means and what it excludes, never swap in a synonym that blurs the distinction. The term then enters the Glossary with its `Not to be called` list. |
 | D7 | **Vague-answer rule** | A low-information answer ("sounds fine", "whatever works") gets exactly ONE concretizing follow-up in D2/D3 form. If still vague, do not badger: record the point as an `ASSUME-n` entry (§3) with your chosen default and continue only independent work; an unresolved factual input remains unknown (D2/D9). |
 | D8 | **Contradiction surfacing** | When a new answer conflicts with an earlier persisted decision, surface it immediately and explicitly ("this changes DEC-2 from X to Y — intentional?"). Never silently overwrite; never silently keep the old one. The resolution is itself a persisted decision. |
 
@@ -43,7 +43,7 @@ Every unconfirmed decision default — skipped questions, D7 vague answers, or D
 | # | Rule | Discipline |
 |---|------|-----------|
 | D10 | **Envelope + delta-only** | A checkpoint presentation fits ~15 lines. On iteration, present the **delta** since the last turn, never re-dump the whole artifact — the full state lives in the draft file the user can open. An unreadable checkpoint produces a rubber-stamp confirm, which is worse than no checkpoint. |
-| D11 | **Option quality** | Options for a pick must be genuinely distinct, each with a one-line trade-off. During divergence, present them neutrally, without a recommendation or ranking (D4). Mark a recommendation and its reason only during convergence, after the user's unprimed reaction; a first reaction does not itself end divergence. 2–4 options; a 5th means the framing is wrong. |
+| D11 | **Option quality** | Options must be genuinely distinct, each with a one-line trade-off — and never padded: when only one or two are real, show one or two and name what closes the rest. During divergence, present them neutrally, without a recommendation or ranking (D4). Mark a recommendation and its reason only during convergence, after the user's unprimed reaction; a first reaction does not itself end divergence. A question asking the user to *pick* offers 2–4 options; a 5th means the framing is wrong. (EXPAND's 3–5 candidate *directions* are the material being explored; they are narrowed to at most four survivors before the CHALLENGE pick.) |
 | D12 | **Orientation line** | Every checkpoint opens with one line of state: current phase · decisions locked so far (count) · open assumptions (count). The user steering a long dialogue must never have to ask "where are we?". |
 
 ## 5. Engagement calibration (D13–D15)
@@ -51,8 +51,8 @@ Every unconfirmed decision default — skipped questions, D7 vague answers, or D
 | # | Rule | Discipline |
 |---|------|-----------|
 | D13 | **Depth follows signal** | Rich, detailed answers → deepen (more D5 probes, finer options). Terse answers trending shorter → compress: batch dimensions into one question, propose defaults, lean on the Ledger. Matching the user's bandwidth is part of the contract, not a courtesy. |
-| D14 | **Circling detection (all phases)** | If any dialogue point circles ≥ 2 rounds with no new information, name it and offer: (a) lock the leading option, or (b) park it as `ASSUME-n` / Open Question and continue only independent work. Neither path waives LOCK preconditions. This generalizes the Phase 2 convergence check to every phase. |
-| D15 | **Delegate mode** | When the user says "just decide" / "任せる", switch to propose-and-confirm: make the call, record it as `ASSUME-n (delegated)`, and continue. Contract-level checkpoints still fire — but they present the delegated decisions for ratification instead of asking the original questions. Delegation compresses the dialogue; it never deletes the checkpoints. |
+| D14 | **Circling detection (all phases)** | If any dialogue point circles ≥ 2 rounds with no new information, name it and offer: (a) adopt the leading option, or (b) park it as `ASSUME-n` / Open Question and continue only independent work. Neither path waives LOCK preconditions. This generalizes the Phase 2 convergence check to every phase. |
+| D15 | **Delegate mode** | When the user says "just decide" / "任せる", switch to propose-and-confirm: make the call, record it as `ASSUME-n (delegated)`, and continue. Contract-level checkpoints still fire — but they present the delegated decisions for ratification instead of asking the original questions. Delegation compresses the dialogue; it never deletes the checkpoints — and it never covers sign-off or the build-path choice, which stay the user's own words. |
 
 ## 6. Provenance Gate (D16)
 

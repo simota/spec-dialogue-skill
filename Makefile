@@ -11,10 +11,10 @@
 #
 # Three CLIs read a `SKILL.md` with YAML frontmatter, and each looks somewhere different:
 #
-#   agent   global                             project
-#   claude  ~/.claude/skills                   <repo>/.claude/skills
-#   codex   $$CODEX_HOME/skills  (~/.codex)    <repo>/.agents/skills
-#   agy     ~/.gemini/antigravity-cli/skills            <repo>/.agents/skills
+#   agent   global                              project
+#   claude  ~/.claude/skills                    <repo>/.claude/skills
+#   codex   $$CODEX_HOME/skills  (~/.codex)     <repo>/.agents/skills
+#   agy     ~/.gemini/antigravity-cli/skills    <repo>/.agents/skills
 #
 # codex and agy share `.agents/skills` at project scope, so one link there serves both — the
 # duplicate collapses in `$(sort ...)` below rather than in a special case.
@@ -38,7 +38,17 @@ AGENT   ?= claude codex agy
 PAGES    := $(REPO)/docs
 PAGES_PORT ?= 8000
 
-CODEX_HOME ?= $(HOME)/.codex
+# Each CLI's global skills directory, relative to $(HOME). The targets below are built from these,
+# and `make check` reads the same list to verify that the README and the published page document
+# the directories `make link` actually writes — an install table that names a stale path sends
+# readers to a directory their CLI never reads, and nothing else would notice.
+GLOBAL_claude := .claude/skills
+GLOBAL_codex  := .codex/skills
+GLOBAL_agy    := .gemini/antigravity-cli/skills
+# codex reads $CODEX_HOME rather than a fixed directory; GLOBAL_codex is its default.
+CODEX_HOME ?= $(HOME)/$(patsubst %/,%,$(dir $(GLOBAL_codex)))
+
+GLOBALS       := $(foreach g,$(GLOBAL_claude) $(GLOBAL_codex) $(GLOBAL_agy),'~/$(g)')
 
 # A `~` reaches make quoted, so nothing ever expands it: `PROJECT=~/repo` would resolve against
 # the current directory. Expand a leading `~/` here, before anything builds a path out of it.
@@ -47,9 +57,11 @@ PROJECTD := $(call tilde,$(PROJECT))
 SKILLSD  := $(call tilde,$(SKILLS_DIR))
 
 ifeq ($(strip $(PROJECT)),)
-tgt_claude := $(HOME)/.claude|$(HOME)/.claude/skills
-tgt_codex  := $(CODEX_HOME)|$(CODEX_HOME)/skills
-tgt_agy    := $(HOME)/.gemini/antigravity-cli|$(HOME)/.gemini/antigravity-cli/skills
+# The guard is the CLI's home: the global skills directory with its last component dropped.
+cli_home   = $(HOME)/$(patsubst %/,%,$(dir $(GLOBAL_$(1))))
+tgt_claude := $(call cli_home,claude)|$(HOME)/$(GLOBAL_claude)
+tgt_codex  := $(CODEX_HOME)|$(CODEX_HOME)/$(notdir $(GLOBAL_codex))
+tgt_agy    := $(call cli_home,agy)|$(HOME)/$(GLOBAL_agy)
 else
 tgt_claude := $(PROJECTD)|$(PROJECTD)/.claude/skills
 tgt_codex  := $(PROJECTD)|$(PROJECTD)/.agents/skills
@@ -78,7 +90,7 @@ help:
 	@echo "make unlink    [AGENT=<a>] [PROJECT=<repo>] [SKILLS_DIR=<dir>]  remove the links this repo owns"
 	@echo "make status    [AGENT=<a>] [PROJECT=<repo>] [SKILLS_DIR=<dir>]  report each destination"
 	@echo "make check                                                      verify this skill is self-contained"
-	@echo "make test                                                       run the fixture battery over make check"
+	@echo "make test                                                       run the fixture battery over make check and make link"
 	@echo ""
 	@echo "make pages                                                      preview the docs/ site (PAGES_PORT=$(PAGES_PORT))"
 	@echo ""
@@ -143,6 +155,13 @@ status:
 # The reference sweep runs the other direction from the citation scan — cited-but-missing is one
 # failure, present-but-uncited is the other, and only the first is visible to someone reading.
 #
+# The install-path scan reads README.md and docs/index.html (tags stripped) for every home-relative
+# path they show — `~/.x`, `$HOME/.x`, `${HOME}/.x` — and holds it against GLOBAL_*. A documented
+# path that is neither a global skills directory, one of its parents (a CLI home), nor something
+# inside one is a stale path; a global skills directory that either page fails to document is the
+# other failure. `$CODEX_HOME/…` paths are held to the codex skills subdirectory the same way.
+# A `SKILLS_DIR=<dir>` example names an override, not a default, so it is left out of the scan.
+#
 # DOCS is one list for every scan that reads prose: a check that names its own subset is how a file
 # quietly escapes every one of them. It spans the repo README as well as the skill, because the README
 # cites the same reference files and repeats the same lens count. The shell globs it after the cd,
@@ -197,6 +216,27 @@ check:
 			[ "$$c" = "$$n" ] || { echo "MISS lens count claims $$c, reference/roles.md defines $$n" >&2; fail=1; }; \
 		done; \
 	fi; \
+	for f in README.md docs/index.html; do \
+		[ -f "$$f" ] || continue; \
+		text=$$(sed 's/<[^>]*>/ /g; s/SKILLS_DIR=[^ `]*//g' "$$f"); \
+		paths=$$(printf '%s\n' "$$text" | grep -oE '(~|\$$HOME|\$$\{HOME\})/\.[A-Za-z0-9._/-]*[A-Za-z0-9_-]' | sed 's|^[^/]*/|~/|' | sort -u); \
+		cpaths=$$(printf '%s\n' "$$text" | grep -oE '\$$(CODEX_HOME|\{CODEX_HOME\})/[A-Za-z0-9._/-]*[A-Za-z0-9_-]' | sed 's|^[^/]*/|$$CODEX_HOME/|' | sort -u); \
+		for p in $$cpaths; do \
+			[ "$$p" = '$$CODEX_HOME/$(notdir $(GLOBAL_codex))' ] || { echo "MISS $$f documents $$p, but make link writes $$CODEX_HOME/$(notdir $(GLOBAL_codex))" >&2; fail=1; }; \
+		done; \
+		[ -n "$$cpaths" ] || { echo "MISS $$f never documents $$CODEX_HOME/$(notdir $(GLOBAL_codex)), where make link writes for codex" >&2; fail=1; }; \
+		for p in $$paths; do \
+			ok=; \
+			for g in $(GLOBALS); do \
+				case "$$p" in "$$g"|"$$g"/*) ok=1;; esac; \
+				case "$$g" in "$$p"/*) ok=1;; esac; \
+			done; \
+			[ -n "$$ok" ] || { echo "MISS $$f documents $$p, which is not on any path make link writes" >&2; fail=1; }; \
+		done; \
+		for g in $(GLOBALS); do \
+			printf '%s\n' "$$paths" | grep -qxF "$$g" || { echo "MISS $$f never documents $$g, where make link writes" >&2; fail=1; }; \
+		done; \
+	done; \
 	if [ $$fail -eq 0 ]; then echo "self-contained: all references resolve inside $(SKILL), $$n lenses, $$d gate dimensions"; else exit 1; fi
 
 # GitHub Pages serves docs/ as static files on `main`; this only previews the same tree locally,

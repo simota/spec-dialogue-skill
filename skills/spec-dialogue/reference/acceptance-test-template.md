@@ -49,7 +49,7 @@ accepted. Anything that could block acceptance and is not on this list will not 
 
 | | Criterion |
 |---|-----------|
-| **Entry** | the spec is `locked`; a build identifying itself by commit is deployed to the named environment; fixtures loaded |
+| **Entry** | the spec is `locked`; a build identifying itself by commit is deployed to the named environment — or, while its binding is `TBD`, to one shown to provide every §3 capability; fixtures loaded |
 | **Exit** | every **must-have** `TC` is PASS · every `CFR` procedure has a recorded measurement meeting its target · no open defect at a blocking severity (§8) · every non-must-have failure is recorded as a defect, not dropped |
 
 ## 3. Environment
@@ -66,6 +66,15 @@ Under-specified environment is the most common reason a result cannot be reprodu
 | Clock / timezone / locale | | |
 
 `N/A` on a row needs the reason: "no external dependency" is information; a blank cell is not.
+
+**Nothing built yet is the normal case**, not an exception: the suite is authored at SPECIFY, before
+any environment exists. Then `Value` states the **capabilities the environment must provide** — "a
+tenant with two roles and a stubbed payment provider that can be forced to time out", each one
+checkable; "staging-like" is not a capability — and the
+concrete binding (host, URL, account name) is a `TBD(<owner>)` carried as a `before-ship` `OQ-n`
+in the spec. That is legitimate only because the capability contract is settled (`spec-template.md`
+Lock rule). Never invent a hostname, a staging URL or an account to make the row look filled — an
+invented binding is a fabricated fact (`doc-quality.md` W5).
 
 ## 4. Test data
 | Fixture | Purpose | Source | Reset procedure | Contains personal data |
@@ -171,6 +180,7 @@ section is what stops "all green" from being read as "everything works".
 | T7 | Results are authored as `NOT_RUN` | `spec-dialogue` writes the suite, never its outcome; a pre-filled pass is a fabricated result (`doc-quality.md` W5) |
 | T8 | Every section present, or `N/A` with a one-line reason | same tier discipline as the spec (`doc-quality.md` W12) |
 | T9 | A second `TC` on the same `AC` exercises a **different** path, or it does not exist | duplicate coverage costs a run every time and raises confidence once; the suite is sized by the paths that can fail, not by the cases someone can write (`doc-quality.md` W9) |
+| T10 | An environment that does not exist yet is specified by required capabilities, its binding left `TBD(<owner>)` | an invented staging URL is a fabricated fact; a capability list is a contract someone can stand up (`doc-quality.md` W5) |
 
 ## Failure Modes Prevented
 
@@ -185,3 +195,4 @@ section is what stops "all green" from being read as "everything works".
 | A flaky case disappearing into a re-run | §9 appends runs rather than overwriting |
 | Error paths specified but never tested | §5 covers the Behavior matrix rows, not just happy paths |
 | A suite that is long rather than discriminating | T9 — a second case per AC only for a different path |
+| A staging URL invented to fill the environment table | T10 — required capabilities now, the binding `TBD(<owner>)` until it exists |

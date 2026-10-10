@@ -1,12 +1,12 @@
 ---
 name: spec-dialogue
-description: "Refining a rough feature idea into a locked, acceptance-criteria-bearing specification plus its acceptance test specification, through deep human-in-the-loop dialogue: problem framing, option divergence, stress-tested convergence, staged authoring, adversarial quality gate, explicit sign-off. Stops at the documents — writes no code and runs no tests."
+description: "Decide, together with the user, what one feature must do — refining a rough idea or an unsettled behavior into a locked, acceptance-criteria-bearing specification plus its acceptance test specification, through human-in-the-loop dialogue: problem framing, option divergence, stress-tested convergence, staged authoring, adversarial quality gate, explicit sign-off. Also revises a locked spec when reality moved. Not for: writing or planning the code of an already-settled feature, transcribing decisions already made into a document, choosing which feature to build, or end-to-end build-and-ship. Stops at the documents — writes no code and runs no tests."
 ---
 
 <!--
 CAPABILITIES_SUMMARY:
 - problem_framing: Establish and confirm a shared problem statement before any option generation
-- option_divergence: Generate 3-5 candidate directions and steer them with the user across multiple turns
+- option_divergence: Generate up to 5 genuinely distinct candidate directions (3-5 unless a named constraint closes the space) and steer them with the user across multiple turns
 - adversarial_convergence: Narrow to one direction under necessity / scope / feasibility / failure pressure
 - staged_authoring: L0 Vision -> L1 Requirements -> L2 Detail -> Behavior matrix -> L3 Acceptance Criteria with REQ<->AC traceability
 - quality_gate: Eight-dimension independent review of the spec as an artifact (lock precondition)
@@ -51,6 +51,11 @@ Do **not** use `spec-dialogue` when:
 - the open question is *which* feature to build at all — decide that first, then spec the winner
 - the deliverable is a whole-repository architecture document rather than one feature
 - an existing feature needs excavating and explaining — that is archaeology, not specification
+- the decisions are already made and only need writing down — transcribing settled notes into a format is writing, not dialogue; there is nothing left to elicit
+- the spec is locked and the deliverable is *how* to build it — technical design, work breakdown, estimates
+- the request is to take a feature all the way to shipped — that is a build lifecycle; it may *call* `spec-dialogue` for its specification step, but the top-level owner is whatever runs the build
+
+**When the deliverable is unstated** ("I want notifications", "make collaboration better") and the user neither invoked `spec-dialogue` by name nor asked for a spec, ask that first — one question: is the output a decision about what to build, a specification, or code? Start FRAME only on "a specification"; otherwise say which kind of work fits instead and stop.
 
 ## Execution model
 
@@ -70,7 +75,16 @@ Do **not** use `spec-dialogue` when:
 | `standard` (default) | a normal feature with genuine alternatives | all six | 2 skeptics (claims 1, 3) | ~8-15 |
 | `deep` | high-stakes, contested, or expensive-to-reverse; a spec several teams will build against | all six + extended EXPAND | 4 skeptics (one per claim) | ~15-30 |
 
-**Invariant across all three:** testable L3 ACs, the Spec Quality Gate, the Provenance Gate, and explicit sign-off are lock preconditions at every depth — `light` buys fewer *turns*, never a weaker *lock*. Propose a depth at FRAME with your reason and let the user override; an unstated depth defaults to `standard`. A `light` run that discovers a real option space **escalates to `standard` and says so** rather than under-specifying.
+**Invariant across all three:** the three lock preconditions (testable L3 ACs, a `TC-n` behind every must-have AC, the Spec Quality Gate — Provenance included) and explicit sign-off hold at every depth — `light` buys fewer *turns*, never a weaker *lock*. Propose a depth at FRAME with your reason and let the user override; an unstated depth defaults to `standard`. A `light` run that discovers a real option space **escalates to `standard` and says so** rather than under-specifying.
+
+### Entry point — start where the open decisions are
+
+Not every request starts from nothing. When the user arrives with upstream decisions already made **and attributable** — a confirmed problem statement, an agreed audience, a chosen direction, a contracted provider — re-asking them wastes the turns the open decisions need and teaches the user that answers are not heard. So:
+
+- **FRAME still runs, as one ratification checkpoint.** List each supplied decision on its own line, paraphrased back (D6) with where it came from — "confirmed in the kickoff notes", "the signed provider contract" — within the D10 envelope, and split the checkpoint when there are more than four (D1). The user confirms or corrects each one; a decision the user was not shown is not ratified. Do not re-elicit what they already settled.
+- **Then enter at the earliest phase whose decision is still open**, by the same mapping as the revision return rule (**Draft persistence & resume**): problem settled but options open → EXPAND; direction settled → SHAPE; direction *and* scope boundary settled → SPECIFY. The skipped checkpoints are not dropped — they are discharged by this one: ratifying a supplied direction **is** the CHALLENGE pick, and is recorded as the pick (with the upstream alternatives in Considered but rejected, or `decided upstream — <source>`).
+- **Record each skipped phase's decisions with their provenance.** A product decision is `elicited` — the ratifying utterance, citing the upstream source. Only an external constraint (a signed contract, a regulation, the code) is `grounded`, with locator and version (`reference/dialogue-protocol.md` D16). The lock preconditions still need every one of them.
+- A supplied decision that turns out to be unattributable or contradictory is not settled: it becomes the first question, at the phase that owns it.
 
 ---
 
@@ -96,14 +110,18 @@ Then drive Socratic clarification with the user per `reference/dialogue-protocol
 
 Generate the option space. Run the **Divergence lens twice with different framings** — once in propose mode (what could this be), once in reframe mode (challenge the assumptions, borrow from another domain). Produce **3-5 candidate directions**, each with a one-line rationale and rough shape. **+Market lens** when differentiation or prior art matters.
 
+**Never pad the option space.** When a grounded or elicited constraint — a signed contract, a mandated standard, a product the user has defined as exactly two states — genuinely leaves fewer than three directions, present the ones that exist, show the constraint's source, and move on; three candidates where only one is real is a fake choice (D11). If no genuine alternative appears to exist, ask neutrally (D4) — "does this constraint leave any direction open?" — rather than asking for agreement that it does not; on a no, that answer is the EXPAND checkpoint and the CHALLENGE pick, and the dialogue moves on to SHAPE.
+
 - **Checkpoint:** present the candidates; the user reacts, eliminates, combines, or adds. Expect **multiple turns** here — this is the divergent heart of the dialogue. Do not converge prematurely. Keep polarity neutral (D4): no recommendation or ranking during divergence; D11 recommendations belong to convergence after the user's unprimed reaction. On checkpoint pass, append the surviving candidates to the draft.
 
 ### Phase 2 — CHALLENGE (stress-test + converge)
 
 Narrow to ONE direction *with the user*, under four distinct pressures: **Arbitration lens** (is it necessary — multi-perspective trade-off), **Subtraction lens** (is it over-scoped — YAGNI), **Impact lens** (is it feasible — blast radius and dependencies), **+Pre-mortem lens** (how does it fail — when stakes are high).
 
-- **Checkpoint (mandatory):** the user makes the **explicit pick** of the single direction to specify. Carry forward rejected directions as recorded "considered but rejected" so the dialogue does not re-derive them. Record the pick and the rejected list to the draft.
-- **Convergence check:** before looping back to EXPAND, ask "are we converging, or circling?" If circling ≥ 2 rounds with no new information, offer to (a) lock the leading candidate, or (b) park the disagreement as an Open Question and continue only work independent of its answer. Parking does not waive LOCK preconditions. Never loop indefinitely.
+- **Checkpoint (mandatory):** narrow the survivors to at most four (D11), then the user makes the **explicit pick** of the single direction to specify. Carry forward rejected directions as recorded "considered but rejected" so the dialogue does not re-derive them. Record the pick and the rejected list to the draft.
+- **One direction is one specified behavior, not one code path.** "Both, behind a per-customer setting" is a legitimate pick — the setting, who owns it, and each branch's behavior then become requirements and ACs like any other. What is not a pick is "both, decide later".
+- **A choice only evidence can settle.** When the directions differ on something nobody can know without building it (an algorithm's quality, a provider's real latency), do not invent the oracle. Either (a) the pick becomes *the experiment* — specify the prototype, its measurement and the decision rule that will choose, and lock that — or (b) park the choice as a `before-build` Open Question, which blocks LOCK of anything that depends on it (`reference/spec-template.md` Lock rule).
+- **Convergence check:** before looping back to EXPAND, ask "are we converging, or circling?" If circling ≥ 2 rounds with no new information, offer to (a) adopt the leading candidate as the pick, or (b) park the disagreement as an Open Question and continue only work independent of its answer. Parking does not waive LOCK preconditions. Never loop indefinitely.
 
 ### Phase 3 — SHAPE (proposal)
 
@@ -115,19 +133,19 @@ The **Proposal lens** synthesizes the chosen direction into a structured proposa
 
 The **Authoring lens** carries the spine — staged elaboration L0 Vision → L1 Requirements → L2 Detail → Behavior matrix → L3 Acceptance Criteria. **+API-detail lens** and **+Data-model lens** when the spec needs interface or storage detail. Author against `reference/spec-template.md` so the artifact is downstream-consumable, and iterate with the user **section by section**, persisting each agreed section to the draft.
 
-- Give every L3 acceptance criterion a **traceable ID (`AC-001`, `AC-002`, … per `reference/traceability.md` §1) mapped to the L1 requirement it verifies**, written as a **Given / When / Then scenario with a named oracle** — the thing that decides pass or fail. This traceability is what the Quality Gate's Completeness check verifies and what any downstream build consumes as its verification contract.
-- **Walk the Behavior matrix explicitly with the user.** Its six condition classes — empty state, invalid input, unauthorized, dependency unavailable, concurrent modification, limit exceeded — are the questions a spec forgets and a build discovers. A class that genuinely does not apply is struck out **with a reason**; a class nobody discussed becomes an `OQ-n`, never a blank.
+- Give every L3 acceptance criterion a **traceable ID (`AC-001`, `AC-002`, … per `reference/traceability.md` §1) mapped to the L1 requirement it verifies**, written as a **Given / When / Then scenario with a named oracle** — the observation that decides pass or fail and the rule that reads it, not merely who looks. An invariant with no triggering user action ("the schema rejects nulls") names its check event in `When` (`at build`, `on every write`) rather than inventing an action (`reference/traceability.md` §3). This traceability is what the Quality Gate's Completeness check verifies and what any downstream build consumes as its verification contract.
+- **Walk the Behavior matrix explicitly with the user.** Its six condition classes — empty state, invalid input, unauthorized, dependency unavailable, concurrent modification, limit exceeded — are the questions a spec forgets and a build discovers. A class that genuinely does not apply is struck out **with a reason** (one line may strike several when the reason is shared — "no input, no dependency, no state"); a class nobody discussed becomes an `OQ-n`, never a blank. The six are a floor, not the whole list: then ask what *this* domain fails on that the six do not name — encoding and newline fidelity for a formatter, a destructive overwrite, a timezone boundary — and give each one found its own row.
 - **Every cross-functional requirement is objectively verifiable.** Quantitative `CFR-n` rows need a justified metric, target and measurement conditions. Categorical or normative rows need a precise required condition or applicable criterion/version, and observable pass/fail evidence. An adjective, arbitrary percentage or standard name without an applicable check is a Testability failure.
 - **Ambiguity is closed, not written down.** A term or threshold with two readings gets one targeted question (D1–D3); if the user does not settle it, it becomes an `ASSUME-n` with your chosen default or an `OQ-n` with an owner. What it never becomes is a hedge — `appropriate`, `as needed`, `robust`, `etc.` are the words a build reinterprets under deadline pressure (`reference/doc-quality.md` W15).
 - **Say it once, then stop.** The documents carry the minimum that conveys intent: a value in the table that owns it and nowhere else (W10), prose only where reasoning changes a build decision, and no line that nobody would miss if it were deleted (W9). Length is not diligence — the Economy dimension scores this at the gate, and a padded spec buries the lines a builder must not miss.
 - **Lock preconditions (all three mandatory, verified at LOCK):** (1) the spec carries **testable L3 acceptance criteria** — the difference between a spec and a wish; the **Verifiability lens** sanity-checks that each AC is actually checkable by a machine or a human. (2) **every must-have AC is discharged by at least one `TC-n`** in the acceptance test specification (`reference/traceability.md` §2, hop 2). (3) the spec **passes the Spec Quality Gate** (below).
-- **Author the acceptance test specification alongside L3**, not after it. `docs/specs/<slug>.acceptance.md` per `reference/acceptance-test-template.md`: a `TC-n` for every must-have AC, with concrete step values, a named environment, fixtures and their reset, exit criteria, and defect severities. Writing the procedure is what exposes an AC that only *reads* as testable — which is why it happens at SPECIFY, while the AC can still be rewritten, rather than at build time. **Every result is authored `NOT_RUN`**: `spec-dialogue` writes the suite, never its outcome.
+- **Author the acceptance test specification alongside L3**, not after it. `docs/specs/<slug>.acceptance.md` per `reference/acceptance-test-template.md`: a `TC-n` for every must-have AC, with concrete step values, a named environment or the capabilities it must provide, fixtures and their reset, exit criteria, and defect severities. Writing the procedure is what exposes an AC that only *reads* as testable — which is why it happens at SPECIFY, while the AC can still be rewritten, rather than at build time. **Every result is authored `NOT_RUN`**: `spec-dialogue` writes the suite, never its outcome.
 - **The test spec decides nothing the spec left open.** A behaviour discovered missing while writing a case becomes an `OQ-n` in the spec (`reference/acceptance-test-template.md` T6), never a decision made in the test document.
 - **+Demand lens** for a quick usability sanity-pass on the shaped flow when there is a UI surface.
 
 ### Phase 5 — LOCK (sign-off + persist, no code)
 
-**Gate:** do not present for sign-off until **all three lock preconditions pass** — testable L3 ACs, a `TC-n` behind every must-have AC, **and** the Spec Quality Gate. Then present the complete spec and require the user's **explicit sign-off** ("lock it"). On sign-off:
+**Gate:** do not present for sign-off until **all three lock preconditions pass** — testable L3 ACs, a `TC-n` behind every must-have AC, **and** the Spec Quality Gate. Then present the complete spec and require the user's **explicit sign-off** ("lock it"). Sign-off is the **user's own utterance** — a delegated "just decide" (D15) never extends to it. On sign-off:
 
 - **Finalize both documents:** promote `docs/specs/<slug>.draft.md` to the locked `docs/specs/<slug>.md` (status `locked`; override the path on request), following `reference/spec-template.md`, and promote the companion `docs/specs/<slug>.acceptance.md` to `locked` with it. The two are locked together — an accepted spec whose test procedure is still a draft has no executable definition of done. Include an explicit **Open Questions / Deferred Decisions** section — parked items, including any non-blocking Quality-Gate findings parked under the dependency-based Lock rule, are recorded, never silently dropped. Archive or remove the `.draft.md` once promoted.
 - **Build-path selection (mandatory checkpoint):** before recommending a handoff, ask the user **how** they want the locked spec built. Present the choice in terms of the build's shape, not a tool name:
@@ -137,9 +155,10 @@ The **Authoring lens** carries the spine — staged elaboration L0 Vision → L1
   | **Unattended loop** — turn the spec into a self-driving runner whose completion contract is the L3 AC set | the build is long-running / multi-session / the user wants to leave it alone; checkpoint-resume matters | the AC set becomes the machine-checkable DONE gate |
   | **One-shot autonomous build** — design → implement → verify → ship in a single sustained run | the build is bounded and the user is present for it | the AC set is the ship gate |
   | **Supervised build** — a human-in-the-loop implementation pass | the change is small, risky, or needs judgment per step | the AC set is the review checklist |
+  | **Spec-only** — no build path is chosen here | the spec is the deliverable itself: an RFP, a contract with a vendor, a team that will choose its own process | the AC set is the acceptance contract whoever builds it |
 
-  Both autonomous paths consume the same L3 ACs; the difference is attendance and resumability. If your environment has a specific runner or build skill for the chosen shape, name it here — but the spec is complete and consumable without one.
-- Emit the **Spec Handoff Packet** (`reference/spec-template.md` § Handoff Packet) as a **recommendation, not execution** — `spec-dialogue` writes no code. The build-path selection is a contract-level checkpoint and cannot be auto-picked, even under an autonomous caller.
+  Both autonomous paths consume the same L3 ACs; the difference is attendance and resumability. If your environment has a specific runner or build skill for the chosen shape, name it here — but the spec is complete and consumable without one. **Spec-only is a real answer, not an evasion:** record it with its reason; it does not leave the Build-path section empty and does not block LOCK.
+- Emit the **Spec Handoff Packet** (`reference/spec-template.md` § Handoff Packet) as a **recommendation, not execution** — `spec-dialogue` writes no code. The build-path selection is a contract-level checkpoint and cannot be auto-picked, even under an autonomous caller; a request that already states it ("spec only, for an RFP") is the user's answer — confirm it, do not ask it again.
 
 ---
 
@@ -163,7 +182,7 @@ The gate scores eight dimensions. Missing lock preconditions block sign-off; use
 | Completeness | Does every in-scope requirement have ≥ 1 L3 AC, and every must-have AC ≥ 1 `TC`? (both hops of `REQ → AC → TC`) |
 | Consistency | Do scope, requirements, and ACs contradict each other anywhere? |
 | Testability | Is every AC verifiable by a machine or a human? |
-| Scope coherence | Are in-scope / out-of-scope collectively exhaustive and mutually exclusive? |
+| Scope coherence | Does every item the dialogue raised — candidate requirement, sub-feature, adjacent concern — land in exactly one of in-scope / out-of-scope? (exhaustive over what was raised, not over everything imaginable; mutually exclusive) |
 | Economy | Does every line change what gets built? Delete what does not — a fact stated twice, prose restating a table, a summary of a section next to it (`reference/doc-quality.md` W9, W10) |
 | Provenance | Is every load-bearing element `elicited` / `ratified` / `grounded` / `parked` — none `silent`, and factual support not replaced by user approval? (`reference/dialogue-protocol.md` D16; open `ASSUME-n` entries are walked with the user here) |
 | Resolvability | Does every `UNKNOWN` / `TBD` / open `ASSUME-n` appear in Open Questions with an owner, a dependent decision and reason in `Blocks`, and a matching `Resolve by` — with no unresolved build or acceptance dependency regardless of label? (`reference/doc-quality.md` W13) |
@@ -181,7 +200,7 @@ The eight dimensions above audit the spec **as a document**. They do not ask the
 | **The ACs actually prove the requirements** | "AC-n passes on an implementation that does not satisfy REQ-m" — a green AC that does not entail its requirement is the most expensive defect a spec can ship |
 | **The scope boundary holds** | "an out-of-scope item is load-bearing for an in-scope requirement" — the boundary is not actually separable |
 
-Aggregation follows the protocol §3: **majority refuted-on-evidence → back to the earliest invalidated decision** per **Draft persistence & resume** (not a park); majority **merely-unproven-because-new → LOCK-with-flag**, the flag recorded in Open Questions with the assumption it rests on. The evidence-vs-novelty discipline (§2) is load-bearing here — a genuinely novel feature must not be blocked for lacking evidence that can only exist after it ships; only an evidence-based refutation blocks. Hard exclusions per §4 apply unchanged.
+Aggregation follows the protocol §3 and weighs **evidence, not headcount**: **a refutation that stands on verified evidence → back to the earliest invalidated decision** per **Draft persistence & resume** (not a park); **merely-unproven-because-new → LOCK-with-flag**, the flag recorded in Open Questions with the assumption it rests on. The evidence-vs-novelty discipline (§2) is load-bearing here — a genuinely novel feature must not be blocked for lacking evidence that can only exist after it ships; only an evidence-based refutation blocks. Hard exclusions per §4 apply unchanged.
 
 Panel size scales with depth: `light` skips the panel, `standard` runs 2 skeptics on claims 1 and 3, `deep` runs 4 — one per claim, so no claim goes unattacked and no skeptic blends two angles.
 
@@ -199,6 +218,9 @@ Panel size scales with depth: `light` skips the panel, `standard` runs 2 skeptic
 | Silently dropped open questions | locked spec carries an explicit Open Questions / Deferred Decisions section |
 | Jumping to build | `spec-dialogue` writes no code; it hands off |
 | Single-pass spec masquerading as dialogue | human-in-the-loop at every phase boundary; an autonomous caller cannot skip contract-level checkpoints |
+| Re-asking what the user already settled | Entry point — FRAME ratifies supplied, attributable decisions in one checkpoint, then enters at the earliest open phase |
+| A fake choice padded to three options | EXPAND never pads; a grounded constraint that closes the space is named instead |
+| An acceptance oracle invented for something only a prototype can know | CHALLENGE: specify the experiment, or park the choice as a blocking `OQ-n` |
 | Reinvent the wheel / out-of-context spec | FRAME's reuse-scan (skipped only for greenfield) |
 | Lost dialogue on interruption | incremental draft persistence + `spec-dialogue resume` |
 | Locking a low-quality spec | eight-dimension Quality Gate as a lock precondition |
@@ -211,6 +233,7 @@ Panel size scales with depth: `light` skips the panel, `standard` runs 2 skeptic
 | A cross-functional requirement that is an adjective | `CFR-n` carries a quantitative or categorical condition and verification evidence, or fails Testability |
 | A `TBD` buried mid-document, found by the build | Resolvability dimension + the Open Questions inventory rule (W13) |
 | Ambiguity surviving in free-form detail prose | L2 is four fixed slots, each filled or `N/A` with a reason |
+| A checklist walked to `N/A` while the domain's own failure goes unasked | the six Behavior-matrix classes are a floor; domain-specific conditions get their own rows |
 | An open question written as a hedge word instead of asked | Ambiguity dimension + W15 — quantify, or carry it as an `OQ-n` |
 | Padding and restated facts burying the load-bearing line | Economy dimension + W9 deletion test + W10 single source of truth |
 | Synonym drift between spec and code | Glossary with a `Not to be called` column (`reference/doc-quality.md` W11) |

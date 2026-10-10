@@ -39,7 +39,7 @@ Every section is present, or marked `N/A` with a one-line reason (`doc-quality.m
 | as-of | <YYYY-MM-DD> |
 | review trigger | <the event or interval that makes this stale, or `evergreen`> |
 | depth | light \| standard \| deep |
-| current phase | FRAME \| EXPAND \| CHALLENGE \| SHAPE \| SPECIFY \| LOCK   <!-- draft only; removed at promotion -->
+| current phase | FRAME \| EXPAND \| CHALLENGE \| SHAPE \| SPECIFY \| LOCK — draft only; the row is removed at promotion |
 | build path | <filled at LOCK> |
 
 ## L0 — Vision
@@ -110,8 +110,11 @@ The conditions a spec forgets. Each row names the requirement it qualifies and t
 it; a condition with no row is an **open question**, not an undefined behaviour — move it to Open
 Questions rather than deleting the row.
 
-The six condition classes below are a fixed checklist. Strike one out only with a stated reason
-(`N/A — the feature has no external dependency`), never by omission.
+The six condition classes below are a fixed floor. Strike one out only with a stated reason
+(`N/A — the feature has no external dependency`), never by omission; several classes sharing one
+reason may be struck in one row. Below the six, add a row for every condition **this domain** fails on
+that the six do not name — or one row saying none was found when it was asked. A matrix that is six
+`N/A`s and nothing else has walked the checklist without asking the question.
 
 | Condition | Applies to | Expected behavior | User-visible | Verifies |
 |-----------|-----------|-------------------|--------------|----------|
@@ -121,6 +124,7 @@ The six condition classes below are a fixed checklist. Strike one out only with 
 | Dependency unavailable or timed out | REQ-001 | … | … | AC-007 |
 | Concurrent modification | REQ-003 | … | … | AC-008 |
 | Limit exceeded / rate limited | CFR-002 | … | … | AC-009 |
+| <domain-specific: e.g. non-UTF-8 input, destructive overwrite> | REQ-004 | … | … | AC-010 |
 
 ## Dependencies & integration points
 What this feature rests on and does not control. The last two columns are the ones that get
@@ -139,8 +143,10 @@ reason, not just the marker.
 
 ## L3 — Acceptance Criteria
 Each criterion is a scenario, not an adjective. `Oracle` names what decides pass or fail — a test
-file, a dashboard query, a named reviewer — because "verifiable in principle" is not a mode
-(`traceability.md` §3). Every requirement above appears at least once in **Verifies**.
+file, a dashboard query, a named reviewer with what they observe and the pass/fail rule — because
+"verifiable in principle" is not a mode (`traceability.md` §3). An invariant names its check event
+in `When` (`at build`) rather than an invented action. Every requirement above appears at least
+once in **Verifies**.
 
 | ID | Given | When | Then | Verifies | Mode | Oracle | Must-have |
 |----|-------|------|------|----------|------|--------|-----------|
@@ -158,11 +164,12 @@ convenience.
 - **In scope** — …
 - **Out of scope** — …
 
-Collectively exhaustive and mutually exclusive. An out-of-scope item that an in-scope requirement
-depends on is a boundary defect, and the refutation panel attacks exactly that.
+Every item the dialogue raised — candidate requirement, sub-feature, adjacent concern — appears in
+exactly one list: exhaustive over what was raised, mutually exclusive. An out-of-scope item that an
+in-scope requirement depends on is a boundary defect, and the refutation panel attacks exactly that.
 
 ## Considered but rejected
-Directions dropped in CHALLENGE, one line each on why. Reuse the rejection while its premises remain valid; revision may reopen it when those premises change.
+Directions dropped in CHALLENGE, one line each on why. Reuse the rejection while its premises remain valid; revision may reopen it when those premises change. When no genuine alternative existed, the content is `none —` plus the constraint that closed the space and its source (`none — the signed provider contract fixes the vendor`); when the direction was decided before this dialogue, it is `decided upstream — <source>` plus the alternatives that were considered there, so the refutation panel still has something to attack. Either is content, not `N/A`.
 
 ## Assumption Ledger
 `dialogue-protocol.md` §3. Draft-time this is live; at LOCK every remaining `open` entry is either
@@ -197,8 +204,8 @@ appears here as an `OQ-n`. A marker buried in L2 that never reaches this table i
 section exists to prevent — it is what the Quality Gate's **Resolvability** dimension scans for.
 
 ## Build-path decision
-Recorded at LOCK: unattended loop \| one-shot autonomous build \| supervised build, plus the
-reason. See `SKILL.md` Phase 5.
+Recorded at LOCK: unattended loop \| one-shot autonomous build \| supervised build \| spec-only,
+plus the reason. See `SKILL.md` Phase 5.
 ```
 
 The L1↔L3 traceability — every requirement has an AC, every AC names a requirement — is exactly what the Quality Gate's Completeness dimension verifies and what the build consumes as its verification contract. The Behavior matrix extends the same loop sideways: each row cites a requirement **and** an AC, so an error path cannot be described in prose and then go untested.
@@ -222,6 +229,6 @@ Emitted at LOCK. A handoff that ships only a file path forces whatever builds th
 | `open_questions` | the `OQ-n` set with `Blocks` / `Owner` / `Resolve by` — never silently dropped downstream, and never carrying an unresolved build/acceptance dependency at LOCK, regardless of label |
 | `refutation_flags` | any `LOCK-with-flag` claim and the assumption it rests on — each is a kill-criterion candidate for the build |
 | `reuse_findings` | the existing-asset and constraint map from FRAME with source versions; avoid re-scanning unchanged premises, not freshness checks |
-| `build_path` | the path chosen at LOCK |
+| `build_path` | the path chosen at LOCK, or `spec-only` with its reason |
 
 **Contract rule.** A build that receives the packet **does not re-open the settled decisions** — it may surface a contradiction it discovers against real code, but re-litigating the direction is drift. A build that finds a **must-have AC unbuildable as written** returns to `spec-dialogue <slug>` for revision, returning to the earliest invalidated decision under `SKILL.md` § Draft persistence & resume and re-running the lock preconditions, rather than quietly reinterpreting it.
