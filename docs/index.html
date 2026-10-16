@@ -207,21 +207,21 @@ a:focus-visible{outline:2px solid var(--gate);outline-offset:2px}
     <svg viewBox="0 0 1200 440" role="img" aria-label="Spec Dialogue flow. FRAME, EXPAND, CHALLENGE, SHAPE, SPECIFY and LOCK run left to right, each preceded by a checkpoint. The shown return arrows illustrate renewed exploration, an AC fix at SPECIFY and a direction fix at CHALLENGE; actual revisions return to the earliest invalidated decision. LOCK emits the locked spec and its acceptance test specification together. A downstream contradiction returns to the earliest invalidated decision, retaining unaffected work.">
       <defs>
         <marker id="ar" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path d="M0,1 L9,5 L0,9 z" fill="currentColor"/></marker>
-        <marker id="arG" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path d="M0,1 L9,5 L0,9 z" fill="#9E3B26"/></marker>
+        <marker id="arG" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path d="M0,1 L9,5 L0,9 z" style="fill:var(--gate)"/></marker>
       </defs>
 
       <text x="20" y="26" font-family="'JetBrains Mono',monospace" font-size="10" fill="currentColor" opacity=".55" letter-spacing=".04em">invoke · spec-dialogue [depth=…]</text>
 
       <!-- checkpoint chips -->
       <g>
-        <rect x="20"   y="44" width="170" height="24" rx="1" fill="#9E3B26" fill-opacity=".10" stroke="#9E3B26" stroke-width="1" stroke-dasharray="4 3"/>
-        <rect x="215"  y="44" width="170" height="24" rx="1" fill="#9E3B26" fill-opacity=".10" stroke="#9E3B26" stroke-width="1" stroke-dasharray="4 3"/>
-        <rect x="410"  y="44" width="170" height="24" rx="1" fill="#9E3B26" fill-opacity=".10" stroke="#9E3B26" stroke-width="1" stroke-dasharray="4 3"/>
-        <rect x="605"  y="44" width="170" height="24" rx="1" fill="#9E3B26" fill-opacity=".10" stroke="#9E3B26" stroke-width="1" stroke-dasharray="4 3"/>
-        <rect x="800"  y="44" width="170" height="24" rx="1" fill="#9E3B26" fill-opacity=".10" stroke="#9E3B26" stroke-width="1" stroke-dasharray="4 3"/>
-        <rect x="995"  y="44" width="170" height="24" rx="1" fill="#9E3B26" fill-opacity=".10" stroke="#9E3B26" stroke-width="1" stroke-dasharray="4 3"/>
+        <rect x="20"   y="44" width="170" height="24" rx="1" fill-opacity=".10" stroke-width="1" stroke-dasharray="4 3" style="fill:var(--gate);stroke:var(--gate)"/>
+        <rect x="215"  y="44" width="170" height="24" rx="1" fill-opacity=".10" stroke-width="1" stroke-dasharray="4 3" style="fill:var(--gate);stroke:var(--gate)"/>
+        <rect x="410"  y="44" width="170" height="24" rx="1" fill-opacity=".10" stroke-width="1" stroke-dasharray="4 3" style="fill:var(--gate);stroke:var(--gate)"/>
+        <rect x="605"  y="44" width="170" height="24" rx="1" fill-opacity=".10" stroke-width="1" stroke-dasharray="4 3" style="fill:var(--gate);stroke:var(--gate)"/>
+        <rect x="800"  y="44" width="170" height="24" rx="1" fill-opacity=".10" stroke-width="1" stroke-dasharray="4 3" style="fill:var(--gate);stroke:var(--gate)"/>
+        <rect x="995"  y="44" width="170" height="24" rx="1" fill-opacity=".10" stroke-width="1" stroke-dasharray="4 3" style="fill:var(--gate);stroke:var(--gate)"/>
       </g>
-      <g font-family="'JetBrains Mono',monospace" font-size="9.5" fill="#9E3B26" text-anchor="middle">
+      <g font-family="'JetBrains Mono',monospace" font-size="9.5" text-anchor="middle" style="fill:var(--gate)">
         <text x="105"  y="60">✓ problem confirmed</text>
         <text x="300"  y="60">✓ steer the options</text>
         <text x="495"  y="60">✓ the explicit pick</text>
@@ -229,7 +229,7 @@ a:focus-visible{outline:2px solid var(--gate);outline-offset:2px}
         <text x="885"  y="60">✓ section by section</text>
         <text x="1080" y="60">✓ sign-off + build path</text>
       </g>
-      <g stroke="#9E3B26" stroke-width="1" fill="none" marker-end="url(#arG)" opacity=".8">
+      <g stroke-width="1" fill="none" marker-end="url(#arG)" opacity=".8" style="stroke:var(--gate)">
         <line x1="105" y1="68" x2="105" y2="92"/><line x1="300" y1="68" x2="300" y2="92"/>
         <line x1="495" y1="68" x2="495" y2="92"/><line x1="690" y1="68" x2="690" y2="92"/>
         <line x1="885" y1="68" x2="885" y2="92"/><line x1="1080" y1="68" x2="1080" y2="92"/>
@@ -257,9 +257,9 @@ a:focus-visible{outline:2px solid var(--gate);outline-offset:2px}
         <text x="814" y="120" font-family="Archivo,sans-serif" font-weight="700" font-size="13" fill="currentColor">4 · SPECIFY</text>
         <text x="814" y="139" font-family="'JetBrains Mono',monospace" font-size="10" fill="currentColor" opacity=".6">L0→L3 + TC-n</text>
 
-        <rect x="995" y="96" width="170" height="58" rx="1" fill="#9E3B26" fill-opacity=".10" stroke="#9E3B26" stroke-width="1.4"/>
-        <text x="1009" y="120" font-family="Archivo,sans-serif" font-weight="700" font-size="13" fill="#9E3B26">5 · LOCK</text>
-        <text x="1009" y="139" font-family="'JetBrains Mono',monospace" font-size="10" fill="#9E3B26" opacity=".85">gate · panel · sign-off</text>
+        <rect x="995" y="96" width="170" height="58" rx="1" fill-opacity=".10" stroke-width="1.4" style="fill:var(--gate);stroke:var(--gate)"/>
+        <text x="1009" y="120" font-family="Archivo,sans-serif" font-weight="700" font-size="13" style="fill:var(--gate)">5 · LOCK</text>
+        <text x="1009" y="139" font-family="'JetBrains Mono',monospace" font-size="10" opacity=".85" style="fill:var(--gate)">gate · panel · sign-off</text>
       </g>
       <g stroke="currentColor" stroke-width="1.4" fill="none" marker-end="url(#ar)">
         <line x1="190" y1="125" x2="211" y2="125"/><line x1="385" y1="125" x2="406" y2="125"/>
@@ -268,12 +268,12 @@ a:focus-visible{outline:2px solid var(--gate);outline-offset:2px}
       </g>
 
       <!-- return edges -->
-      <g stroke="#9E3B26" stroke-width="1.5" fill="none" marker-end="url(#arG)">
+      <g stroke-width="1.5" fill="none" marker-end="url(#arG)" style="stroke:var(--gate)">
         <polyline points="460,154 460,208 300,208 300,158"/>
         <polyline points="1060,154 1060,250 885,250 885,158"/>
         <polyline points="1100,154 1100,296 530,296 530,158"/>
       </g>
-      <g font-family="'JetBrains Mono',monospace" font-size="9.5" fill="#9E3B26">
+      <g font-family="'JetBrains Mono',monospace" font-size="9.5" style="fill:var(--gate)">
         <text x="380" y="226" text-anchor="middle">circling ≥ 2 rounds → re-diverge, or park it</text>
         <text x="918" y="268" text-anchor="middle">gate finding → fix; park only if non-blocking</text>
         <text x="815" y="314" text-anchor="middle">refuted on evidence → earliest invalidated decision</text>
@@ -508,9 +508,9 @@ a:focus-visible{outline:2px solid var(--gate);outline-offset:2px}
         <text x="560" y="82" text-anchor="middle" font-family="Archivo,sans-serif" font-weight="700" font-size="15" fill="currentColor">AC-n</text>
         <text x="560" y="103" text-anchor="middle" font-family="'JetBrains Mono',monospace" font-size="10" fill="currentColor" opacity=".6">L3 — how we would know</text>
 
-        <rect x="840" y="54" width="240" height="66" rx="1" fill="#14615C" fill-opacity=".10" stroke="#14615C" stroke-width="1.4"/>
-        <text x="960" y="82" text-anchor="middle" font-family="Archivo,sans-serif" font-weight="700" font-size="15" fill="#14615C">TC-n</text>
-        <text x="960" y="103" text-anchor="middle" font-family="'JetBrains Mono',monospace" font-size="10" fill="#14615C" opacity=".85">acceptance doc — who decides</text>
+        <rect x="840" y="54" width="240" height="66" rx="1" fill-opacity=".10" stroke-width="1.4" style="fill:var(--doc);stroke:var(--doc)"/>
+        <text x="960" y="82" text-anchor="middle" font-family="Archivo,sans-serif" font-weight="700" font-size="15" style="fill:var(--doc)">TC-n</text>
+        <text x="960" y="103" text-anchor="middle" font-family="'JetBrains Mono',monospace" font-size="10" opacity=".85" style="fill:var(--doc)">acceptance doc — who decides</text>
       </g>
 
       <g stroke="currentColor" stroke-width="1.5" fill="none" marker-end="url(#ar2)">
@@ -528,7 +528,7 @@ a:focus-visible{outline:2px solid var(--gate);outline-offset:2px}
         <text x="758" y="120" opacity=".55">names its criterion</text>
       </g>
 
-      <g font-family="'JetBrains Mono',monospace" font-size="10" fill="#9E3B26">
+      <g font-family="'JetBrains Mono',monospace" font-size="10" style="fill:var(--gate)">
         <text x="160" y="170" text-anchor="middle">forward gap</text>
         <text x="560" y="170" text-anchor="middle">backward gap · forward gap</text>
         <text x="960" y="170" text-anchor="middle">backward gap</text>

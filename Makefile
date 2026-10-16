@@ -155,6 +155,10 @@ status:
 # The reference sweep runs the other direction from the citation scan — cited-but-missing is one
 # failure, present-but-uncited is the other, and only the first is visible to someone reading.
 #
+# The page's SVG figures take their colours from the same CSS tokens as the rest of the page. A
+# hex `fill=`/`stroke=` attribute ignores the theme, so in dark mode it paints light-theme ink on a
+# dark ground (about 2.5:1) — the scan refuses one rather than leaving it to someone's eyes.
+#
 # The install-path scan reads README.md and docs/index.html (tags stripped) for every home-relative
 # path they show — `~/.x`, `$HOME/.x`, `${HOME}/.x` — and holds it against GLOBAL_*. A documented
 # path that is neither a global skills directory, one of its parents (a CLI home), nor something
@@ -237,6 +241,9 @@ check:
 			printf '%s\n' "$$paths" | grep -qxF "$$g" || { echo "MISS $$f never documents $$g, where make link writes" >&2; fail=1; }; \
 		done; \
 	done; \
+	if [ -f docs/index.html ] && grep -nE '(fill|stroke)="#[0-9A-Fa-f]{3,8}"' docs/index.html >&2; then \
+		echo "MISS docs/index.html colours an SVG with a fixed hex value — use style=\"fill:var(--token)\" so dark mode applies" >&2; fail=1; \
+	fi; \
 	if [ $$fail -eq 0 ]; then echo "self-contained: all references resolve inside $(SKILL), $$n lenses, $$d gate dimensions"; else exit 1; fi
 
 # GitHub Pages serves docs/ as static files on `main`; this only previews the same tree locally,

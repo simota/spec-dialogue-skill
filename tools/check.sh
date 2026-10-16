@@ -117,6 +117,9 @@ case_ 'stale $CODEX_HOME path in page'   fail 'sed "s|<code>\$CODEX_HOME/skills<
 case_ 'SKILLS_DIR= example is allowed'   ok   'printf "\n\`\`\`sh\nmake link SKILLS_DIR=~/.config/agents/skills\n\`\`\`\n" >> README.md'
 case_ 'Makefile moves agy, docs stale'   fail 'sed "s|^GLOBAL_agy    := .*|GLOBAL_agy    := .gemini/elsewhere/skills|" Makefile > _ && mv _ Makefile'
 
+# --- the page's figures follow the colour theme -------------------------------
+case_ 'fixed hex colour in a page SVG'   fail 'sed "s|style=\"fill:var(--gate)\"|fill=\"#9E3B26\"|" docs/index.html > _ && cmp -s _ docs/index.html && exit 1; mv _ docs/index.html'
+
 # --- a non-lens heading must not inflate the count ----------------------------
 case_ 'non-lens ### in roles.md'         ok   'printf "\n### Notes — not a lens\ntext\n" >> $SKILL/reference/roles.md'
 case_ 'a 19th lens, prose not updated'   fail 'printf "\n### Fake — a lens\n**Question:** counts?\n" >> $SKILL/reference/roles.md'
