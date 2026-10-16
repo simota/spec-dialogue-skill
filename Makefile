@@ -180,6 +180,10 @@ status:
 # drift a reader is most likely to meet and least able to check. `tools/check.sh` is the battery that keeps this recipe honest — run `make test`
 # after editing anything below.
 #
+# A markdown link is read by taking what sits between `](` and `)`, then dropping the parts the
+# syntax allows around the target — `<…>`, a `"title"`, a `#fragment` — before resolving it, so
+# each optional piece does not need its own pattern.
+#
 # The reference sweep runs the other direction from the citation scan — cited-but-missing is one
 # failure, present-but-uncited is the other, and only the first is visible to someone reading.
 #
@@ -208,7 +212,8 @@ check:
 	misses=$$( \
 		for f in $(DOCS); do \
 			{ grep -ohE '`(reference/)?[A-Za-z][A-Za-z0-9._-]*\.md`' "$$f" | tr -d '`'; \
-			  grep -ohE '\]\((reference/)?[A-Za-z][A-Za-z0-9._-]*\.md(#[^)]*)?\)' "$$f" | sed 's/^](//; s/)$$//; s/#.*//'; } | sort -u | while read -r ref; do \
+			  grep -ohE '\]\([^)]*\)' "$$f" | sed 's/^](//; s/)$$//; s/^[[:space:]]*<//; s/[>[:space:]].*//; s/#.*//' | \
+			  grep -E '^(reference/)?[A-Za-z][A-Za-z0-9._-]*\.md$$'; } | sort -u | while read -r ref; do \
 				[ -f "$(SKILL)/$$ref" ] || [ -f "$(SKILL)/reference/$$ref" ] || echo "MISS $$f -> $$ref"; \
 			done; \
 		done); \
