@@ -148,6 +148,14 @@ case_ 'stale $CODEX_HOME path in page'   fail 'sed "s|<code>\$CODEX_HOME/skills<
 case_ 'SKILLS_DIR= example is allowed'   ok   'printf "\n\`\`\`sh\nmake link SKILLS_DIR=~/.config/agents/skills\n\`\`\`\n" >> README.md'
 case_ 'Makefile moves agy, docs stale'   fail 'sed "s|^GLOBAL_agy    := .*|GLOBAL_agy    := .gemini/elsewhere/skills|" Makefile > _ && mv _ Makefile'
 
+# --- a scan must not read outside what it claims to read ----------------------
+case_ 'a word ending in -ten is no count' ok   'printf "Weigh the written dimension too.\n" >> $SKILL/SKILL.md'
+case_ 'gate count drifts to five'        fail 'sed "s/eight dimensions/five dimensions/" $SKILL/SKILL.md > _ && mv _ $SKILL/SKILL.md'
+case_ 'missing ref via markdown link'    fail 'printf "See [roles](reference/missing.md).\n" >> $SKILL/SKILL.md'
+case_ 'parent ref via markdown link'     fail 'printf "See [up](../escape.md).\n" >> $SKILL/SKILL.md'
+case_ 'a ../ outside any code span'      ok   'printf "Run \`make link\` from the repo, or ../ it.\n" >> README.md'
+case_ 'a path inside $CODEX_HOME/skills' ok   'printf "It lands at \`\$CODEX_HOME/skills/spec-dialogue\`.\n" >> README.md'
+
 # --- the page's figures follow the colour theme -------------------------------
 case_ 'fixed hex colour in a page SVG'   fail 'sed "s|style=\"fill:var(--gate)\"|fill=\"#9E3B26\"|" docs/index.html > _ && cmp -s _ docs/index.html && exit 1; mv _ docs/index.html'
 
@@ -253,6 +261,48 @@ link_case_ 'unlink removes only ours'    ok   'unlink' \
 	'make HOME="$H" CODEX_HOME="$H/.codex" link >/dev/null 2>&1
 	 mkdir -p "$H/.gemini/antigravity-cli/skills" && ln -s /elsewhere "$H/.gemini/antigravity-cli/skills/spec-dialogue"'
 
+
+# cmd_case <name> <ok|fail> <command> <assertion>
+#   For what link_case_ cannot express — a caller's environment, or a path make cannot carry.
+#   Both run inside a fresh copy with $H as a fake home and $S as the skill's physical path.
+cmd_case_() {
+	name=$1; want=$2; cmd=$3; assert=$4
+	fixture_ "cmd_$name"
+	H=$d/home
+	mkdir -p "$H/.claude" "$H/.codex" || exit 2
+	S=$(cd "$d/$SKILL" && pwd -P)
+	( cd "$d" && H=$H S=$S eval "$cmd" ) >/dev/null 2>&1
+	got=$?
+	if { [ "$want" = ok ] && [ "$got" -ne 0 ]; } || { [ "$want" = fail ] && [ "$got" -eq 0 ]; }; then
+		fail=$((fail + 1)); printf 'FAIL   cmd: %s (exit %s, want %s)\n' "$name" "$got" "$want"; return
+	fi
+	if ( cd "$d" && H=$H S=$S eval "$assert" ); then
+		pass=$((pass + 1)); printf 'ok     cmd: %s\n' "$name"
+	else
+		fail=$((fail + 1)); printf 'FAIL   cmd: %s (exit %s as expected, tree is wrong)\n' "$name" "$got"
+	fi
+}
+
+# An exported PROJECT is an everyday shell variable; only `make link PROJECT=…` may retarget.
+cmd_case_ 'an exported PROJECT is ignored'   ok \
+	'mkdir -p proj && PROJECT=proj make HOME="$H" CODEX_HOME="$H/.codex" link' \
+	'[ -L "$H/.claude/skills/spec-dialogue" ] && [ ! -e proj/.claude ]'
+
+# A link written through another path to this same checkout is still ours.
+cmd_case_ 'a link via an alias path is ours' ok \
+	'ln -s "$PWD" ../alias_$$ && make -f "../alias_$$/Makefile" HOME="$H" CODEX_HOME="$H/.codex" AGENT=claude link &&
+	 make HOME="$H" CODEX_HOME="$H/.codex" AGENT=claude link &&
+	 make HOME="$H" CODEX_HOME="$H/.codex" AGENT=claude unlink' \
+	'[ ! -e "$H/.claude/skills/spec-dialogue" ] && [ ! -L "$H/.claude/skills/spec-dialogue" ]'
+
+# make splits words on spaces; a spaced HOME must stop, never half-link into a sibling.
+cmd_case_ 'a HOME with a space stops'        fail \
+	'mkdir -p "$H/sp ace/.claude" "$H/sp" && make HOME="$H/sp ace" AGENT=claude link' \
+	'[ ! -e "$H/sp/.claude" ] && [ -z "$(find "$H" -name spec-dialogue)" ]'
+
+cmd_case_ 'a repo path with a space stops'   fail \
+	'mkdir -p "../sp ace_$$" && cp -R . "../sp ace_$$/r" && cd / && make -f "$OLDPWD/../sp ace_$$/r/Makefile" HOME="$H" AGENT=claude link' \
+	'[ -z "$(find "$H" -name spec-dialogue)" ]'
 
 printf '\n%s passed, %s failed\n' "$pass" "$fail"
 [ "$fail" -eq 0 ]

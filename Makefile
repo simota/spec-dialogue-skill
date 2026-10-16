@@ -30,11 +30,24 @@
 # A directory named that explicitly is not a probe for an installed CLI, so it has no guard to
 # skip on — `/` stands in — and is created in full rather than reported missing.
 
+# PROJECT, SKILLS_DIR and AGENT retarget every link, so they count only when given on the command
+# line. PROJECT in particular is an everyday shell variable; an exported one must not quietly
+# send `make link` into some other repository.
+$(foreach v,PROJECT SKILLS_DIR AGENT,$(if $(filter environment%,$(origin $(v))),$(eval $(v) :=)))
+
 NAME    := spec-dialogue
-REPO    := $(abspath $(dir $(lastword $(MAKEFILE_LIST))))
+# realpath, not abspath: a link written through one path to this checkout and inspected through
+# another (a symlinked parent, /tmp on macOS) must still compare equal to SKILL.
+REPO    := $(realpath $(dir $(lastword $(MAKEFILE_LIST))))
 SKILL   := $(REPO)/skills/$(NAME)
 PROJECT ?=
 AGENT   ?= claude codex agy
+
+# make splits every value on spaces, so a path that contains one cannot be carried: it becomes
+# several targets, one of which may be a real sibling directory. Stop instead of guessing.
+ifeq ($(wildcard $(REPO)/Makefile),)
+$(error cannot locate this repository from "$(MAKEFILE_LIST)" — is its path free of spaces?)
+endif
 PAGES    := $(REPO)/docs
 PAGES_PORT ?= 8000
 
@@ -55,12 +68,18 @@ GLOBALS       := $(foreach g,$(GLOBAL_claude) $(GLOBAL_codex) $(GLOBAL_agy),'~/$
 tilde     = $(abspath $(patsubst ~/%,$(HOME)/%,$(1)))
 PROJECTD := $(call tilde,$(PROJECT))
 SKILLSD  := $(call tilde,$(SKILLS_DIR))
+CODEXD   := $(call tilde,$(CODEX_HOME))
+
+LINKGOALS := $(filter help link unlink status,$(or $(MAKECMDGOALS),help))
+ifneq ($(LINKGOALS),)
+$(foreach v,REPO HOME CODEXD PROJECTD SKILLSD,$(if $(filter-out 0 1,$(words $($(v)))),$(error $(v) contains a space ("$($(v))") — make cannot carry it as one path)))
+endif
 
 ifeq ($(strip $(PROJECT)),)
 # The guard is the CLI's home: the global skills directory with its last component dropped.
 cli_home   = $(HOME)/$(patsubst %/,%,$(dir $(GLOBAL_$(1))))
 tgt_claude := $(call cli_home,claude)|$(HOME)/$(GLOBAL_claude)
-tgt_codex  := $(CODEX_HOME)|$(CODEX_HOME)/$(notdir $(GLOBAL_codex))
+tgt_codex  := $(CODEXD)|$(CODEXD)/$(notdir $(GLOBAL_codex))
 tgt_agy    := $(call cli_home,agy)|$(HOME)/$(GLOBAL_agy)
 else
 tgt_claude := $(PROJECTD)|$(PROJECTD)/.claude/skills
@@ -108,7 +127,7 @@ link:
 		guard=$${t%%|*}; dir=$${t##*|}; d="$$dir/$(NAME)"; \
 		if [ ! -d "$$guard" ]; then echo "skip     $$d — $$guard does not exist"; continue; fi; \
 		if [ -L "$$d" ]; then \
-			if [ "$$(readlink "$$d")" = "$(SKILL)" ]; then echo "ok       $$d already linked"; n=$$((n+1)); continue; fi; \
+			if [ "$$(cd "$$d" 2>/dev/null && pwd -P)" = "$(SKILL)" ]; then echo "ok       $$d already linked"; n=$$((n+1)); continue; fi; \
 			echo "refusing $$d is a symlink to $$(readlink "$$d") — resolve it, then re-run" >&2; exit 1; \
 		elif [ -e "$$d" ]; then \
 			echo "refusing $$d exists and is not a symlink — move it aside first" >&2; exit 1; \
@@ -122,7 +141,7 @@ link:
 unlink:
 	@for t in $(QTARGETS); do \
 		dir=$${t##*|}; d="$$dir/$(NAME)"; \
-		if [ -L "$$d" ] && [ "$$(readlink "$$d")" = "$(SKILL)" ]; then rm "$$d"; echo "unlinked $$d"; \
+		if [ -L "$$d" ] && [ "$$(cd "$$d" 2>/dev/null && pwd -P)" = "$(SKILL)" ]; then rm "$$d"; echo "unlinked $$d"; \
 		elif [ -L "$$d" ]; then echo "skip     $$d — links to $$(readlink "$$d"), not this repo"; \
 		elif [ -e "$$d" ]; then echo "skip     $$d — not a symlink, leaving it alone"; \
 		else echo "none     $$d"; fi; \
@@ -144,8 +163,9 @@ status:
 # is `**Question:**`, so a note added to roles.md does not inflate it. The same rule covers the
 # Quality Gate: the dimension count the prose claims must match the rows SKILL.md tabulates, since
 # a gate that grows a dimension nobody renamed the prose for is a gate half the readers do not run.
-# The prose writes that count in words, so the check maps six..ten rather than pretending prose says
-# `7`. The published page writes it as a digit in its fact strip, which the word scan cannot see, so
+# The prose writes that count in words, so the check maps one..twelve rather than pretending prose
+# says `7` — anchored at a word start, so "written dimension" is not a ten. D1's "four independent
+# dimensions" is about batching a question, not the gate, and is the one phrase left out. The published page writes it as a digit in its fact strip, which the word scan cannot see, so
 # a second scan reads the digit — anchored to the phrase `N gate dimensions` rather than to any
 # markup, and safe against a bare `4 independent dimensions` elsewhere in the prose. Both count scans
 # read docs/index.html with its tags stripped: a page that says six while the gate has seven is the
@@ -179,7 +199,8 @@ check:
 	fail=0; \
 	misses=$$( \
 		for f in $(DOCS); do \
-			grep -ohE '`(reference/)?[A-Za-z][A-Za-z0-9._-]*\.md`' "$$f" | tr -d '`' | sort -u | while read -r ref; do \
+			{ grep -ohE '`(reference/)?[A-Za-z][A-Za-z0-9._-]*\.md`' "$$f" | tr -d '`'; \
+			  grep -ohE '\]\((reference/)?[A-Za-z][A-Za-z0-9._-]*\.md\)' "$$f" | sed 's/^](//; s/)$$//'; } | sort -u | while read -r ref; do \
 				[ -f "$(SKILL)/$$ref" ] || [ -f "$(SKILL)/reference/$$ref" ] || echo "MISS $$f -> $$ref"; \
 			done; \
 		done); \
@@ -189,20 +210,20 @@ check:
 		b=$$(basename "$$f"); \
 		grep -q "reference/$$b" "$(SKILL)/SKILL.md" || { echo "MISS reference/$$b exists but SKILL.md never names it" >&2; fail=1; }; \
 	done; \
-	if grep -nE '`[^`]*\.\./' $(DOCS) >&2; then \
+	if grep -nE '`[^`]*\.\./[^`]*`|\]\([^)]*\.\./[^)]*\)' $(DOCS) >&2; then \
 		echo "MISS a cited path reaches through a parent directory" >&2; fail=1; \
 	fi; \
 	claimsrc=$$( cat $(DOCS); [ -f docs/index.html ] && sed 's/<[^>]*>/ /g' docs/index.html | tr -s ' ' ); \
 	d=; \
 	if [ -f "$(SKILL)/SKILL.md" ]; then \
 		d=$$(awk '/^\| Dimension \| Question \|/{t=1;next} t&&/^\|---/{next} t&&/^\|/{c++;next} t{exit} END{print c+0}' "$(SKILL)/SKILL.md"); \
-		dclaimed=$$(printf '%s' "$$claimsrc" | grep -oiE '(six|seven|eight|nine|ten)( [A-Za-z-]+)?[- ]dimension' | tr 'A-Z' 'a-z' | cut -d- -f1 | cut -d' ' -f1 | sort -u); \
+		dclaimed=$$(printf '%s' "$$claimsrc" | grep -oiE '(^|[^A-Za-z])(one|two|three|four|five|six|seven|eight|nine|ten|eleven|twelve)( [A-Za-z-]+)?[- ]dimension' | grep -viE ' independent[- ]' | tr 'A-Z' 'a-z' | sed 's/^[^a-z]*//' | cut -d- -f1 | cut -d' ' -f1 | sort -u); \
 		ddigits=$$(printf '%s' "$$claimsrc" | grep -oE '[0-9]+ gate dimensions' | grep -oE '[0-9]+' | sort -u); \
 		if [ -z "$$dclaimed$$ddigits" ]; then \
 			echo "MISS no Quality-Gate dimension-count claim found — this check has drifted from the prose" >&2; fail=1; \
 		fi; \
 		for c in $$dclaimed; do \
-			case $$c in six) v=6;; seven) v=7;; eight) v=8;; nine) v=9;; ten) v=10;; *) v=0;; esac; \
+			case $$c in one) v=1;; two) v=2;; three) v=3;; four) v=4;; five) v=5;; six) v=6;; seven) v=7;; eight) v=8;; nine) v=9;; ten) v=10;; eleven) v=11;; twelve) v=12;; *) v=0;; esac; \
 			[ "$$v" = "$$d" ] || { echo "MISS gate-dimension count claims $$c ($$v), SKILL.md tabulates $$d" >&2; fail=1; }; \
 		done; \
 		for c in $$ddigits; do \
@@ -226,9 +247,10 @@ check:
 		paths=$$(printf '%s\n' "$$text" | grep -oE '(~|\$$HOME|\$$\{HOME\})/\.[A-Za-z0-9._/-]*[A-Za-z0-9_-]' | sed 's|^[^/]*/|~/|' | sort -u); \
 		cpaths=$$(printf '%s\n' "$$text" | grep -oE '\$$(CODEX_HOME|\{CODEX_HOME\})/[A-Za-z0-9._/-]*[A-Za-z0-9_-]' | sed 's|^[^/]*/|$$CODEX_HOME/|' | sort -u); \
 		for p in $$cpaths; do \
-			[ "$$p" = '$$CODEX_HOME/$(notdir $(GLOBAL_codex))' ] || { echo "MISS $$f documents $$p, but make link writes $$CODEX_HOME/$(notdir $(GLOBAL_codex))" >&2; fail=1; }; \
+			case "$$p" in '$$CODEX_HOME/$(notdir $(GLOBAL_codex))'|'$$CODEX_HOME/$(notdir $(GLOBAL_codex))/'*) ;; \
+			*) echo "MISS $$f documents $$p, but make link writes "'$$CODEX_HOME/$(notdir $(GLOBAL_codex))' >&2; fail=1;; esac; \
 		done; \
-		[ -n "$$cpaths" ] || { echo "MISS $$f never documents $$CODEX_HOME/$(notdir $(GLOBAL_codex)), where make link writes for codex" >&2; fail=1; }; \
+		[ -n "$$cpaths" ] || { echo "MISS $$f never documents "'$$CODEX_HOME/$(notdir $(GLOBAL_codex))'", where make link writes for codex" >&2; fail=1; }; \
 		for p in $$paths; do \
 			ok=; \
 			for g in $(GLOBALS); do \
