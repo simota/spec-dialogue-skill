@@ -8,9 +8,16 @@
 #   sh tools/check.sh
 #
 # Cases are named for what they inject. `want=ok` means the tree is clean and the check must
-# pass; `want=fail` means the injected fault must be caught.
+# pass; `want=fail` means the injected fault must be caught — by the check itself, so the run
+# must print a `MISS` line: a syntax error or a missing file also exits non-zero, and is not a
+# catch. A case with a setup must also leave its copy different from the clean tree, so a
+# mutation that silently matched nothing cannot pass for either verdict.
 
 set -u
+
+# The battery drives make itself; a caller's `make test AGENT=codex` or an exported PROJECT
+# would otherwise leak into every nested make and retarget the links the cases assert on.
+unset MAKEFLAGS MAKELEVEL MFLAGS AGENT PROJECT SKILLS_DIR CODEX_HOME
 
 SRC=$(cd "$(dirname "$0")/.." && pwd)
 SKILL=skills/spec-dialogue
@@ -20,14 +27,34 @@ trap 'rm -rf "$TMP"' EXIT
 pass=0
 fail=0
 
-# copy_ <name> — a throwaway copy of the tree, printed as a path. Every case mutates its own.
+# copy_ <dir> — a throwaway copy of the tree at <dir>. Every case mutates its own.
+#
+# It sets nothing and prints nothing: the caller passes the directory and checks the status.
+# A copy that cannot be made stops the whole battery, because every setup below is a mutation
+# meant for a copy — `rm -rf $SKILL/reference`, `sed … > _ && mv` — and run anywhere else it
+# would be run on the real tree.
 copy_() {
+	rm -rf "$1" &&
+	mkdir -p "$1/skills" &&
+	cp -R "$SRC/Makefile" "$SRC/README.md" "$SRC/docs" "$1/" &&
+	cp -R "$SRC/$SKILL" "$1/skills/" &&
+	[ -f "$1/Makefile" ] && [ -d "$1/$SKILL" ] || {
+		printf 'ABORT  could not build a fixture copy at %s — stopping before any setup runs\n' "$1" >&2
+		exit 2
+	}
+}
+
+# fixture_ <name> — sets $d to a fresh copy for the case <name>.
+fixture_() {
 	d=$TMP/$(printf '%s' "$1" | tr -c 'a-zA-Z0-9' '_')
-	rm -rf "$d"
-	mkdir -p "$d/skills" || exit 1
-	cp -R "$SRC/Makefile" "$SRC/README.md" "$SRC/docs" "$d/" || exit 1
-	cp -R "$SRC/$SKILL" "$d/skills/" || exit 1
-	printf '%s' "$d"
+	copy_ "$d"
+}
+
+# changed_ — true when the copy at $d differs from the clean tree.
+CLEAN=$TMP/_clean
+copy_ "$CLEAN"
+changed_() {
+	! diff -r "$CLEAN" "$d" >/dev/null 2>&1
 }
 
 # case <name> <ok|fail> <setup-shell-run-inside-the-copy> [indir|foreign]
@@ -37,23 +64,27 @@ case_() {
 	setup=$3
 	where=${4:-indir}
 
-	d=$(copy_ "$name")
+	fixture_ "$name"
 
 	if [ -n "$setup" ]; then
 		( cd "$d" && eval "$setup" ) || { printf 'SETUP  %s\n' "$name"; fail=$((fail + 1)); return; }
+		changed_ || { printf 'FAIL   %s (setup left the tree unchanged)\n' "$name"; fail=$((fail + 1)); return; }
 	fi
 
+	err=$TMP/stderr
 	if [ "$where" = foreign ]; then
-		( cd / && make -f "$d/Makefile" check ) >/dev/null 2>&1
+		( cd / && make -f "$d/Makefile" check ) >/dev/null 2>"$err"
 	else
-		( cd "$d" && make check ) >/dev/null 2>&1
+		( cd "$d" && make check ) >/dev/null 2>"$err"
 	fi
 	got=$?
 
 	if [ "$want" = ok ] && [ "$got" -eq 0 ]; then
 		pass=$((pass + 1)); printf 'ok     %s\n' "$name"
-	elif [ "$want" = fail ] && [ "$got" -ne 0 ]; then
+	elif [ "$want" = fail ] && [ "$got" -ne 0 ] && grep -q '^MISS ' "$err"; then
 		pass=$((pass + 1)); printf 'ok     %s\n' "$name"
+	elif [ "$want" = fail ] && [ "$got" -ne 0 ]; then
+		fail=$((fail + 1)); printf 'FAIL   %s (exit %s, but no MISS — the check did not catch it)\n' "$name" "$got"
 	else
 		fail=$((fail + 1)); printf 'FAIL   %s (want %s, exit %s)\n' "$name" "$want" "$got"
 	fi
@@ -143,9 +174,9 @@ link_case_() {
 	assert=$4
 	setup=${5:-}
 
-	d=$(copy_ "link_$name")
+	fixture_ "link_$name"
 	H=$d/home
-	mkdir -p "$H/.claude" "$H/.codex" || exit 1
+	mkdir -p "$H/.claude" "$H/.codex" || exit 2
 	# make resolves its own directory physically, so the link it writes names the physical path.
 	# Comparing against `$d` would fail on any machine where the scratch tree sits under a
 	# symlink — /tmp on macOS, for one — for a reason that has nothing to do with the recipe.
