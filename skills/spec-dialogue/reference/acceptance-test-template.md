@@ -50,7 +50,7 @@ accepted. Anything that could block acceptance and is not on this list will not 
 | | Criterion |
 |---|-----------|
 | **Entry** | the spec is `locked`; a build identifying itself by commit is deployed to the named environment — or, while its binding is `TBD`, to one shown to provide every §3 capability; fixtures loaded |
-| **Exit** | every **must-have** `TC` is PASS · every `CFR` procedure has a recorded observation meeting its required outcome (Verdict `PASS`) · no open defect at a blocking severity (§8) · every non-must-have failure is recorded as a defect, not dropped |
+| **Exit** | every **must-have** `TC` is PASS · every §6 procedure has a recorded observation meeting its required outcome (`Result` `PASS`) · no open defect at a blocking severity (§8) · every non-must-have failure is recorded as a defect, not dropped |
 
 ## 3. Environment
 Under-specified environment is the most common reason a result cannot be reproduced or believed.
@@ -118,12 +118,13 @@ Quantitative procedures state workload, sample and measurement conditions. Categ
 procedures identify the inspected surface, applicable criterion and pass/fail evidence; no invented
 score, duration or percentage is needed. Tool or reviewer names alone do not define the observation.
 
-| CFR | Measure / criterion | Required outcome (from spec) | Procedure | Tool / observer | Conditions / sample | Observed result | Verdict |
-|-----|---------------------|------------------------------|-----------|-----------------|---------------------|-----------------|---------|
-| CFR-001 | … | see spec CFR-001 | … | … | … | NOT_RUN | NOT_RUN |
+| ID | Verifies | CFR | Measure / criterion | Required outcome (from spec) | Procedure | Tool / observer | Conditions / sample | Observed result | Result |
+|----|----------|-----|---------------------|------------------------------|-----------|-----------------|---------------------|-----------------|--------|
+| TC-010 | AC-007 | CFR-001 | … | see spec CFR-001 | … | … | … | — | NOT_RUN |
 
-An AC that verifies a `CFR` is discharged by its row here: in the §7 coverage matrix, cite the row
-as `CFR-001 (§6)` in **Covered by** — it plays the part of the `TC` for T2.
+Each procedure is a `TC-n` like any other — it names the AC it discharges (T1), counts toward T2,
+appears in the §7 coverage matrix, and carries the same `Result` states as §5. It lives here
+rather than in §5 only because its shape (workload, sample, observer) differs.
 
 ## 7. Coverage matrix
 The `AC → TC` half of the chain `REQ → AC → TC` (`traceability.md` §2).
@@ -132,7 +133,7 @@ The `AC → TC` half of the chain `REQ → AC → TC` (`traceability.md` §2).
 |----|-----------|-----------|------|-----|
 | AC-001 | yes | TC-001, TC-004 | machine | — |
 
-- **Forward gap** — a must-have AC with no TC (or, for a `CFR`'s AC, no §6 row): the exit criteria cannot be evaluated, so acceptance cannot happen. This is a blocking defect of *this document*.
+- **Forward gap** — a must-have AC with no TC: the exit criteria cannot be evaluated, so acceptance cannot happen. This is a blocking defect of *this document*.
 - **Backward gap** — a TC citing no AC: either an AC went unwritten, or the case tests something nobody asked for.
 
 ## 8. Defect handling

@@ -208,7 +208,7 @@ check:
 	misses=$$( \
 		for f in $(DOCS); do \
 			{ grep -ohE '`(reference/)?[A-Za-z][A-Za-z0-9._-]*\.md`' "$$f" | tr -d '`'; \
-			  grep -ohE '\]\((reference/)?[A-Za-z][A-Za-z0-9._-]*\.md\)' "$$f" | sed 's/^](//; s/)$$//'; } | sort -u | while read -r ref; do \
+			  grep -ohE '\]\((reference/)?[A-Za-z][A-Za-z0-9._-]*\.md(#[^)]*)?\)' "$$f" | sed 's/^](//; s/)$$//; s/#.*//'; } | sort -u | while read -r ref; do \
 				[ -f "$(SKILL)/$$ref" ] || [ -f "$(SKILL)/reference/$$ref" ] || echo "MISS $$f -> $$ref"; \
 			done; \
 		done); \

@@ -152,6 +152,8 @@ case_ 'Makefile moves agy, docs stale'   fail 'sed "s|^GLOBAL_agy    := .*|GLOBA
 case_ 'a word ending in -ten is no count' ok   'printf "Weigh the written dimension too.\n" >> $SKILL/SKILL.md'
 case_ 'gate count drifts to five'        fail 'sed "s/eight dimensions/five dimensions/" $SKILL/SKILL.md > _ && mv _ $SKILL/SKILL.md'
 case_ 'missing ref via markdown link'    fail 'printf "See [roles](reference/missing.md).\n" >> $SKILL/SKILL.md'
+case_ 'missing ref, link with #fragment' fail 'printf "See [d](reference/does-not-exist.md#details).\n" >> $SKILL/SKILL.md'
+case_ 'good ref, link with #fragment'    ok   'printf "See [r](reference/roles.md#demand).\n" >> $SKILL/SKILL.md'
 case_ 'parent ref via markdown link'     fail 'printf "See [up](../escape.md).\n" >> $SKILL/SKILL.md'
 case_ 'a ../ outside any code span'      ok   'printf "Run \`make link\` from the repo, or ../ it.\n" >> README.md'
 case_ 'a path inside $CODEX_HOME/skills' ok   'printf "It lands at \`\$CODEX_HOME/skills/spec-dialogue\`.\n" >> README.md'
