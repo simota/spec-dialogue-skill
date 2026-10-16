@@ -132,7 +132,7 @@ The `AC → TC` half of the chain `REQ → AC → TC` (`traceability.md` §2).
 |----|-----------|-----------|------|-----|
 | AC-001 | yes | TC-001, TC-004 | machine | — |
 
-- **Forward gap** — a must-have AC with no TC: the exit criteria cannot be evaluated, so acceptance cannot happen. This is a blocking defect of *this document*.
+- **Forward gap** — a must-have AC with no TC (or, for a `CFR`'s AC, no §6 row): the exit criteria cannot be evaluated, so acceptance cannot happen. This is a blocking defect of *this document*.
 - **Backward gap** — a TC citing no AC: either an AC went unwritten, or the case tests something nobody asked for.
 
 ## 8. Defect handling
@@ -160,7 +160,7 @@ Per-case results live in the §5 table's `Result` column, or in the machine-read
 
 ## 10. Residual risk
 What acceptance does **not** cover, stated plainly: untested combinations, environments not
-exercised, load levels not reached, the manual cases whose oracle is one person's judgement. This
+exercised, load levels not reached, the human-checked cases whose oracle is one person's judgement. This
 section is what stops "all green" from being read as "everything works".
 
 ## 11. Sign-off

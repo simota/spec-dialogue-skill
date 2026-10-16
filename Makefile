@@ -35,13 +35,21 @@
 # send `make link` into some other repository.
 $(foreach v,PROJECT SKILLS_DIR AGENT,$(if $(filter environment%,$(origin $(v))),$(eval $(v) :=)))
 
+# This Makefile includes nothing, so MAKEFILE_LIST holds exactly its own path — unless that path
+# contains a space, which make splits; its last word could then name some *other* checkout.
+ifneq ($(words $(MAKEFILE_LIST)),1)
+$(error the path to this Makefile contains a space ("$(MAKEFILE_LIST)") — make cannot carry it as one path)
+endif
+
 NAME    := spec-dialogue
 # realpath, not abspath: a link written through one path to this checkout and inspected through
 # another (a symlinked parent, /tmp on macOS) must still compare equal to SKILL.
 REPO    := $(realpath $(dir $(lastword $(MAKEFILE_LIST))))
 SKILL   := $(REPO)/skills/$(NAME)
 PROJECT ?=
-AGENT   ?= claude codex agy
+# `:=`/`$(or)` rather than `?=`: an exported AGENT was cleared above, which leaves AGENT defined
+# but empty, and `?=` never fills a variable that is defined.
+AGENT   := $(or $(strip $(AGENT)),claude codex agy)
 
 # make splits every value on spaces, so a path that contains one cannot be carried: it becomes
 # several targets, one of which may be a real sibling directory. Stop instead of guessing.
@@ -70,7 +78,7 @@ PROJECTD := $(call tilde,$(PROJECT))
 SKILLSD  := $(call tilde,$(SKILLS_DIR))
 CODEXD   := $(call tilde,$(CODEX_HOME))
 
-LINKGOALS := $(filter help link unlink status,$(or $(MAKECMDGOALS),help))
+LINKGOALS := $(filter link unlink status,$(MAKECMDGOALS))
 ifneq ($(LINKGOALS),)
 $(foreach v,REPO HOME CODEXD PROJECTD SKILLSD,$(if $(filter-out 0 1,$(words $($(v)))),$(error $(v) contains a space ("$($(v))") — make cannot carry it as one path)))
 endif
@@ -263,7 +271,7 @@ check:
 			printf '%s\n' "$$paths" | grep -qxF "$$g" || { echo "MISS $$f never documents $$g, where make link writes" >&2; fail=1; }; \
 		done; \
 	done; \
-	if [ -f docs/index.html ] && grep -nE '(fill|stroke)="#[0-9A-Fa-f]{3,8}"' docs/index.html >&2; then \
+	if [ -f docs/index.html ] && grep -nE "(fill|stroke)=[\"']#[0-9A-Fa-f]{3,8}|style=[\"'][^\"']*(fill|stroke):[[:space:]]*#[0-9A-Fa-f]" docs/index.html >&2; then \
 		echo "MISS docs/index.html colours an SVG with a fixed hex value — use style=\"fill:var(--token)\" so dark mode applies" >&2; fail=1; \
 	fi; \
 	if [ $$fail -eq 0 ]; then echo "self-contained: all references resolve inside $(SKILL), $$n lenses, $$d gate dimensions"; else exit 1; fi

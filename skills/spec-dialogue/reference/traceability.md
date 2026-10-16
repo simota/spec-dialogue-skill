@@ -41,7 +41,7 @@ REQ-001 ─▶ AC-001, AC-002 ─▶ TC-001, TC-004
 
 **Hop 2 — `AC` ↔ `TC`** (spec ↔ `docs/specs/<slug>.acceptance.md`)
 
-- **Forward gap** — a **must-have** `AC` with no `TC`: an **unexecutable criterion**. Nobody can decide it, so it will not gate acceptance no matter what the spec says.
+- **Forward gap** — a **must-have** `AC` with no `TC` — or, for an AC that verifies a `CFR`, no procedure row in the acceptance document's §6: an **unexecutable criterion**. Nobody can decide it, so it will not gate acceptance no matter what the spec says.
 - **Backward gap** — a `TC` citing no `AC`: either a criterion went unwritten, or the case tests something nobody asked for.
 
 Both hops are defects, not warnings. Both are exactly what the Quality Gate's **Completeness** dimension checks, and both are cheap to fix at SPECIFY and expensive to fix after a build has started against the spec.
@@ -101,18 +101,18 @@ links:
         must_have: true
         verification: machine | human
         oracle: <test file / dashboard query / named reviewer>
-        tests: [TC-001, TC-004]   # the hop-2 link; empty on a must-have AC is a gap
+        tests: [TC-001, TC-004]   # the hop-2 link: TC-n, or `CFR-001 (§6)` for a CFR's AC; empty on a must-have AC is a gap
         status: NOT_VERIFIED | PASS | FAIL
 coverage:
   forward: <0.0-1.0>       # requirements with >= 1 AC / total requirements
   backward: <0.0-1.0>      # ACs citing a valid requirement / total ACs
-  test_forward: <0.0-1.0>  # must-have ACs with >= 1 TC / total must-have ACs
+  test_forward: <0.0-1.0>  # must-have ACs with >= 1 TC or §6 row / total must-have ACs
   gaps: [<REQ/CFR with no AC>]
   orphans: [<AC citing no requirement>]
-  untested: [<must-have AC with no TC>]
+  untested: [<must-have AC with no TC or §6 row>]
 ```
 
-This is optional for a small spec and worth the cost for anything a build will run against unattended. `spec-dialogue` authors it and sets every status to `NOT_VERIFIED`; the build fills the statuses in. The statuses belong to the **AC**, the acceptance document's `NOT_RUN`/`PASS`/… to each **TC**: an AC is `PASS` only when every `TC` listed under it is `PASS`, `FAIL` when any is `FAIL`, and `NOT_VERIFIED` otherwise.
+This is optional for a small spec and worth the cost for anything a build will run against unattended. `spec-dialogue` authors it and sets every status to `NOT_VERIFIED`; the build fills the statuses in. The statuses belong to the **AC**, the acceptance document's `NOT_RUN`/`PASS`/… to each **TC**: an AC is `PASS` when its `tests` list is non-empty and every entry in it — a `TC` result, or a §6 row's `Verdict` — is `PASS`; `FAIL` when any entry is `FAIL`; and `NOT_VERIFIED` otherwise, including when the list is empty.
 
 ## 5. Adoption checklist
 

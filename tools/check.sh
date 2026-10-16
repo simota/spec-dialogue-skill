@@ -157,6 +157,8 @@ case_ 'a ../ outside any code span'      ok   'printf "Run \`make link\` from th
 case_ 'a path inside $CODEX_HOME/skills' ok   'printf "It lands at \`\$CODEX_HOME/skills/spec-dialogue\`.\n" >> README.md'
 
 # --- the page's figures follow the colour theme -------------------------------
+case_ 'single-quoted hex in a page SVG'  fail 'sed "s|style=\"fill:var(--gate)\"|fill='"'"'#9E3B26'"'"'|" docs/index.html > _ && mv _ docs/index.html'
+case_ 'hex inside an SVG style attr'     fail 'sed "s|style=\"fill:var(--gate)\"|style=\"fill:#9E3B26\"|" docs/index.html > _ && mv _ docs/index.html'
 case_ 'fixed hex colour in a page SVG'   fail 'sed "s|style=\"fill:var(--gate)\"|fill=\"#9E3B26\"|" docs/index.html > _ && cmp -s _ docs/index.html && exit 1; mv _ docs/index.html'
 
 # --- a non-lens heading must not inflate the count ----------------------------
@@ -287,6 +289,21 @@ cmd_case_() {
 cmd_case_ 'an exported PROJECT is ignored'   ok \
 	'mkdir -p proj && PROJECT=proj make HOME="$H" CODEX_HOME="$H/.codex" link' \
 	'[ -L "$H/.claude/skills/spec-dialogue" ] && [ ! -e proj/.claude ]'
+
+cmd_case_ 'an exported AGENT is ignored'     ok \
+	'AGENT=codex make HOME="$H" CODEX_HOME="$H/.codex" link' \
+	'[ -L "$H/.claude/skills/spec-dialogue" ] && [ -L "$H/.codex/skills/spec-dialogue" ]'
+
+# A spaced path to some *other* checkout must not be shortened to its last word and used.
+cmd_case_ 'a spaced -f path never retargets'  fail \
+	'cp -R "$PWD" ../src_$$ && mkdir -p x "sib x" && cp -R ../src_$$ x/repo && cp -R ../src_$$ "sib x/repo" &&
+	 make -f "sib x/repo/Makefile" HOME="$H" AGENT=claude link' \
+	'[ -z "$(find "$H" -name spec-dialogue)" ]'
+
+# help needs no destination, so a spaced HOME must not stop it.
+cmd_case_ 'help works under a spaced HOME'    ok \
+	'make HOME="$H/sp ace" help' \
+	'true'
 
 # A link written through another path to this same checkout is still ours.
 cmd_case_ 'a link via an alias path is ours' ok \
