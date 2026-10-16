@@ -19,7 +19,7 @@
 
 | # | Rule | Discipline |
 |---|------|-----------|
-| W4 | **Every externally-checkable fact is grounded** | Market sizes, usage numbers, competitor behavior, dates, "studies show", API signatures, library capabilities — each is `sourced` (with the source), `ASSUMPTION` (flagged inline), or `research-to-do`. Internal propositions — the user's own plan, their priorities, the chosen direction — are exempt; the rule targets facts a reader could check and find false. |
+| W4 | **Every externally-checkable fact is grounded** | Market sizes, usage numbers, competitor behavior, dates, "studies show", API signatures, library capabilities — each is `sourced` (with the source), or an honest gap per W5 — `UNKNOWN` or `TBD(<owner>)` — which W13 then inventories. An unsourced fact is never relabelled as an assumption the user can approve (`dialogue-protocol.md` D16). Internal propositions — the user's own plan, their priorities, the chosen direction — are exempt; the rule targets facts a reader could check and find false. |
 | W5 | **UNKNOWN over fabrication** | A gap the dialogue could not close is written as `UNKNOWN` or `TBD(owner)`, never filled with a plausible guess. Specifics are where fabrication hides: numbers, product names, URLs, endpoint shapes, legal citations are **verified or flagged, never improvised**. |
 | W6 | **Quote fidelity** | Anything presented as a quotation — of the user, of an existing spec, of a contract — is verbatim, or explicitly marked as paraphrase. Silent paraphrase inside quotation marks is fabrication with extra steps, and in a spec it becomes a requirement nobody agreed to. |
 
@@ -76,4 +76,4 @@ nor longer.
 | Missing section read as "considered and empty" | W12 present-or-`N/A`+reason, by tier |
 | A `TBD` buried mid-document, found by the build | W13 unresolved-marker inventory |
 
-These rules **specialize** the Spec Quality Gate rather than replacing it: the gate's eight dimensions decide whether the spec is *right*; the W rules decide whether it can be *read and trusted*. Both are lock preconditions.
+These rules **specialize** the Spec Quality Gate rather than replacing it: the gate's eight dimensions decide whether the spec is *right*; the W rules decide whether it can be *read and trusted*. The W rules are checked inside the gate — lock precondition 3 in `SKILL.md` — not as a fourth precondition.

@@ -8,9 +8,16 @@
 #   sh tools/check.sh
 #
 # Cases are named for what they inject. `want=ok` means the tree is clean and the check must
-# pass; `want=fail` means the injected fault must be caught.
+# pass; `want=fail` means the injected fault must be caught — by the check itself, so the run
+# must print a `MISS` line: a syntax error or a missing file also exits non-zero, and is not a
+# catch. A case with a setup must also leave its copy different from the clean tree, so a
+# mutation that silently matched nothing cannot pass for either verdict.
 
 set -u
+
+# The battery drives make itself; a caller's `make test AGENT=codex` or an exported PROJECT
+# would otherwise leak into every nested make and retarget the links the cases assert on.
+unset MAKEFLAGS MAKELEVEL MFLAGS AGENT PROJECT SKILLS_DIR CODEX_HOME
 
 SRC=$(cd "$(dirname "$0")/.." && pwd)
 SKILL=skills/spec-dialogue
@@ -20,14 +27,34 @@ trap 'rm -rf "$TMP"' EXIT
 pass=0
 fail=0
 
-# copy_ <name> — a throwaway copy of the tree, printed as a path. Every case mutates its own.
+# copy_ <dir> — a throwaway copy of the tree at <dir>. Every case mutates its own.
+#
+# It sets nothing and prints nothing: the caller passes the directory and checks the status.
+# A copy that cannot be made stops the whole battery, because every setup below is a mutation
+# meant for a copy — `rm -rf $SKILL/reference`, `sed … > _ && mv` — and run anywhere else it
+# would be run on the real tree.
 copy_() {
+	rm -rf "$1" &&
+	mkdir -p "$1/skills" &&
+	cp -R "$SRC/Makefile" "$SRC/README.md" "$SRC/docs" "$1/" &&
+	cp -R "$SRC/$SKILL" "$1/skills/" &&
+	[ -f "$1/Makefile" ] && [ -d "$1/$SKILL" ] || {
+		printf 'ABORT  could not build a fixture copy at %s — stopping before any setup runs\n' "$1" >&2
+		exit 2
+	}
+}
+
+# fixture_ <name> — sets $d to a fresh copy for the case <name>.
+fixture_() {
 	d=$TMP/$(printf '%s' "$1" | tr -c 'a-zA-Z0-9' '_')
-	rm -rf "$d"
-	mkdir -p "$d/skills" || exit 1
-	cp -R "$SRC/Makefile" "$SRC/README.md" "$SRC/docs" "$d/" || exit 1
-	cp -R "$SRC/$SKILL" "$d/skills/" || exit 1
-	printf '%s' "$d"
+	copy_ "$d"
+}
+
+# changed_ — true when the copy at $d differs from the clean tree.
+CLEAN=$TMP/_clean
+copy_ "$CLEAN"
+changed_() {
+	! diff -r "$CLEAN" "$d" >/dev/null 2>&1
 }
 
 # case <name> <ok|fail> <setup-shell-run-inside-the-copy> [indir|foreign]
@@ -37,23 +64,27 @@ case_() {
 	setup=$3
 	where=${4:-indir}
 
-	d=$(copy_ "$name")
+	fixture_ "$name"
 
 	if [ -n "$setup" ]; then
 		( cd "$d" && eval "$setup" ) || { printf 'SETUP  %s\n' "$name"; fail=$((fail + 1)); return; }
+		changed_ || { printf 'FAIL   %s (setup left the tree unchanged)\n' "$name"; fail=$((fail + 1)); return; }
 	fi
 
+	err=$TMP/stderr
 	if [ "$where" = foreign ]; then
-		( cd / && make -f "$d/Makefile" check ) >/dev/null 2>&1
+		( cd / && make -f "$d/Makefile" check ) >/dev/null 2>"$err"
 	else
-		( cd "$d" && make check ) >/dev/null 2>&1
+		( cd "$d" && make check ) >/dev/null 2>"$err"
 	fi
 	got=$?
 
 	if [ "$want" = ok ] && [ "$got" -eq 0 ]; then
 		pass=$((pass + 1)); printf 'ok     %s\n' "$name"
-	elif [ "$want" = fail ] && [ "$got" -ne 0 ]; then
+	elif [ "$want" = fail ] && [ "$got" -ne 0 ] && grep -q '^MISS ' "$err"; then
 		pass=$((pass + 1)); printf 'ok     %s\n' "$name"
+	elif [ "$want" = fail ] && [ "$got" -ne 0 ]; then
+		fail=$((fail + 1)); printf 'FAIL   %s (exit %s, but no MISS — the check did not catch it)\n' "$name" "$got"
 	else
 		fail=$((fail + 1)); printf 'FAIL   %s (want %s, exit %s)\n' "$name" "$want" "$got"
 	fi
@@ -117,6 +148,24 @@ case_ 'stale $CODEX_HOME path in page'   fail 'sed "s|<code>\$CODEX_HOME/skills<
 case_ 'SKILLS_DIR= example is allowed'   ok   'printf "\n\`\`\`sh\nmake link SKILLS_DIR=~/.config/agents/skills\n\`\`\`\n" >> README.md'
 case_ 'Makefile moves agy, docs stale'   fail 'sed "s|^GLOBAL_agy    := .*|GLOBAL_agy    := .gemini/elsewhere/skills|" Makefile > _ && mv _ Makefile'
 
+# --- a scan must not read outside what it claims to read ----------------------
+case_ 'a word ending in -ten is no count' ok   'printf "Weigh the written dimension too.\n" >> $SKILL/SKILL.md'
+case_ 'gate count drifts to five'        fail 'sed "s/eight dimensions/five dimensions/" $SKILL/SKILL.md > _ && mv _ $SKILL/SKILL.md'
+case_ 'missing ref via markdown link'    fail 'printf "See [roles](reference/missing.md).\n" >> $SKILL/SKILL.md'
+case_ 'missing ref, link with #fragment' fail 'printf "See [d](reference/does-not-exist.md#details).\n" >> $SKILL/SKILL.md'
+case_ 'good ref, link with #fragment'    ok   'printf "See [r](reference/roles.md#demand).\n" >> $SKILL/SKILL.md'
+case_ 'missing ref, link with a title'   fail 'printf "See [d](reference/does-not-exist.md \"Details\").\n" >> $SKILL/SKILL.md'
+case_ 'missing ref, angle-bracket link'  fail 'printf "See [d](<reference/does-not-exist.md>).\n" >> $SKILL/SKILL.md'
+case_ 'good ref, link with title + frag' ok   'printf "See [r](reference/roles.md#demand \"Roles\").\n" >> $SKILL/SKILL.md'
+case_ 'parent ref via markdown link'     fail 'printf "See [up](../escape.md).\n" >> $SKILL/SKILL.md'
+case_ 'a ../ outside any code span'      ok   'printf "Run \`make link\` from the repo, or ../ it.\n" >> README.md'
+case_ 'a path inside $CODEX_HOME/skills' ok   'printf "It lands at \`\$CODEX_HOME/skills/spec-dialogue\`.\n" >> README.md'
+
+# --- the page's figures follow the colour theme -------------------------------
+case_ 'single-quoted hex in a page SVG'  fail 'sed "s|style=\"fill:var(--gate)\"|fill='"'"'#9E3B26'"'"'|" docs/index.html > _ && mv _ docs/index.html'
+case_ 'hex inside an SVG style attr'     fail 'sed "s|style=\"fill:var(--gate)\"|style=\"fill:#9E3B26\"|" docs/index.html > _ && mv _ docs/index.html'
+case_ 'fixed hex colour in a page SVG'   fail 'sed "s|style=\"fill:var(--gate)\"|fill=\"#9E3B26\"|" docs/index.html > _ && cmp -s _ docs/index.html && exit 1; mv _ docs/index.html'
+
 # --- a non-lens heading must not inflate the count ----------------------------
 case_ 'non-lens ### in roles.md'         ok   'printf "\n### Notes — not a lens\ntext\n" >> $SKILL/reference/roles.md'
 case_ 'a 19th lens, prose not updated'   fail 'printf "\n### Fake — a lens\n**Question:** counts?\n" >> $SKILL/reference/roles.md'
@@ -140,9 +189,9 @@ link_case_() {
 	assert=$4
 	setup=${5:-}
 
-	d=$(copy_ "link_$name")
+	fixture_ "link_$name"
 	H=$d/home
-	mkdir -p "$H/.claude" "$H/.codex" || exit 1
+	mkdir -p "$H/.claude" "$H/.codex" || exit 2
 	# make resolves its own directory physically, so the link it writes names the physical path.
 	# Comparing against `$d` would fail on any machine where the scratch tree sits under a
 	# symlink — /tmp on macOS, for one — for a reason that has nothing to do with the recipe.
@@ -219,6 +268,63 @@ link_case_ 'unlink removes only ours'    ok   'unlink' \
 	'make HOME="$H" CODEX_HOME="$H/.codex" link >/dev/null 2>&1
 	 mkdir -p "$H/.gemini/antigravity-cli/skills" && ln -s /elsewhere "$H/.gemini/antigravity-cli/skills/spec-dialogue"'
 
+
+# cmd_case <name> <ok|fail> <command> <assertion>
+#   For what link_case_ cannot express — a caller's environment, or a path make cannot carry.
+#   Both run inside a fresh copy with $H as a fake home and $S as the skill's physical path.
+cmd_case_() {
+	name=$1; want=$2; cmd=$3; assert=$4
+	fixture_ "cmd_$name"
+	H=$d/home
+	mkdir -p "$H/.claude" "$H/.codex" || exit 2
+	S=$(cd "$d/$SKILL" && pwd -P)
+	( cd "$d" && H=$H S=$S eval "$cmd" ) >/dev/null 2>&1
+	got=$?
+	if { [ "$want" = ok ] && [ "$got" -ne 0 ]; } || { [ "$want" = fail ] && [ "$got" -eq 0 ]; }; then
+		fail=$((fail + 1)); printf 'FAIL   cmd: %s (exit %s, want %s)\n' "$name" "$got" "$want"; return
+	fi
+	if ( cd "$d" && H=$H S=$S eval "$assert" ); then
+		pass=$((pass + 1)); printf 'ok     cmd: %s\n' "$name"
+	else
+		fail=$((fail + 1)); printf 'FAIL   cmd: %s (exit %s as expected, tree is wrong)\n' "$name" "$got"
+	fi
+}
+
+# An exported PROJECT is an everyday shell variable; only `make link PROJECT=…` may retarget.
+cmd_case_ 'an exported PROJECT is ignored'   ok \
+	'mkdir -p proj && PROJECT=proj make HOME="$H" CODEX_HOME="$H/.codex" link' \
+	'[ -L "$H/.claude/skills/spec-dialogue" ] && [ ! -e proj/.claude ]'
+
+cmd_case_ 'an exported AGENT is ignored'     ok \
+	'AGENT=codex make HOME="$H" CODEX_HOME="$H/.codex" link' \
+	'[ -L "$H/.claude/skills/spec-dialogue" ] && [ -L "$H/.codex/skills/spec-dialogue" ]'
+
+# A spaced path to some *other* checkout must not be shortened to its last word and used.
+cmd_case_ 'a spaced -f path never retargets'  fail \
+	'cp -R "$PWD" ../src_$$ && mkdir -p x "sib x" && cp -R ../src_$$ x/repo && cp -R ../src_$$ "sib x/repo" &&
+	 make -f "sib x/repo/Makefile" HOME="$H" AGENT=claude link' \
+	'[ -z "$(find "$H" -name spec-dialogue)" ]'
+
+# help needs no destination, so a spaced HOME must not stop it.
+cmd_case_ 'help works under a spaced HOME'    ok \
+	'make HOME="$H/sp ace" help' \
+	'true'
+
+# A link written through another path to this same checkout is still ours.
+cmd_case_ 'a link via an alias path is ours' ok \
+	'ln -s "$PWD" ../alias_$$ && make -f "../alias_$$/Makefile" HOME="$H" CODEX_HOME="$H/.codex" AGENT=claude link &&
+	 make HOME="$H" CODEX_HOME="$H/.codex" AGENT=claude link &&
+	 make HOME="$H" CODEX_HOME="$H/.codex" AGENT=claude unlink' \
+	'[ ! -e "$H/.claude/skills/spec-dialogue" ] && [ ! -L "$H/.claude/skills/spec-dialogue" ]'
+
+# make splits words on spaces; a spaced HOME must stop, never half-link into a sibling.
+cmd_case_ 'a HOME with a space stops'        fail \
+	'mkdir -p "$H/sp ace/.claude" "$H/sp" && make HOME="$H/sp ace" AGENT=claude link' \
+	'[ ! -e "$H/sp/.claude" ] && [ -z "$(find "$H" -name spec-dialogue)" ]'
+
+cmd_case_ 'a repo path with a space stops'   fail \
+	'mkdir -p "../sp ace_$$" && cp -R . "../sp ace_$$/r" && cd / && make -f "$OLDPWD/../sp ace_$$/r/Makefile" HOME="$H" AGENT=claude link' \
+	'[ -z "$(find "$H" -name spec-dialogue)" ]'
 
 printf '\n%s passed, %s failed\n' "$pass" "$fail"
 [ "$fail" -eq 0 ]

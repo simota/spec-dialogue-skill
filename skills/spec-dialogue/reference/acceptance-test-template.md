@@ -50,7 +50,7 @@ accepted. Anything that could block acceptance and is not on this list will not 
 | | Criterion |
 |---|-----------|
 | **Entry** | the spec is `locked`; a build identifying itself by commit is deployed to the named environment — or, while its binding is `TBD`, to one shown to provide every §3 capability; fixtures loaded |
-| **Exit** | every **must-have** `TC` is PASS · every `CFR` procedure has a recorded measurement meeting its target · no open defect at a blocking severity (§8) · every non-must-have failure is recorded as a defect, not dropped |
+| **Exit** | every **must-have** `TC` is PASS · every §6 procedure has a recorded observation meeting its required outcome (`Result` `PASS`) · no open defect at a blocking severity (§8) · every non-must-have failure is recorded as a defect, not dropped |
 
 ## 3. Environment
 Under-specified environment is the most common reason a result cannot be reproduced or believed.
@@ -89,15 +89,18 @@ Every case names the AC it discharges. **Steps carry concrete values.** "Enter a
 a step; "enter `a@example.com`" is — the difference is whether two people running this suite run the
 same suite.
 
-| ID | Verifies | Title | Precondition | Steps | Expected result | Mode | Automation ref | Must-have | Priority |
-|----|----------|-------|--------------|-------|-----------------|------|----------------|-----------|----------|
-| TC-001 | AC-001 | badge shows unread count | member `m1` with 3 unread | open the list | badge reads `3` | machine | `test/notif.spec.ts:12` | yes | HIGH |
+| ID | Verifies | Title | Precondition | Steps | Expected result | Mode | Automation ref | Must-have | Priority | Result |
+|----|----------|-------|--------------|-------|-----------------|------|----------------|-----------|----------|--------|
+| TC-001 | AC-001 | badge shows unread count | member `m1` with 3 unread | open the list | badge reads `3` | machine | `test/notif.spec.ts:12` | yes | HIGH | NOT_RUN |
+
+`Result` is `NOT_RUN` \| `PASS` \| `FAIL` \| `BLOCKED` \| `SKIPPED` — the same states §9 counts — and
+is authored `NOT_RUN` (T7).
 
 A case that does not fit one line per cell moves to a block, in the same shape:
 
 ### TC-002 — <title>
 - **Verifies:** `AC-002` (`REQ-001`)
-- **Mode:** machine \| manual · **Must-have:** yes \| no · **Automation ref:** …
+- **Mode:** machine \| human · **Must-have:** yes \| no · **Automation ref:** … · **Result:** `NOT_RUN`
 - **Precondition:** …
 - **Steps:**
   1. … (concrete input)
@@ -115,9 +118,13 @@ Quantitative procedures state workload, sample and measurement conditions. Categ
 procedures identify the inspected surface, applicable criterion and pass/fail evidence; no invented
 score, duration or percentage is needed. Tool or reviewer names alone do not define the observation.
 
-| CFR | Measure / criterion | Required outcome (from spec) | Procedure | Tool / observer | Conditions / sample | Observed result | Verdict |
-|-----|---------------------|------------------------------|-----------|-----------------|---------------------|-----------------|---------|
-| CFR-001 | … | see spec CFR-001 | … | … | … | NOT_RUN | |
+| ID | Verifies | CFR | Measure / criterion | Required outcome (from spec) | Procedure | Tool / observer | Conditions / sample | Observed result | Result |
+|----|----------|-----|---------------------|------------------------------|-----------|-----------------|---------------------|-----------------|--------|
+| TC-010 | AC-007 | CFR-001 | … | see spec CFR-001 | … | … | … | — | NOT_RUN |
+
+Each procedure is a `TC-n` like any other — it names the AC it discharges (T1), counts toward T2,
+appears in the §7 coverage matrix, and carries the same `Result` states as §5. It lives here
+rather than in §5 only because its shape (workload, sample, observer) differs.
 
 ## 7. Coverage matrix
 The `AC → TC` half of the chain `REQ → AC → TC` (`traceability.md` §2).
@@ -149,12 +156,12 @@ overwrites, so a flaky case is visible as a case that changed verdict without a 
 |-----|------|-------|-------------|--------|--------|---------|---------|----------------|
 | 1 | | | | | | | | |
 
-Per-case results live in the §5 table's own status column, or in the machine-readable ledger
+Per-case results live in the §5 table's `Result` column, or in the machine-readable ledger
 (`traceability.md` §4) when the spec carries one.
 
 ## 10. Residual risk
 What acceptance does **not** cover, stated plainly: untested combinations, environments not
-exercised, load levels not reached, the manual cases whose oracle is one person's judgement. This
+exercised, load levels not reached, the human-checked cases whose oracle is one person's judgement. This
 section is what stops "all green" from being read as "everything works".
 
 ## 11. Sign-off

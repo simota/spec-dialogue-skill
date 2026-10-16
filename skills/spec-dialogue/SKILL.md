@@ -71,7 +71,7 @@ Do **not** use `spec-dialogue` when:
 
 | Depth | When | Phases | Panel | Turns |
 |-------|------|--------|-------|-------|
-| `light` | one bounded change, the problem is already agreed, no real option space | FRAME → SPECIFY → LOCK (EXPAND/CHALLENGE/SHAPE collapse into one confirm) | skipped | ~3-5 |
+| `light` | one bounded change, the problem is already agreed, no real option space | FRAME → SPECIFY → LOCK (EXPAND/CHALLENGE/SHAPE collapse into one confirm that discharges each of their decisions still open — the pick and the scope boundary — per Entry point) | skipped | ~3-5 |
 | `standard` (default) | a normal feature with genuine alternatives | all six | 2 skeptics (claims 1, 3) | ~8-15 |
 | `deep` | high-stakes, contested, or expensive-to-reverse; a spec several teams will build against | all six + extended EXPAND | 4 skeptics (one per claim) | ~15-30 |
 
@@ -145,19 +145,20 @@ The **Authoring lens** carries the spine — staged elaboration L0 Vision → L1
 
 ### Phase 5 — LOCK (sign-off + persist, no code)
 
-**Gate:** do not present for sign-off until **all three lock preconditions pass** — testable L3 ACs, a `TC-n` behind every must-have AC, **and** the Spec Quality Gate. Then present the complete spec and require the user's **explicit sign-off** ("lock it"). Sign-off is the **user's own utterance** — a delegated "just decide" (D15) never extends to it. On sign-off:
+**Build-path selection (mandatory checkpoint, before sign-off):** ask the user **how** they want the spec built, and record the answer in the Build-path decision section — a required section, so it is filled before the gate scores the document and before the user signs it, never written into a spec that is already locked. Present the choice in terms of the build's shape, not a tool name:
+
+| Path | Pick when | What the spec provides |
+|------|-----------|------------------------|
+| **Unattended loop** — turn the spec into a self-driving runner whose completion contract is the L3 AC set | the build is long-running / multi-session / the user wants to leave it alone; checkpoint-resume matters | the AC set becomes the machine-checkable DONE gate |
+| **One-shot autonomous build** — design → implement → verify → ship in a single sustained run | the build is bounded and the user is present for it | the AC set is the ship gate |
+| **Supervised build** — a human-in-the-loop implementation pass | the change is small, risky, or needs judgment per step | the AC set is the review checklist |
+| **Spec-only** — no build path is chosen here | the spec is the deliverable itself: an RFP, a contract with a vendor, a team that will choose its own process | the AC set is the acceptance contract whoever builds it |
+
+Both autonomous paths consume the same L3 ACs; the difference is attendance and resumability. If your environment has a specific runner or build skill for the chosen shape, name it here — but the spec is complete and consumable without one. **Spec-only is a real answer, not an evasion:** record it with its reason; it does not leave the Build-path section empty and does not block LOCK.
+
+**Gate:** do not present for sign-off until the build path is recorded and **all three lock preconditions pass** — testable L3 ACs, a `TC-n` behind every must-have AC, **and** the Spec Quality Gate. Then present the complete spec and require the user's **explicit sign-off** ("lock it"). Sign-off is the **user's own utterance** — a delegated "just decide" (D15) never extends to it. On sign-off:
 
 - **Finalize both documents:** promote `docs/specs/<slug>.draft.md` to the locked `docs/specs/<slug>.md` (status `locked`; override the path on request), following `reference/spec-template.md`, and promote the companion `docs/specs/<slug>.acceptance.md` to `locked` with it. The two are locked together — an accepted spec whose test procedure is still a draft has no executable definition of done. Include an explicit **Open Questions / Deferred Decisions** section — parked items, including any non-blocking Quality-Gate findings parked under the dependency-based Lock rule, are recorded, never silently dropped. Archive or remove the `.draft.md` once promoted.
-- **Build-path selection (mandatory checkpoint):** before recommending a handoff, ask the user **how** they want the locked spec built. Present the choice in terms of the build's shape, not a tool name:
-
-  | Path | Pick when | What the spec provides |
-  |------|-----------|------------------------|
-  | **Unattended loop** — turn the spec into a self-driving runner whose completion contract is the L3 AC set | the build is long-running / multi-session / the user wants to leave it alone; checkpoint-resume matters | the AC set becomes the machine-checkable DONE gate |
-  | **One-shot autonomous build** — design → implement → verify → ship in a single sustained run | the build is bounded and the user is present for it | the AC set is the ship gate |
-  | **Supervised build** — a human-in-the-loop implementation pass | the change is small, risky, or needs judgment per step | the AC set is the review checklist |
-  | **Spec-only** — no build path is chosen here | the spec is the deliverable itself: an RFP, a contract with a vendor, a team that will choose its own process | the AC set is the acceptance contract whoever builds it |
-
-  Both autonomous paths consume the same L3 ACs; the difference is attendance and resumability. If your environment has a specific runner or build skill for the chosen shape, name it here — but the spec is complete and consumable without one. **Spec-only is a real answer, not an evasion:** record it with its reason; it does not leave the Build-path section empty and does not block LOCK.
 - Emit the **Spec Handoff Packet** (`reference/spec-template.md` § Handoff Packet) as a **recommendation, not execution** — `spec-dialogue` writes no code. The build-path selection is a contract-level checkpoint and cannot be auto-picked, even under an autonomous caller; a request that already states it ("spec only, for an RFP") is the user's answer — confirm it, do not ask it again.
 
 ---
@@ -185,7 +186,7 @@ The gate scores eight dimensions. Missing lock preconditions block sign-off; use
 | Scope coherence | Does every item the dialogue raised — candidate requirement, sub-feature, adjacent concern — land in exactly one of in-scope / out-of-scope? (exhaustive over what was raised, not over everything imaginable; mutually exclusive) |
 | Economy | Does every line change what gets built? Delete what does not — a fact stated twice, prose restating a table, a summary of a section next to it (`reference/doc-quality.md` W9, W10) |
 | Provenance | Is every load-bearing element `elicited` / `ratified` / `grounded` / `parked` — none `silent`, and factual support not replaced by user approval? (`reference/dialogue-protocol.md` D16; open `ASSUME-n` entries are walked with the user here) |
-| Resolvability | Does every `UNKNOWN` / `TBD` / open `ASSUME-n` appear in Open Questions with an owner, a dependent decision and reason in `Blocks`, and a matching `Resolve by` — with no unresolved build or acceptance dependency regardless of label? (`reference/doc-quality.md` W13) |
+| Resolvability | Does every `UNKNOWN` / `TBD` / open `ASSUME-n` appear in Open Questions with an owner, a dependent decision and reason in `Blocks`, and a matching `Resolve by` — with no unresolved answer that would change implementation or acceptance meaning, regardless of label? (`reference/doc-quality.md` W13) |
 
 The spec is also a **document deliverable**: `reference/doc-quality.md` adds the dimensions this gate does not natively carry (freshness metadata, grounding of externally-checkable facts, summary-first readability). A gate failure routes to the earliest invalidated decision for a fix (see **Draft persistence & resume**). Only a non-blocking finding may be parked with the user's agreement; ambiguity in must-have behavior, contradictory ACs, missing security obligations or a missing oracle/TC procedure still blocks LOCK. The gate is a **lock precondition**: an autonomous caller cannot skip it.
 
@@ -253,7 +254,7 @@ Panel size scales with depth: `light` skips the panel, `standard` runs 2 skeptic
 
 ## Chain template
 
-`FRAME (Demand +Research?/Persona? +Reuse-scan? + ✓depth-mode + Socratic dialogue) → ✓confirm-problem + draft-init → EXPAND (Divergence ×2 +Market?) → ✓steer + draft → CHALLENGE (Arbitration + Subtraction + Impact +Pre-mortem?) → ✓pick + convergence-check + draft → SHAPE (Proposal +Prioritization?) → ✓edit + draft → SPECIFY (Authoring +API?/Data-model? +Verifiability +Demand? + acceptance-test authoring) → ✓iterate + draft → LOCK (✓quality-gate: Review +Verifiability +Arbitration? → ✓refutation-panel: 2-4 skeptics [skipped at depth=light] → ✓sign-off → promote draft to docs/specs/<slug>.md + docs/specs/<slug>.acceptance.md → ✓build-path → emit Spec Handoff Packet) [NO CODE, NO TEST EXECUTION]`
+`FRAME (Demand +Research?/Persona? +Reuse-scan? + ✓depth-mode + Socratic dialogue) → ✓confirm-problem + draft-init → EXPAND (Divergence ×2 +Market?) → ✓steer + draft → CHALLENGE (Arbitration + Subtraction + Impact +Pre-mortem?) → ✓pick + convergence-check + draft → SHAPE (Proposal +Prioritization?) → ✓edit + draft → SPECIFY (Authoring +API?/Data-model? +Verifiability +Demand? + acceptance-test authoring) → ✓iterate + draft → LOCK (✓build-path → ✓quality-gate: Review +Verifiability +Arbitration? → ✓refutation-panel: 2-4 skeptics [skipped at depth=light] → ✓sign-off → promote draft to docs/specs/<slug>.md + docs/specs/<slug>.acceptance.md → emit Spec Handoff Packet) [NO CODE, NO TEST EXECUTION]`
 
 Gate content is not restated in the chain — the eight Quality-Gate dimensions live in § Spec Quality Gate, the panel's polarity and four claims in § Pre-lock refutation panel, the mandatory traceable L3 ACs in Phase 4.
 

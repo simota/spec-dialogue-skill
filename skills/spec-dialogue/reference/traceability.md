@@ -20,7 +20,7 @@ IDs are **stable** — never renumber. When a revision changes an item's meaning
 | `TC-{n}` | Test case — the executable procedure that discharges an AC | `<slug>.acceptance.md` | `TC-001` |
 | `ASSUME-{n}` | Open assumption (Assumption Ledger, `dialogue-protocol.md` §3) | draft + Open Questions | `ASSUME-1` |
 | `OQ-{n}` | An unresolved question carrying an owner and a `Blocks` dependency | Open Questions | `OQ-1` |
-| `DEC-{n}` | A decision persisted during the dialogue | draft | `DEC-2` |
+| `DEC-{n}` | A decision persisted during the dialogue — the draft's working trail, carried into the `REQ`/`AC`/section it settles; the locked spec cites those IDs, not `DEC-n` | draft only | `DEC-2` |
 
 **Optional feature-scoping.** In a repository that will hold many specs, scope AC IDs by feature — `AC-LOGIN-001` — so IDs stay unique when specs are read together. Pick one form per spec and stay in it.
 
@@ -41,7 +41,7 @@ REQ-001 ─▶ AC-001, AC-002 ─▶ TC-001, TC-004
 
 **Hop 2 — `AC` ↔ `TC`** (spec ↔ `docs/specs/<slug>.acceptance.md`)
 
-- **Forward gap** — a **must-have** `AC` with no `TC`: an **unexecutable criterion**. Nobody can decide it, so it will not gate acceptance no matter what the spec says.
+- **Forward gap** — a **must-have** `AC` with no `TC` (a §5 case, or a §6 `CFR` procedure — both are `TC-n`): an **unexecutable criterion**. Nobody can decide it, so it will not gate acceptance no matter what the spec says.
 - **Backward gap** — a `TC` citing no `AC`: either a criterion went unwritten, or the case tests something nobody asked for.
 
 Both hops are defects, not warnings. Both are exactly what the Quality Gate's **Completeness** dimension checks, and both are cheap to fix at SPECIFY and expensive to fix after a build has started against the spec.
@@ -74,7 +74,7 @@ user-triggered path is being relabelled as an invariant to escape a scenario.
 
 Each AC additionally states:
 - **Its verification mode** — machine-checkable (a test can assert it) or human-checkable (someone must look). "Verifiable in principle" is not a mode.
-- **Its oracle** — the specific thing that decides pass or fail: a test file or case name, a dashboard query, a named reviewer **plus what they observe and the rule that turns it into a verdict**. "QA reviewer" alone is not an oracle — it names who looks, not what they look at or where the line between pass and fail sits; "QA reviewer compares the export against fixture `F-3`; any missing column fails" is. A mode without an oracle defers the hardest question — *who decides, by what?* — to whoever is under deadline pressure later.
+- **Its oracle** — the specific thing that decides pass or fail: a test case whose assertion is the rule, a dashboard query with its threshold, a named reviewer **plus what they observe and the rule that turns it into a verdict**. "QA reviewer" alone is not an oracle — it names who looks, not what they look at or where the line between pass and fail sits; "QA reviewer compares the export against fixture `F-3`; any missing column fails" is. A mode without an oracle defers the hardest question — *who decides, by what?* — to whoever is under deadline pressure later.
 - **Its must-have flag** — must-have ACs gate the build's completion; nice-to-have ACs do not. An unflagged AC set forces the builder to guess which failures block ship.
 
 ### Error paths are requirements too
@@ -112,7 +112,7 @@ coverage:
   untested: [<must-have AC with no TC>]
 ```
 
-This is optional for a small spec and worth the cost for anything a build will run against unattended. `spec-dialogue` authors it and sets every status to `NOT_VERIFIED`; the build fills the statuses in.
+This is optional for a small spec and worth the cost for anything a build will run against unattended. `spec-dialogue` authors it and sets every status to `NOT_VERIFIED`; the build fills the statuses in. The statuses belong to the **AC**, the acceptance document's `NOT_RUN`/`PASS`/… to each **TC**: an AC is `PASS` when its `tests` list is non-empty and every `TC` in it is `PASS`; `FAIL` when any entry is `FAIL`; and `NOT_VERIFIED` otherwise, including when the list is empty.
 
 ## 5. Adoption checklist
 

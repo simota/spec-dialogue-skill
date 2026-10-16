@@ -35,7 +35,9 @@ does not conjure `~/.gemini/antigravity-cli` for someone who has never run agy �
 Nothing at the destination is ever overwritten: a real directory, or a symlink into some other
 checkout, is refused and left alone, and `make unlink` removes only the links pointing at this repo.
 Override the destination outright with `SKILLS_DIR=<dir>` when your runtime keeps skills somewhere
-none of the three names.
+none of the three names. `PROJECT`, `SKILLS_DIR` and `AGENT` take effect only on the `make` command line —
+an exported `PROJECT` in your shell does not retarget the links — and a path containing a space is
+refused, because make would split it into several destinations.
 
 ## Use
 
