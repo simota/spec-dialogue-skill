@@ -40,7 +40,7 @@ Every section is present, or marked `N/A` with a one-line reason (`doc-quality.m
 | review trigger | <the event or interval that makes this stale, or `evergreen`> |
 | depth | light \| standard \| deep |
 | current phase | FRAME \| EXPAND \| CHALLENGE \| SHAPE \| SPECIFY \| LOCK — draft only; the row is removed at promotion |
-| build path | <filled at LOCK> |
+| build path | <recorded at LOCK, before sign-off> |
 
 ## L0 — Vision
 - **Problem** — what is wrong today, and for whom.
@@ -107,8 +107,8 @@ survives a review, so it is four fixed slots — each either filled or `N/A` wit
 
 ## Behavior matrix
 The conditions a spec forgets. Each row names the requirement it qualifies and the AC that proves
-it; a condition with no row is an **open question**, not an undefined behaviour — move it to Open
-Questions rather than deleting the row.
+it. A condition whose behaviour nobody has decided is an **open question**, not an undefined
+behaviour: it keeps its row, cites the `OQ-n` in `Expected behavior`, and appears in Open Questions.
 
 The six condition classes below are a fixed floor. Strike one out only with a stated reason
 (`N/A — the feature has no external dependency`), never by omission; several classes sharing one
@@ -150,7 +150,7 @@ once in **Verifies**.
 
 | ID | Given | When | Then | Verifies | Mode | Oracle | Must-have |
 |----|-------|------|------|----------|------|--------|-----------|
-| AC-001 | a member with 3 unread items | they open the list | the badge reads `3` | REQ-001 | machine | `test/notif.spec.ts` | yes |
+| AC-001 | a member with 3 unread items | they open the list | the badge reads `3` | REQ-001 | machine | `test/notif.spec.ts` › "badge count" — its assertion decides | yes |
 
 Every **must-have** AC is discharged by at least one `TC-n` in `docs/specs/<slug>.acceptance.md`
 (`traceability.md` §2, hop 2). An AC that reads as testable but that nobody has written a procedure
@@ -178,6 +178,10 @@ ratified into a decision or moved to Open Questions as an `OQ-n`; parking does n
 | ID | Assumption | Default chosen | Why | Status |
 |----|-----------|----------------|-----|--------|
 
+`Status` is `open` \| `ratified` \| `moved (OQ-n)`; a delegated default (D15) adds `(delegated)` to its
+ID cell. A dialogue that left nothing assumed writes `none — <why>` (`none — every default was
+ratified at a checkpoint`); that is content, not `N/A`.
+
 ## Open Questions / Deferred Decisions
 Every unresolved thing in the document, in one place with an owner. Parked items, Quality-Gate
 non-blocking findings parked with the user's agreement, and any `LOCK-with-flag` refutation with the assumption it
@@ -186,6 +190,9 @@ rests on. Nothing is dropped silently.
 | ID | Question | Blocks | Owner | Resolve by | Impact if wrong |
 |----|----------|--------|-------|-----------|-----------------|
 | OQ-1 | … | REQ-003 — dependent decision + reason, or nothing — reason | <who> | before-build \| before-ship \| deferred | … |
+
+With nothing open, the section says `none —` and why (`none — every marker resolved, no flag
+raised`); that is content, not `N/A`, and is exactly what the inventory rule below checks.
 
 **Lock rule.** Derive `Resolve by` from dependencies, not a desired schedule. In `Blocks`, name the
 dependent decision/requirement/AC and why it needs the answer (or `nothing` with a reason).
@@ -204,8 +211,8 @@ appears here as an `OQ-n`. A marker buried in L2 that never reaches this table i
 section exists to prevent — it is what the Quality Gate's **Resolvability** dimension scans for.
 
 ## Build-path decision
-Recorded at LOCK: unattended loop \| one-shot autonomous build \| supervised build \| spec-only,
-plus the reason. See `SKILL.md` Phase 5.
+Recorded at LOCK, before the gate and the sign-off: unattended loop \| one-shot autonomous build \|
+supervised build \| spec-only, plus the reason. See `SKILL.md` Phase 5.
 ```
 
 The L1↔L3 traceability — every requirement has an AC, every AC names a requirement — is exactly what the Quality Gate's Completeness dimension verifies and what the build consumes as its verification contract. The Behavior matrix extends the same loop sideways: each row cites a requirement **and** an AC, so an error path cannot be described in prose and then go untested.
@@ -214,7 +221,7 @@ The L1↔L3 traceability — every requirement has an AC, every AC names a requi
 
 ## Spec Handoff Packet
 
-Emitted at LOCK. A handoff that ships only a file path forces whatever builds the feature to re-derive what the dialogue already settled, so the packet carries the settled state in consumable fields.
+Emitted at LOCK. A handoff that ships only a file path forces whatever builds the feature to re-derive what the dialogue already settled, so the packet carries the settled state in consumable fields. It **supplements** `spec_path`, never replaces it: L1 requirements and `CFR` targets, the L2 detail and Migration & rollout are read from the locked spec itself, where each is stated once (`doc-quality.md` W10).
 
 | Field | Content |
 |-------|---------|
@@ -226,7 +233,7 @@ Emitted at LOCK. A handoff that ships only a file path forces whatever builds th
 | `non_goals` | the out-of-scope list, verbatim — carried into the scope bound of every downstream work item |
 | `dependencies` | the integration points, their contracts, and the declared fallback for each |
 | `assumption_ledger` | remaining `ASSUME-n` entries and their status — risk input for the build |
-| `open_questions` | the `OQ-n` set with `Blocks` / `Owner` / `Resolve by` — never silently dropped downstream, and never carrying an unresolved build/acceptance dependency at LOCK, regardless of label |
+| `open_questions` | the `OQ-n` set with `Blocks` / `Owner` / `Resolve by` — never silently dropped downstream, and never carrying, at LOCK, an unresolved answer that would change implementation or acceptance meaning, regardless of label |
 | `refutation_flags` | any `LOCK-with-flag` claim and the assumption it rests on — each is a kill-criterion candidate for the build |
 | `reuse_findings` | the existing-asset and constraint map from FRAME with source versions; avoid re-scanning unchanged premises, not freshness checks |
 | `build_path` | the path chosen at LOCK, or `spec-only` with its reason |

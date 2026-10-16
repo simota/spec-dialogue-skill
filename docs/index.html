@@ -274,7 +274,7 @@ a:focus-visible{outline:2px solid var(--gate);outline-offset:2px}
         <polyline points="1100,154 1100,296 530,296 530,158"/>
       </g>
       <g font-family="'JetBrains Mono',monospace" font-size="9.5" style="fill:var(--gate)">
-        <text x="380" y="226" text-anchor="middle">circling ≥ 2 rounds → re-diverge, or park it</text>
+        <text x="380" y="226" text-anchor="middle">circling ≥ 2 rounds → adopt the leading option, or park it</text>
         <text x="918" y="268" text-anchor="middle">gate finding → fix; park only if non-blocking</text>
         <text x="815" y="314" text-anchor="middle">refuted on evidence → earliest invalidated decision</text>
       </g>
@@ -435,7 +435,7 @@ a:focus-visible{outline:2px solid var(--gate);outline-offset:2px}
       <div class="pc-id"><span class="k">PHASE 5</span><span class="n">LOCK</span></div>
       <div class="pc-body">
         <h4>Sign-off, and nothing else</h4>
-        <p class="focus">The independent Quality Gate, then the refutation panel, then the user's explicit sign-off. On sign-off both documents are promoted to <code>locked</code> together, the build path is chosen with the user, and the Handoff Packet is emitted as a recommendation.</p>
+        <p class="focus">The build path is chosen with the user and recorded first, so the gate scores a complete document. Then the independent Quality Gate, the refutation panel, and the user's explicit sign-off. On sign-off both documents are promoted to <code>locked</code> together, and the Handoff Packet is emitted as a recommendation.</p>
         <ul class="rows"><li>Adversarial-review</li><li>Verifiability</li><li>Skeptic ×2–4</li><li data-req="cond">Arbitration?</li></ul>
       </div>
       <div class="pc-gate">
@@ -465,7 +465,7 @@ a:focus-visible{outline:2px solid var(--gate);outline-offset:2px}
         <li><b>Dependencies</b> · <b>Migration &amp; rollout</b> <span class="tag cond">cond</span> — what we do not control, and the point past which a change stops being reversible</li>
         <li><b>L3 Acceptance Criteria</b> <span class="tag req">req</span> — Given / When / Then, verification mode, oracle, must-have flag</li>
         <li><b>Scope</b> · <b>Considered but rejected</b> <span class="tag req">req</span></li>
-        <li><b>Assumption Ledger</b> · <b>Open Questions</b> <span class="tag req">req</span> — <code>ASSUME-n</code> and <code>OQ-n</code>, each with an owner and a level</li>
+        <li><b>Assumption Ledger</b> · <b>Open Questions</b> <span class="tag req">req</span> — <code>OQ-n</code> with an owner and a <code>Resolve by</code> level; <code>ASSUME-n</code> with its default and status — or <code>none</code> with the reason</li>
         <li><b>Build-path decision</b> <span class="tag req">req</span></li>
       </ul>
     </div>
