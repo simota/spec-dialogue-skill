@@ -206,6 +206,9 @@ status:
 # into it, never the other way.
 DOCS := *.md skills/$(NAME)/*.md skills/$(NAME)/reference/*.md
 
+# A `case` inside `$(...)` writes its patterns as `(pattern)`: macOS /bin/sh is bash 3.2, which
+# reads a bare `pattern)` there as the end of the substitution and fails the whole recipe.
+
 check:
 	@cd "$(REPO)" || exit 1; \
 	fail=0; \
@@ -214,10 +217,10 @@ check:
 		[ -n "$$f" ] || continue; \
 		ref=$${t%%#*}; ref=$${ref%%\?*}; \
 		case $$k in \
-		code) printf '%s\n' "$$ref" | grep -qE '^(reference/)?[A-Za-z][A-Za-z0-9._-]*\.md$$' || continue;; \
-		link) printf '%s\n' "$$t" | grep -qE '^[A-Za-z][A-Za-z0-9+.-]*:' && continue; \
+		(code) printf '%s\n' "$$ref" | grep -qE '^(reference/)?[A-Za-z][A-Za-z0-9._-]*\.md$$' || continue;; \
+		(link) printf '%s\n' "$$t" | grep -qE '^[A-Za-z][A-Za-z0-9+.-]*:' && continue; \
 		      ref=$${ref#./}; \
-		      case $$ref in *.[mM][dD]) ;; *) continue;; esac; \
+		      case $$ref in (*.[mM][dD]) ;; (*) continue;; esac; \
 		      printf '%s\n' "$$ref" | grep -qE '^(reference/)?[A-Za-z][A-Za-z0-9._-]*\.md$$' || \
 		        { echo "MISS $$f -> $$t is a local .md link outside the skill's own files"; continue; };; \
 		esac; \
@@ -230,7 +233,7 @@ check:
 		grep -qF "reference/$$b" "$(SKILL)/SKILL.md" || { echo "MISS reference/$$b exists but SKILL.md never names it" >&2; fail=1; }; \
 	done; \
 	parents=$$(printf '%s\n' "$$cites" | while IFS='|' read -r f k t; do \
-		case $$t in ../*|*/../*|..) echo "MISS $$f -> $$t reaches through a parent directory";; esac; \
+		case $$t in (../*|*/../*|..) echo "MISS $$f -> $$t reaches through a parent directory";; esac; \
 	done); \
 	if [ -n "$$parents" ]; then echo "$$parents" >&2; fail=1; fi; \
 	claimsrc=$$( cat $(DOCS); [ -f docs/index.html ] && sed 's/<[^>]*>/ /g' docs/index.html | tr -s ' ' ); \
