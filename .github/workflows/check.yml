@@ -1,0 +1,36 @@
+# Runs the repository's own checks — the same two commands a contributor runs locally.
+#
+# macOS is in the matrix on purpose: its /usr/bin/make is GNU make 3.81 and its sed, grep and
+# find are the BSD ones, which is what most people who run `make link` on a Mac will have.
+# Linux covers GNU make 4.x with dash as /bin/sh.
+name: check
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+
+permissions:
+  contents: read
+
+jobs:
+  check:
+    strategy:
+      fail-fast: false
+      matrix:
+        os: [ubuntu-latest, macos-latest]
+    runs-on: ${{ matrix.os }}
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Tool versions
+        run: |
+          command -v make sh sed grep
+          make --version | head -n 1
+          ls -l /bin/sh
+
+      - name: make check
+        run: make check
+
+      - name: make test
+        run: make test
