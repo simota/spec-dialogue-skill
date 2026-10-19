@@ -27,7 +27,8 @@ function dest(t) {
 	else sub(/[ \t].*/, "", t)
 	return t
 }
-# spans(s): print every code span in s; return s with the spans removed.
+# spans(s): print every code span in s; return s with each span replaced by a space, so the text
+# on either side cannot join into syntax that is not there — `[x]` + span + `(y)` is not a link.
 function spans(s,    out, rest, p, n, body, closed, run) {
 	out = ""
 	while (match(s, /`+/)) {
@@ -49,6 +50,7 @@ function spans(s,    out, rest, p, n, body, closed, run) {
 		if (closed) {
 			if (body ~ /^ .* $/ && body !~ /^ +$/) body = substr(body, 2, length(body) - 2)
 			print FILENAME "|code|" body
+			out = out " "
 			s = rest
 		} else {
 			out = out substr(s, p, n)

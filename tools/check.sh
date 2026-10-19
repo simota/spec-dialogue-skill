@@ -171,6 +171,8 @@ case_ 'missing ref, double-backtick span' fail 'printf "See \`\`reference/missin
 case_ 'a link shown in a double-backtick span' ok 'printf "Write \`\` [x](reference/missing.md) \`\` literally.\n" >> $SKILL/SKILL.md'
 case_ 'a ~~~ line inside a backtick fence' fail 'printf "\n\`\`\`\n~~~\n\`\`\`\n\nSee [x](reference/missing.md).\n" >> $SKILL/SKILL.md'
 case_ 'a longer fence holds a shorter one' fail 'printf "\n\`\`\`\`\n\`\`\`\n\`\`\`\`\n\nSee [x](reference/missing.md).\n" >> $SKILL/SKILL.md'
+case_ 'a span between [x] and (y) is no link' ok 'printf "See [label]\`code\`(reference/missing.md) as prose.\n" >> $SKILL/SKILL.md'
+case_ 'a span inside link text still links' fail 'printf "See [a \`b\` c](reference/missing.md).\n" >> $SKILL/SKILL.md'
 case_ '../ mid-way through a code span'  fail 'printf "Run \`make link PROJECT=../sibling\`.\n" >> $SKILL/SKILL.md'
 case_ '../ only in a link title'         ok   'printf "See [x](reference/roles.md \"see ../notes\").\n" >> $SKILL/SKILL.md'
 case_ '../ between two code spans'       ok   'printf "See \`a\` then ../ then \`b\`.\n" >> $SKILL/SKILL.md'
