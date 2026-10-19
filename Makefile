@@ -233,7 +233,7 @@ check:
 		grep -qF "reference/$$b" "$(SKILL)/SKILL.md" || { echo "MISS reference/$$b exists but SKILL.md never names it" >&2; fail=1; }; \
 	done; \
 	parents=$$(printf '%s\n' "$$cites" | while IFS='|' read -r f k t; do \
-		case $$t in (../*|*/../*|..) echo "MISS $$f -> $$t reaches through a parent directory";; esac; \
+		case $$t in (*../*|..) echo "MISS $$f -> $$t reaches through a parent directory";; esac; \
 	done); \
 	if [ -n "$$parents" ]; then echo "$$parents" >&2; fail=1; fi; \
 	claimsrc=$$( cat $(DOCS); [ -f docs/index.html ] && sed 's/<[^>]*>/ /g' docs/index.html | tr -s ' ' ); \

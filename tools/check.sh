@@ -167,6 +167,7 @@ case_ 'missing ref, spaced link target'  fail 'printf "See [x]( reference/missin
 case_ 'good ref, ./ link'                ok   'printf "See [x](./reference/roles.md).\n" >> $SKILL/SKILL.md'
 case_ 'a URL ending in .md is not local' ok   'printf "See [x](https://example.com/missing.md).\n" >> $SKILL/SKILL.md'
 case_ 'an example link in a fence'       ok   'printf "\n\`\`\`markdown\n[x](reference/example.md)\n\`\`\`\n" >> $SKILL/SKILL.md'
+case_ '../ mid-way through a code span'  fail 'printf "Run \`make link PROJECT=../sibling\`.\n" >> $SKILL/SKILL.md'
 case_ '../ only in a link title'         ok   'printf "See [x](reference/roles.md \"see ../notes\").\n" >> $SKILL/SKILL.md'
 case_ '../ between two code spans'       ok   'printf "See \`a\` then ../ then \`b\`.\n" >> $SKILL/SKILL.md'
 case_ 'parent ref via markdown link'     fail 'printf "See [up](../escape.md).\n" >> $SKILL/SKILL.md'
