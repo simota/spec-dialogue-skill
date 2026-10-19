@@ -206,26 +206,36 @@ status:
 # into it, never the other way.
 DOCS := *.md skills/$(NAME)/*.md skills/$(NAME)/reference/*.md
 
+# A `case` inside `$(...)` writes its patterns as `(pattern)`: macOS /bin/sh is bash 3.2, which
+# reads a bare `pattern)` there as the end of the substitution and fails the whole recipe.
+
 check:
 	@cd "$(REPO)" || exit 1; \
 	fail=0; \
-	misses=$$( \
-		for f in $(DOCS); do \
-			{ grep -ohE '`(reference/)?[A-Za-z][A-Za-z0-9._-]*\.md`' "$$f" | tr -d '`'; \
-			  grep -ohE '\]\([^)]*\)' "$$f" | sed 's/^](//; s/)$$//; s/^[[:space:]]*<//; s/[>[:space:]].*//; s/#.*//' | \
-			  grep -E '^(reference/)?[A-Za-z][A-Za-z0-9._-]*\.md$$'; } | sort -u | while read -r ref; do \
-				[ -f "$(SKILL)/$$ref" ] || [ -f "$(SKILL)/reference/$$ref" ] || echo "MISS $$f -> $$ref"; \
-			done; \
-		done); \
+	cites=$$(sh tools/cites.sh $(DOCS)) || { echo "MISS tools/cites.sh could not read the documents" >&2; exit 1; }; \
+	misses=$$(printf '%s\n' "$$cites" | sort -u | while IFS='|' read -r f k t; do \
+		[ -n "$$f" ] || continue; \
+		ref=$${t%%#*}; ref=$${ref%%\?*}; \
+		case $$k in \
+		(code) printf '%s\n' "$$ref" | grep -qE '^(reference/)?[A-Za-z][A-Za-z0-9._-]*\.md$$' || continue;; \
+		(link) printf '%s\n' "$$t" | grep -qE '^([A-Za-z][A-Za-z0-9+.-]*:|//)' && continue; \
+		      ref=$${ref#./}; \
+		      case $$ref in (*.[mM][dD]) ;; (*) continue;; esac; \
+		      printf '%s\n' "$$ref" | grep -qE '^(reference/)?[A-Za-z][A-Za-z0-9._-]*\.md$$' || \
+		        { echo "MISS $$f -> $$t is a local .md link outside the skill's own files"; continue; };; \
+		esac; \
+		[ -f "$(SKILL)/$$ref" ] || [ -f "$(SKILL)/reference/$$ref" ] || echo "MISS $$f -> $$ref"; \
+	done); \
 	if [ -n "$$misses" ]; then echo "$$misses" >&2; fail=1; fi; \
 	for f in "$(SKILL)"/reference/*.md; do \
 		[ -e "$$f" ] || continue; \
 		b=$$(basename "$$f"); \
-		grep -q "reference/$$b" "$(SKILL)/SKILL.md" || { echo "MISS reference/$$b exists but SKILL.md never names it" >&2; fail=1; }; \
+		grep -qF "reference/$$b" "$(SKILL)/SKILL.md" || { echo "MISS reference/$$b exists but SKILL.md never names it" >&2; fail=1; }; \
 	done; \
-	if grep -nE '`[^`]*\.\./[^`]*`|\]\([^)]*\.\./[^)]*\)' $(DOCS) >&2; then \
-		echo "MISS a cited path reaches through a parent directory" >&2; fail=1; \
-	fi; \
+	parents=$$(printf '%s\n' "$$cites" | while IFS='|' read -r f k t; do \
+		case $$t in (*../*|..) echo "MISS $$f -> $$t reaches through a parent directory";; esac; \
+	done); \
+	if [ -n "$$parents" ]; then echo "$$parents" >&2; fail=1; fi; \
 	claimsrc=$$( cat $(DOCS); [ -f docs/index.html ] && sed 's/<[^>]*>/ /g' docs/index.html | tr -s ' ' ); \
 	d=; \
 	if [ -f "$(SKILL)/SKILL.md" ]; then \
