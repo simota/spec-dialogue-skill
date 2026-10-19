@@ -59,6 +59,7 @@ The dialogue writes `docs/specs/<slug>.draft.md` incrementally and promotes it t
 |------|---------|
 | `Makefile` | `link` / `unlink` / `status` per agent CLI, plus `check` / `test` |
 | `tools/check.sh` | The fixture battery `make test` runs — what keeps `make check` and `make link` honest |
+| `tools/cites.sh` | Lists the paths each document cites (code spans and Markdown links), which both of `make check`'s path checks read |
 | `.github/workflows/check.yml` | CI: `make check` and `make test` on Linux (GNU make 4, dash) and macOS (make 3.81, BSD sed/grep) |
 | `skills/spec-dialogue/` | The skill itself — the directory `make link` symlinks |
 | `docs/index.html` | The published site — one self-contained page explaining the workflow |

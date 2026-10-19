@@ -37,8 +37,9 @@ copy_() {
 	rm -rf "$1" &&
 	mkdir -p "$1/skills" &&
 	cp -R "$SRC/Makefile" "$SRC/README.md" "$SRC/docs" "$1/" &&
+	mkdir -p "$1/tools" && cp "$SRC/tools/cites.sh" "$1/tools/" &&
 	cp -R "$SRC/$SKILL" "$1/skills/" &&
-	[ -f "$1/Makefile" ] && [ -d "$1/$SKILL" ] || {
+	[ -f "$1/Makefile" ] && [ -f "$1/tools/cites.sh" ] && [ -d "$1/$SKILL" ] || {
 		printf 'ABORT  could not build a fixture copy at %s — stopping before any setup runs\n' "$1" >&2
 		exit 2
 	}
@@ -157,6 +158,17 @@ case_ 'good ref, link with #fragment'    ok   'printf "See [r](reference/roles.m
 case_ 'missing ref, link with a title'   fail 'printf "See [d](reference/does-not-exist.md \"Details\").\n" >> $SKILL/SKILL.md'
 case_ 'missing ref, angle-bracket link'  fail 'printf "See [d](<reference/does-not-exist.md>).\n" >> $SKILL/SKILL.md'
 case_ 'good ref, link with title + frag' ok   'printf "See [r](reference/roles.md#demand \"Roles\").\n" >> $SKILL/SKILL.md'
+case_ 'missing ref, code span + #frag'  fail 'printf "See \`reference/missing.md#frag\`.\n" >> $SKILL/SKILL.md'
+case_ 'good ref, code span + #frag'     ok   'printf "See \`reference/roles.md#demand\`.\n" >> $SKILL/SKILL.md'
+case_ 'missing ref, reference-style link' fail 'printf "See [x][id].\n\n[id]: reference/missing.md\n" >> $SKILL/SKILL.md'
+case_ 'missing ref, ./ link'             fail 'printf "See [x](./reference/missing.md).\n" >> $SKILL/SKILL.md'
+case_ 'absolute .md link escapes'        fail 'printf "See [x](/etc/missing.md).\n" >> $SKILL/SKILL.md'
+case_ 'missing ref, spaced link target'  fail 'printf "See [x]( reference/missing.md ).\n" >> $SKILL/SKILL.md'
+case_ 'good ref, ./ link'                ok   'printf "See [x](./reference/roles.md).\n" >> $SKILL/SKILL.md'
+case_ 'a URL ending in .md is not local' ok   'printf "See [x](https://example.com/missing.md).\n" >> $SKILL/SKILL.md'
+case_ 'an example link in a fence'       ok   'printf "\n\`\`\`markdown\n[x](reference/example.md)\n\`\`\`\n" >> $SKILL/SKILL.md'
+case_ '../ only in a link title'         ok   'printf "See [x](reference/roles.md \"see ../notes\").\n" >> $SKILL/SKILL.md'
+case_ '../ between two code spans'       ok   'printf "See \`a\` then ../ then \`b\`.\n" >> $SKILL/SKILL.md'
 case_ 'parent ref via markdown link'     fail 'printf "See [up](../escape.md).\n" >> $SKILL/SKILL.md'
 case_ 'a ../ outside any code span'      ok   'printf "Run \`make link\` from the repo, or ../ it.\n" >> README.md'
 case_ 'a path inside $CODEX_HOME/skills' ok   'printf "It lands at \`\$CODEX_HOME/skills/spec-dialogue\`.\n" >> README.md'
