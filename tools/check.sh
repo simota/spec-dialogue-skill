@@ -165,6 +165,7 @@ case_ 'missing ref, ./ link'             fail 'printf "See [x](./reference/missi
 case_ 'absolute .md link escapes'        fail 'printf "See [x](/etc/missing.md).\n" >> $SKILL/SKILL.md'
 case_ 'missing ref, spaced link target'  fail 'printf "See [x]( reference/missing.md ).\n" >> $SKILL/SKILL.md'
 case_ 'good ref, ./ link'                ok   'printf "See [x](./reference/roles.md).\n" >> $SKILL/SKILL.md'
+case_ 'a //host/x.md link is not local' ok   'printf "See [x](//example.com/guide.md).\n" >> $SKILL/SKILL.md'
 case_ 'a URL ending in .md is not local' ok   'printf "See [x](https://example.com/missing.md).\n" >> $SKILL/SKILL.md'
 case_ 'an example link in a fence'       ok   'printf "\n\`\`\`markdown\n[x](reference/example.md)\n\`\`\`\n" >> $SKILL/SKILL.md'
 case_ 'missing ref, double-backtick span' fail 'printf "See \`\`reference/missing.md\`\`.\n" >> $SKILL/SKILL.md'

@@ -218,7 +218,7 @@ check:
 		ref=$${t%%#*}; ref=$${ref%%\?*}; \
 		case $$k in \
 		(code) printf '%s\n' "$$ref" | grep -qE '^(reference/)?[A-Za-z][A-Za-z0-9._-]*\.md$$' || continue;; \
-		(link) printf '%s\n' "$$t" | grep -qE '^[A-Za-z][A-Za-z0-9+.-]*:' && continue; \
+		(link) printf '%s\n' "$$t" | grep -qE '^([A-Za-z][A-Za-z0-9+.-]*:|//)' && continue; \
 		      ref=$${ref#./}; \
 		      case $$ref in (*.[mM][dD]) ;; (*) continue;; esac; \
 		      printf '%s\n' "$$ref" | grep -qE '^(reference/)?[A-Za-z][A-Za-z0-9._-]*\.md$$' || \
