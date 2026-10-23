@@ -214,7 +214,7 @@ Recorded at LOCK, before the gate and the sign-off: unattended loop \| one-shot 
 supervised build \| spec-only, plus the reason. See `SKILL.md` Phase 5.
 ```
 
-The L1↔L3 traceability — every requirement has an AC, every AC names a requirement — is exactly what the Quality Gate's Completeness dimension verifies and what the build consumes as its verification contract. The Behavior matrix extends the same loop sideways: each row cites a requirement **and** an AC, so an error path cannot be described in prose and then go untested.
+The L1↔L3 traceability — every requirement has an AC, every AC names a requirement — is the first hop of what the Quality Gate's Completeness dimension verifies (the second, `AC → TC`, lives in the companion) and what the build consumes as its verification contract. The Behavior matrix extends the same loop sideways: each row cites a requirement **and** an AC, so an error path cannot be described in prose and then go untested.
 
 ---
 

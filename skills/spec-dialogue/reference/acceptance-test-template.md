@@ -94,7 +94,8 @@ same suite.
 | TC-001 | AC-001 | badge shows unread count | member `m1` with 3 unread | open the list | badge reads `3` | machine | `test/notif.spec.ts:12` | yes | HIGH | NOT_RUN |
 
 `Result` is `NOT_RUN` \| `PASS` \| `FAIL` \| `BLOCKED` \| `SKIPPED` — the same states §9 counts — and
-is authored `NOT_RUN` (T7).
+is authored `NOT_RUN` (T7). `Must-have` is the flag of the AC the case verifies, never set per case:
+a case on a must-have AC that is marked `no` would let the exit criteria pass while §8 S1 fails.
 
 A case that does not fit one line per cell moves to a block, in the same shape:
 
@@ -123,7 +124,7 @@ score, duration or percentage is needed. Tool or reviewer names alone do not def
 | TC-010 | AC-007 | CFR-001 | … | see spec CFR-001 | … | … | … | — | yes | NOT_RUN |
 
 Each procedure is a `TC-n` like any other — it names the AC it discharges (T1), counts toward T2,
-appears in the §7 coverage matrix, and carries the same `Must-have` flag (its AC's) and `Result`
+appears in the §7 coverage matrix, and carries its AC's `Must-have` flag and the same `Result`
 states as §5. It lives here rather than in §5 only because its shape (workload, sample, observer)
 differs.
 
@@ -157,7 +158,7 @@ overwrites, so a flaky case is visible as a case that changed verdict without a 
 |-----|------|-------|-------------|--------|--------|---------|---------|----------------|
 | 1 | | | | | | | | |
 
-Per-case results live in the §5 table's `Result` column, or in the machine-readable ledger
+Per-case results live in the `Result` column of §5 and §6, or in the machine-readable ledger
 (`traceability.md` §4) when the spec carries one.
 
 ## 10. Residual risk
