@@ -8,7 +8,7 @@ CAPABILITIES_SUMMARY:
 - problem_framing: Establish and confirm a shared problem statement before any option generation
 - option_divergence: Generate up to 5 genuinely distinct candidate directions (3-5 unless a named constraint closes the space) and steer them with the user across multiple turns
 - adversarial_convergence: Narrow to one direction under necessity / scope / feasibility / failure pressure
-- staged_authoring: L0 Vision -> L1 Requirements -> L2 Detail -> Behavior matrix -> L3 Acceptance Criteria with REQ<->AC traceability
+- staged_authoring: L0 Vision -> L1 Requirements -> L2 Detail -> Behavior matrix -> L3 Acceptance Criteria with REQ->AC->TC traceability
 - quality_gate: Eight-dimension independent review of the spec as an artifact (lock precondition)
 - refutation_panel: Refute-polarity skeptic panel against the four load-bearing claims a locked spec asserts
 - draft_persistence: Incremental draft writes with phase markers and resume from the last checkpoint
@@ -33,7 +33,7 @@ This skill is **fully self-contained**. It needs no other skill, agent, registry
 | `reference/dialogue-protocol.md` | D1–D16 — how to ask, how to process answers, the Assumption Ledger, the Provenance Gate |
 | `reference/roles.md` | The 18 analytical lenses this recipe uses, each defined inline |
 | `reference/refutation-protocol.md` | Skeptic-panel composition, evidence-vs-novelty, aggregation |
-| `reference/traceability.md` | The `REQ-n` / `AC-n` ID scheme the L1↔L3 mapping rests on |
+| `reference/traceability.md` | The `REQ-n` / `AC-n` / `TC-n` ID scheme and the two-hop `REQ → AC → TC` linking rule |
 | `reference/doc-quality.md` | Document-deliverable discipline (reader contract, grounding, readability, economy, precision) |
 | `reference/spec-template.md` | The spec document template and the Spec Handoff Packet |
 | `reference/acceptance-test-template.md` | The companion acceptance test specification — `TC-n` cases, environment, fixtures, exit criteria, sign-off |
@@ -120,7 +120,7 @@ Narrow to ONE direction *with the user*, under four distinct pressures: **Arbitr
 
 - **Checkpoint (mandatory):** narrow the survivors to at most four (D11), then the user makes the **explicit pick** of the single direction to specify. Carry forward rejected directions as recorded "considered but rejected" so the dialogue does not re-derive them. Record the pick and the rejected list to the draft.
 - **One direction is one specified behavior, not one code path.** "Both, behind a per-customer setting" is a legitimate pick — the setting, who owns it, and each branch's behavior then become requirements and ACs like any other. What is not a pick is "both, decide later".
-- **A choice only evidence can settle.** When the directions differ on something nobody can know without building it (an algorithm's quality, a provider's real latency), do not invent the oracle. Either (a) the pick becomes *the experiment* — specify the prototype, its measurement and the decision rule that will choose, and lock that — or (b) park the choice as a `before-build` Open Question, which blocks LOCK of anything that depends on it (`reference/spec-template.md` Lock rule).
+- **A choice only evidence can settle.** When the directions differ on something nobody can know without building it (an algorithm's quality, a provider's real latency), do not invent the oracle. Either (a) the pick becomes *the experiment* — specify the prototype, its measurement and the decision rule that will choose, and lock that — or (b) park the choice as a `before-build` Open Question, which blocks LOCK until it is answered, or until the affected scope and its obligations are explicitly revised and revalidated (`reference/spec-template.md` Lock rule).
 - **Convergence check:** before looping back to EXPAND, ask "are we converging, or circling?" If circling ≥ 2 rounds with no new information, offer to (a) adopt the leading candidate as the pick, or (b) park the disagreement as an Open Question and continue only work independent of its answer. Parking does not waive LOCK preconditions. Never loop indefinitely.
 
 ### Phase 3 — SHAPE (proposal)
@@ -225,7 +225,7 @@ Panel size scales with depth: `light` skips the panel, `standard` runs 2 skeptic
 | Reinvent the wheel / out-of-context spec | FRAME's reuse-scan (skipped only for greenfield) |
 | Lost dialogue on interruption | incremental draft persistence + `spec-dialogue resume` |
 | Locking a low-quality spec | eight-dimension Quality Gate as a lock precondition |
-| Downstream can't consume the spec | standard template + L1↔L3 AC traceability |
+| Downstream can't consume the spec | standard template + `REQ → AC → TC` traceability |
 | Silent assumptions inside a signed spec | Assumption Ledger (D9) + Provenance Gate (D16) blocks LOCK on any `silent` element |
 | Wall-of-questions, leading questions, rubber-stamp checkpoints, swallowed vague answers | `reference/dialogue-protocol.md` D1–D15 |
 | An internally-perfect but wrong spec | pre-lock refutation panel — the eight document dimensions cannot catch this |
