@@ -40,7 +40,6 @@ Every section is present, or marked `N/A` with a one-line reason (`doc-quality.m
 | review trigger | <the event or interval that makes this stale, or `evergreen`> |
 | depth | light \| standard \| deep |
 | current phase | FRAME \| EXPAND \| CHALLENGE \| SHAPE \| SPECIFY \| LOCK — draft only; the row is removed at promotion |
-| build path | <recorded at LOCK, before sign-off> |
 
 ## L0 — Vision
 - **Problem** — what is wrong today, and for whom.

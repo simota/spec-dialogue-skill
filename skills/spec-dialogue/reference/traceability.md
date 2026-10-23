@@ -1,4 +1,4 @@
-# Traceability — the ID scheme the L1↔L3 mapping rests on
+# Traceability — the ID scheme the REQ → AC → TC chain rests on
 
 **Purpose:** One stable identifier scheme for requirements, acceptance criteria and test cases, so the locked spec's coverage claim is checkable and so whatever builds the feature can cite the spec instead of paraphrasing it.
 
