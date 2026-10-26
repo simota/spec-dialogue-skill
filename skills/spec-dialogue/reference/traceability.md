@@ -121,6 +121,6 @@ This is optional for a small spec and worth the cost for anything a build will r
 - Every AC → a verification mode, an oracle (observation + pass/fail rule, not just a name), and a must-have flag. An invariant names its check event in `When`.
 - Every must-have AC → at least one `TC-{n}` in `docs/specs/<slug>.acceptance.md`.
 - Every TC → the AC it discharges, concrete step values, and an observable expected result (`acceptance-test-template.md` T1–T4).
-- Every Behavior-matrix row → a requirement in `Applies to` and an AC in `Verifies`.
+- Every Behavior-matrix row that states a behaviour → a requirement in `Applies to` and an AC in `Verifies` (a struck-out class states none; an undecided one cites its `OQ-n`).
 - Meaning-changing revision → supersede, never renumber; wording-only edits retain the ID.
 - Before LOCK → walk both hops, forward and backward; that walk *is* the Completeness check.

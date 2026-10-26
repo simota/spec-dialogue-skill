@@ -35,6 +35,7 @@ must follow under time pressure is the last place to make them translate.
 | spec source | `docs/specs/<slug>.md` as-of <YYYY-MM-DD> |
 | status | draft \| locked \| executed |
 | owner | <who runs this and reports the result> |
+| reader | <role> — <what they decide with it: run the suite, accept the build, …> (`doc-quality.md` W1) |
 | as-of | <YYYY-MM-DD> |
 | review trigger | <the event that makes this stale — usually "the spec changes"> |
 

@@ -36,6 +36,7 @@ Every section is present, or marked `N/A` with a one-line reason (`doc-quality.m
 | slug | <feature-slug> |
 | status | draft \| locked |
 | owner | <who answers questions about this> |
+| reader | <role> — <what they decide with it: implement, review, estimate, …> (`doc-quality.md` W1) |
 | as-of | <YYYY-MM-DD> |
 | review trigger | <the event or interval that makes this stale, or `evergreen`> |
 | depth | light \| standard \| deep |
@@ -105,9 +106,11 @@ survives a review, so it is four fixed slots — each either filled or `N/A` wit
 |-------|------|--------------|----------------|
 
 ## Behavior matrix
-The conditions a spec forgets. Each row names the requirement it qualifies and the AC that proves
-it. A condition whose behaviour nobody has decided is an **open question**, not an undefined
-behaviour: it keeps its row, cites the `OQ-n` in `Expected behavior`, and appears in Open Questions.
+The conditions a spec forgets. Each row that states a behaviour names the requirement it qualifies
+and the AC that proves it. A condition whose behaviour nobody has decided is an **open question**, not an undefined
+behaviour: it keeps its row, cites the `OQ-n` in `Expected behavior` and in `Verifies` until an AC
+replaces it, and appears in Open Questions. A struck-out class, or the row saying no domain
+condition was found, states no behaviour and carries `—` in `Applies to` and `Verifies`.
 
 The six condition classes below are a fixed floor. Strike one out only with a stated reason
 (`N/A — the feature has no external dependency`), never by omission; several classes sharing one
@@ -155,6 +158,11 @@ Every **must-have** AC is discharged by at least one `TC-n` in `docs/specs/<slug
 (`traceability.md` §2, hop 2). An AC that reads as testable but that nobody has written a procedure
 for is not yet a gate.
 
+An AC's provenance is the `Source` of the requirement it verifies. An AC that adds a choice its
+requirement does not make — a threshold, a message text — carries a new decision: put it in the
+requirement row, where `Source` records it, rather than leaving it unsourced in a cell here
+(`dialogue-protocol.md` D16).
+
 A criterion whose cells do not fit on one line gets a block below the table under its own `### AC-n`
 heading, in the same Given / When / Then shape — the shape is the contract, the table is a
 convenience.
@@ -164,11 +172,15 @@ convenience.
 - **Out of scope** — …
 
 Every item the dialogue raised — candidate requirement, sub-feature, adjacent concern — appears in
-exactly one list: exhaustive over what was raised, mutually exclusive. An out-of-scope item that an
+exactly one list: exhaustive over what was raised, mutually exclusive. Each item ends with its
+provenance, in the form L1's `Source` uses — `(elicited, turn 6)`, `(ratified)`, `(grounded: <source>)`,
+`(parked: OQ-n)` — because a scope boundary is a load-bearing element the Provenance Gate classifies. An out-of-scope item that an
 in-scope requirement depends on is a boundary defect, and the refutation panel attacks exactly that.
 
 ## Considered but rejected
-Directions dropped in CHALLENGE, one line each on why. Reuse the rejection while its premises remain valid; revision may reopen it when those premises change. When no genuine alternative existed, the content is `none —` plus the constraint that closed the space and its source (`none — the signed provider contract fixes the vendor`); when the direction was decided before this dialogue, it is `decided upstream — <source>` plus the alternatives that were considered there, so the refutation panel still has something to attack. Either is content, not `N/A`.
+Opens with one line naming the **chosen direction** and its provenance — the CHALLENGE pick
+(`elicited`, with the turn) or `decided upstream — <source>` — because the refutation panel's second
+claim compares the rejected directions against it. Then the directions dropped in CHALLENGE, one line each on why. Reuse the rejection while its premises remain valid; revision may reopen it when those premises change. When no genuine alternative existed, the content is `none —` plus the constraint that closed the space and its source (`none — the signed provider contract fixes the vendor`); when the direction was decided before this dialogue, it is `decided upstream — <source>` plus the alternatives that were considered there, so the refutation panel still has something to attack. Either is content, not `N/A`.
 
 ## Assumption Ledger
 `dialogue-protocol.md` §3. Draft-time this is live; at LOCK every remaining `open` entry is either
@@ -190,8 +202,14 @@ rests on. Nothing is dropped silently.
 |----|----------|--------|-------|-----------|-----------------|
 | OQ-1 | … | REQ-003 — dependent decision + reason, or nothing — reason | <who> | before-build \| before-ship \| deferred | … |
 
-With nothing open, the section says `none —` and why (`none — every marker resolved, no flag
+With nothing open, the table says `none —` and why (`none — every marker resolved, no flag
 raised`); that is content, not `N/A`, and is exactly what the inventory rule below checks.
+
+**Refutation record.** Below the table, one line per skeptic the pre-lock panel ran: the claim, the
+evidence source it argued from, and the verdict — `survived`, `refuted-on-evidence` (and the
+decision it sent the spec back to), or `unproven-because-new` (and the `OQ-n` carrying its flag).
+A surviving claim is recorded here, not as an `OQ-n`: it is not open. At `depth=light` the line reads
+`panel skipped — depth=light` (`refutation-protocol.md` §3).
 
 **Lock rule.** Derive `Resolve by` from dependencies, not a desired schedule. In `Blocks`, name the
 dependent decision/requirement/AC and why it needs the answer (or `nothing` with a reason).
