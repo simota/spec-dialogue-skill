@@ -34,7 +34,7 @@ Every unconfirmed decision default — skipped questions, D7 vague answers, or D
 | ASSUME-1 | Notification delivery is best-effort | at-least-once NOT required | user skipped reliability Q | open |
 ```
 
-- **Lifecycle:** `open` → `ratified` (user approves at a checkpoint) → becomes a decision; or `open` → `moved (OQ-n)`, into **Open Questions**, at LOCK. `open` entries never silently disappear.
+- **Lifecycle:** `open` → `ratified` (user approves at a checkpoint) → becomes a decision; or `open` → `moved (OQ-n)`, into **Open Questions**, at LOCK — reusing the `OQ-n` the inventory rule already gave it while it was open, never a second ID. `open` entries never silently disappear.
 - **Checkpoint duty:** every checkpoint presentation shows the count of open assumptions and lists any *new* ones since the last checkpoint (delta-only, per D10).
 - **Final-gate duty:** at LOCK, walk the remaining `open` entries with the user — each is either ratified or moved to Open Questions / Deferred Decisions. Parking preserves visibility, not permission to LOCK with a dependency unresolved (`spec-template.md`). This is what the Provenance Gate (§6) verifies.
 

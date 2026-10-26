@@ -461,7 +461,7 @@ a:focus-visible{outline:2px solid var(--gate);outline-offset:2px}
         <li><b>Glossary</b> <span class="tag req">req</span> — one concept one term, with a <em>not to be called</em> column so synonym drift is a grep rather than a feeling</li>
         <li><b>L1 Requirements</b> <span class="tag req">req</span> — <code>REQ-n</code> and <code>CFR-n</code>; quantitative rows carry a justified metric and threshold; categorical or normative rows name a required condition and conformance evidence</li>
         <li><b>L2 Detail</b> <span class="tag cond">cond</span> — four fixed slots: data model, interface contract, state and transitions, validation rules</li>
-        <li><b>Behavior matrix</b> <span class="tag req">req</span> — the six conditions a spec forgets, plus the ones this domain adds, each row citing a requirement and a criterion</li>
+        <li><b>Behavior matrix</b> <span class="tag req">req</span> — the six conditions a spec forgets, plus the ones this domain adds, each row that states a behaviour citing a requirement and a criterion</li>
         <li><b>Dependencies</b> · <b>Migration &amp; rollout</b> <span class="tag cond">cond</span> — what we do not control, and the point past which a change stops being reversible</li>
         <li><b>L3 Acceptance Criteria</b> <span class="tag req">req</span> — Given / When / Then, verification mode, oracle, must-have flag</li>
         <li><b>Scope</b> · <b>Considered but rejected</b> <span class="tag req">req</span></li>
@@ -568,7 +568,7 @@ a:focus-visible{outline:2px solid var(--gate);outline-offset:2px}
     </table>
   </div>
   <p class="sub-lab">and the document rules underneath them</p>
-  <p class="sec-note">The eight dimensions decide whether the spec is <em>right</em>. A separate set of rules decides whether it can be <em>read and trusted</em>: a declared audience and decision, freshness metadata with a review trigger, every externally-checkable fact grounded or flagged, <code>UNKNOWN</code> over a plausible guess, one fact stated in exactly one place, one concept one term, every template section present, and no line that changes nothing if deleted. Both are lock preconditions.</p>
+  <p class="sec-note">The eight dimensions decide whether the spec is <em>right</em>. A separate set of rules decides whether it can be <em>read and trusted</em>: a declared audience and decision, freshness metadata with a review trigger, every externally-checkable fact grounded or flagged, <code>UNKNOWN</code> over a plausible guess, one fact stated in exactly one place, one concept one term, every template section present, and no line that changes nothing if deleted. The rules are checked inside the gate, so a spec that fails one fails the gate — they are not a fourth precondition.</p>
 </section>
 
 <!-- ========== 8. PANEL ========== -->
